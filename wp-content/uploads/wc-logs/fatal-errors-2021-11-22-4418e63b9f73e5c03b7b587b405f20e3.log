@@ -1,0 +1,84 @@
+2021-11-22T10:07:46+00:00 CRITICAL Uncaught Error: Using $this when not in object context in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php:12
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-settings.php(546): include()
+#1 /var/www/html/primusevent/store/wp-config.php(134): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/wp-load.php(50): require_once('/var/www/html/p...')
+#3 /var/www/html/primusevent/store/wp-blog-header.php(13): require_once('/var/www/html/p...')
+#4 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#5 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 12
+
+2021-11-22T10:07:47+00:00 CRITICAL Uncaught Error: Using $this when not in object context in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php:12
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-settings.php(546): include()
+#1 /var/www/html/primusevent/store/wp-config.php(134): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/wp-load.php(50): require_once('/var/www/html/p...')
+#3 /var/www/html/primusevent/store/wp-blog-header.php(13): require_once('/var/www/html/p...')
+#4 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#5 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 12
+
+2021-11-22T10:07:56+00:00 CRITICAL Uncaught Error: Using $this when not in object context in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php:12
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-settings.php(546): include()
+#1 /var/www/html/primusevent/store/wp-config.php(134): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/wp-load.php(50): require_once('/var/www/html/p...')
+#3 /var/www/html/primusevent/store/wp-blog-header.php(13): require_once('/var/www/html/p...')
+#4 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#5 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 12
+
+2021-11-22T10:07:57+00:00 CRITICAL Uncaught Error: Using $this when not in object context in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php:12
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-settings.php(546): include()
+#1 /var/www/html/primusevent/store/wp-config.php(134): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/wp-load.php(50): require_once('/var/www/html/p...')
+#3 /var/www/html/primusevent/store/wp-blog-header.php(13): require_once('/var/www/html/p...')
+#4 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#5 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 12
+
+2021-11-22T10:15:41+00:00 CRITICAL Uncaught Error: Using $this when not in object context in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php:12
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-settings.php(546): include()
+#1 /var/www/html/primusevent/store/wp-config.php(134): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/wp-load.php(50): require_once('/var/www/html/p...')
+#3 /var/www/html/primusevent/store/wp-blog-header.php(13): require_once('/var/www/html/p...')
+#4 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#5 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 12
+
+2021-11-22T10:15:42+00:00 CRITICAL Uncaught Error: Using $this when not in object context in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php:12
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-settings.php(546): include()
+#1 /var/www/html/primusevent/store/wp-config.php(134): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/wp-load.php(50): require_once('/var/www/html/p...')
+#3 /var/www/html/primusevent/store/wp-blog-header.php(13): require_once('/var/www/html/p...')
+#4 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#5 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 12
+
+2021-11-22T10:32:45+00:00 CRITICAL Uncaught Error: Call to a member function get_location() on boolean in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/dokan/store-vendor-biography.php:10
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-includes/template-loader.php(106): include()
+#1 /var/www/html/primusevent/store/wp-blog-header.php(19): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#3 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/dokan/store-vendor-biography.php à la ligne 10
+
+2021-11-22T10:39:59+00:00 CRITICAL Uncaught Error: Call to a member function get_location() on boolean in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/dokan/store-vendor-biography.php:10
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-includes/template-loader.php(106): include()
+#1 /var/www/html/primusevent/store/wp-blog-header.php(19): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#3 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/dokan/store-vendor-biography.php à la ligne 10
+
+2021-11-22T10:44:00+00:00 CRITICAL Uncaught Error: Call to a member function get_location() on boolean in /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/dokan/store-vendor-biography.php:10
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-includes/template-loader.php(106): include()
+#1 /var/www/html/primusevent/store/wp-blog-header.php(19): require_once('/var/www/html/p...')
+#2 /var/www/html/primusevent/store/index.php(17): require('/var/www/html/p...')
+#3 {main}
+  thrown dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/dokan/store-vendor-biography.php à la ligne 10
+

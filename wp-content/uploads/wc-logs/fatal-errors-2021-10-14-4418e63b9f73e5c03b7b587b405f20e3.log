@@ -1,0 +1,40 @@
+2021-10-14T04:08:53+00:00 CRITICAL Uncaught Error: Call to undefined function jardiwinery_show_custom_field() in /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php:136
+Stack trace:
+#0 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(545): jardiwinery_widget_socials->form(Array)
+#1 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(484): WP_REST_Widget_Types_Controller->get_widget_form(Object(jardiwinery_widget_socials), Array)
+#2 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(1140): WP_REST_Widget_Types_Controller->encode_form_data(Object(WP_REST_Request))
+#3 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(987): WP_REST_Server->respond_to_request(Object(WP_REST_Request), '/wp/v2/widget-t...', Array, NULL)
+#4 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(414): WP_REST_Server->dispatch(Object(WP_REST_Request))
+#5 /var/www/html/wp-includes/rest-api.php(370): WP_REST_Server->serve_request('/wp/v2/widget-t...')
+#6 /var/www/ht dans /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php à la ligne 136
+
+2021-10-14T04:17:49+00:00 CRITICAL Uncaught Error: Call to undefined function jardiwinery_show_custom_field() in /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php:136
+Stack trace:
+#0 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(545): jardiwinery_widget_socials->form(Array)
+#1 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(484): WP_REST_Widget_Types_Controller->get_widget_form(Object(jardiwinery_widget_socials), Array)
+#2 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(1140): WP_REST_Widget_Types_Controller->encode_form_data(Object(WP_REST_Request))
+#3 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(987): WP_REST_Server->respond_to_request(Object(WP_REST_Request), '/wp/v2/widget-t...', Array, NULL)
+#4 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(414): WP_REST_Server->dispatch(Object(WP_REST_Request))
+#5 /var/www/html/wp-includes/rest-api.php(370): WP_REST_Server->serve_request('/wp/v2/widget-t...')
+#6 /var/www/ht dans /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php à la ligne 136
+
+2021-10-14T04:18:29+00:00 CRITICAL Uncaught Error: Call to undefined function jardiwinery_show_custom_field() in /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php:136
+Stack trace:
+#0 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(545): jardiwinery_widget_socials->form(Array)
+#1 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(484): WP_REST_Widget_Types_Controller->get_widget_form(Object(jardiwinery_widget_socials), Array)
+#2 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(1140): WP_REST_Widget_Types_Controller->encode_form_data(Object(WP_REST_Request))
+#3 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(987): WP_REST_Server->respond_to_request(Object(WP_REST_Request), '/wp/v2/widget-t...', Array, NULL)
+#4 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(414): WP_REST_Server->dispatch(Object(WP_REST_Request))
+#5 /var/www/html/wp-includes/rest-api.php(370): WP_REST_Server->serve_request('/wp/v2/widget-t...')
+#6 /var/www/ht dans /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php à la ligne 136
+
+2021-10-14T04:43:40+00:00 CRITICAL Uncaught Error: Call to undefined function jardiwinery_show_custom_field() in /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php:136
+Stack trace:
+#0 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(545): jardiwinery_widget_socials->form(Array)
+#1 /var/www/html/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(484): WP_REST_Widget_Types_Controller->get_widget_form(Object(jardiwinery_widget_socials), Array)
+#2 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(1140): WP_REST_Widget_Types_Controller->encode_form_data(Object(WP_REST_Request))
+#3 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(987): WP_REST_Server->respond_to_request(Object(WP_REST_Request), '/wp/v2/widget-t...', Array, NULL)
+#4 /var/www/html/wp-includes/rest-api/class-wp-rest-server.php(414): WP_REST_Server->dispatch(Object(WP_REST_Request))
+#5 /var/www/html/wp-includes/rest-api.php(370): WP_REST_Server->serve_request('/wp/v2/widget-t...')
+#6 /var/www/ht dans /var/www/html/wp-content/plugins/trx_utils/widgets/socials.php à la ligne 136
+

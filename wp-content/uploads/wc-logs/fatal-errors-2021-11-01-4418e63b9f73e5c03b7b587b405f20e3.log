@@ -1,0 +1,9 @@
+2021-11-01T16:09:03+00:00 CRITICAL Uncaught Error: Call to undefined function jardiwinery_show_custom_field() in /var/www/html/primusevent/store/wp-content/plugins/trx_utils/widgets/socials.php:136
+Stack trace:
+#0 /var/www/html/primusevent/store/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(545): jardiwinery_widget_socials->form(Array)
+#1 /var/www/html/primusevent/store/wp-includes/rest-api/endpoints/class-wp-rest-widget-types-controller.php(485): WP_REST_Widget_Types_Controller->get_widget_form(Object(jardiwinery_widget_socials), Array)
+#2 /var/www/html/primusevent/store/wp-includes/rest-api/class-wp-rest-server.php(1140): WP_REST_Widget_Types_Controller->encode_form_data(Object(WP_REST_Request))
+#3 /var/www/html/primusevent/store/wp-includes/rest-api/class-wp-rest-server.php(987): WP_REST_Server->respond_to_request(Object(WP_REST_Request), '/wp/v2/widget-t...', Array, NULL)
+#4 /var/www/html/primusevent/store/wp-includes/rest-api/class-wp-rest-server.php(414): WP_REST_Server->dispatch(Object(WP_REST_Request))
+#5 /va dans /var/www/html/primusevent/store/wp-content/plugins/trx_utils/widgets/socials.php à la ligne 136
+

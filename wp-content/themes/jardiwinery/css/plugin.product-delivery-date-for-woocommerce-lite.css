@@ -1,0 +1,49 @@
+/*------------product-delivery-date-for-woocommerce-lite------------*/
+
+#delivery_cal_lite{
+    top:50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+
+}
+.ui-datepicker table thead th,
+#ui-datepicker-div table>tbody td,
+#ui-datepicker-div .ui-widget-header{
+    background-color: transparent!important;
+}
+
+#ui-datepicker-div .ui-widget-header > a{
+    padding-top: 6px;
+    box-sizing: border-box;
+}
+
+#ui-datepicker-div .ui-state-default, 
+#ui-datepicker-div table>tbody td a {
+    background: transparent;
+}
+#ui-datepicker-div span.ui-state-default{
+	opacity: 1;
+}
+
+.ui-datepicker .ui-datepicker-title {
+	text-transform:uppercase;
+    font-size: 12px;
+    font-family: Montserrat, sans-serif;
+    font-weight: 400;
+    letter-spacing: 5px;
+}
+
+.ui-widget-content table,
+.ui-widget-content{
+	background-image: none!important;
+}
+.woocommerce .widget_shopping_cart .variation{
+	border: transparent!important;
+	display: inline-block;
+    width: 50%;
+    padding-left: 0;
+}
+.woocommerce .widget_shopping_cart .variation-DeliveryDate{
+	margin-left: 0;
+}

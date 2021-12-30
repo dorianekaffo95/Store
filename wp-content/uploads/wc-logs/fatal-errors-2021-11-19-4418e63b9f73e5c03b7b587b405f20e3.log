@@ -1,0 +1,8 @@
+2021-11-19T14:50:31+00:00 CRITICAL syntax error, unexpected '<' dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 14
+
+2021-11-19T14:50:32+00:00 CRITICAL syntax error, unexpected '<' dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 14
+
+2021-11-19T15:04:38+00:00 CRITICAL syntax error, unexpected '}', expecting end of file dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 24
+
+2021-11-19T15:04:41+00:00 CRITICAL syntax error, unexpected '}', expecting end of file dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 24
+
