@@ -17,7 +17,7 @@ class Auth extends OAuth {
         return self::authorizeUrl(
             [
                 'scope'        => 'read_write',
-                'redirect_uri' => dokan_get_navigation_url( 'settings/payment' ),
+                'redirect_uri' => dokan_get_navigation_url( 'settings/payment-manage-dokan-stripe-connect' ),
                 'state'        => 'dokan-stripe-connect:' . wp_create_nonce( 'dokan-stripe-vendor-authorize' )
             ]
         );
@@ -34,7 +34,7 @@ class Auth extends OAuth {
         return wp_nonce_url(
             add_query_arg(
                 [ 'action' => 'dokan-disconnect-stripe' ],
-                dokan_get_navigation_url( 'settings/payment' )
+                dokan_get_navigation_url( 'settings/payment-manage-dokan-stripe-connect' )
             ),
             'dokan-stripe-vendor-deauthorize'
         );

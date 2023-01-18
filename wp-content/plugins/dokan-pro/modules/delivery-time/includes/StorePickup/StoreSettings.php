@@ -221,13 +221,13 @@ class StoreSettings {
             return $dokan_settings;
         }
 
-        $dokan_settings['address']['location_name'] = $vendor_settings['address']['location_name'];
-        $dokan_settings['address']['street_1']      = $vendor_settings['address']['street_1'];
-        $dokan_settings['address']['street_2']      = $vendor_settings['address']['street_2'];
-        $dokan_settings['address']['city']          = $vendor_settings['address']['city'];
-        $dokan_settings['address']['zip']           = $vendor_settings['address']['zip'];
-        $dokan_settings['address']['country']       = $vendor_settings['address']['country'];
-        $dokan_settings['address']['state']         = $vendor_settings['address']['state'];
+        $dokan_settings['address']['location_name'] = isset( $vendor_settings['address']['location_name'] ) ? $vendor_settings['address']['location_name'] : '';
+        $dokan_settings['address']['street_1']      = isset( $vendor_settings['address']['street_1'] ) ? $vendor_settings['address']['street_1'] : '';
+        $dokan_settings['address']['street_2']      = isset( $vendor_settings['address']['street_2'] ) ? $vendor_settings['address']['street_2'] : '';
+        $dokan_settings['address']['city']          = isset( $vendor_settings['address']['city'] ) ? $vendor_settings['address']['city'] : '';
+        $dokan_settings['address']['zip']           = isset( $vendor_settings['address']['zip'] ) ? $vendor_settings['address']['zip'] : '';
+        $dokan_settings['address']['country']       = isset( $vendor_settings['address']['country'] ) ? $vendor_settings['address']['country'] : '';
+        $dokan_settings['address']['state']         = isset( $vendor_settings['address']['state'] ) ? $vendor_settings['address']['state'] : '';
 
         return $dokan_settings;
     }

@@ -53,7 +53,7 @@
                     ?>
 
                     <span class="left-header-content dokan-right" style="font-size: 14px;">
-                        <a href="<?php echo dokan_get_navigation_url( 'staffs' ); ?>" class="dokan-right"><i class="fa fa-long-arrow-left" aria-hidden="true"></i> <?php _e( 'Back to all Staff', 'dokan' ); ?></a>
+                        <a href="<?php echo dokan_get_navigation_url( 'staffs' ); ?>" class="dokan-right"><i class="fas fa-long-arrow-alt-left" aria-hidden="true"></i> <?php _e( 'Back to all Staff', 'dokan' ); ?></a>
                     </span>
                 </h1>
             </span>

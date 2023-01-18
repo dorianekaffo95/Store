@@ -17,7 +17,8 @@ do_action( 'dokan_dashboard_wrap_start' );
 // Checking if vendor can see customer info
 $can_vendor_see_customer_info = 'off' === dokan_get_option( 'hide_customer_info', 'dokan_selling', 'off' );
 
-$activities = dokan_auction_get_activity();
+$activities     = dokan_auction_get_activity();
+$localized_date = $date_from && $date_to ? dokan_format_datetime( $date_from ) . ' - ' . dokan_format_datetime( $date_to ) : '';
 ?>
 <div class="dokan-dashboard-wrap">
     <?php
@@ -37,23 +38,30 @@ $activities = dokan_auction_get_activity();
         ?>
         <header class="dokan-dashboard-header dokan-clearfix">
             <h1 class="entry-title">
-                <?php esc_html_e( 'Auction Activity', 'dokan' ); ?>
+                <?php esc_html_e( 'Auctions Activity', 'dokan' ); ?>
+                <a type="button" href="<?php echo esc_url( dokan_get_navigation_url( 'auction' ) ); ?>" name="clear_filter" class="dokan-btn dokan-right button-ml"><span class="fa fa-arrow-left back-to-auction"></span> <?php esc_html_e( 'Auctions', 'dokan' ); ?></a>
             </h1>
         </header><!-- .entry-header -->
 
         <div class="dokan-auction-activity-section">
             <div class="filter">
-                <form id="auction-activity-form" method="get">
-                    <div>
-                        <input class="auction-datepicker" name="_auction_dates_from" id="_auction_dates_from" placeholder="<?php esc_attr_e( 'Date from', 'dokan' ); ?>" type="text" value="<?php echo esc_attr( $date_from ); ?>" readonly="">
-                        <input class="auction-datepicker" name="_auction_dates_to" id="_auction_dates_to" placeholder="<?php esc_attr_e( 'Date to', 'dokan' ); ?>" type="text" value="<?php echo esc_attr( $date_to ); ?>" readonly="">
-
+                <form id="auction-activity-form" method="get" class="dokan-form-inline">
+                    <div class="dokan-form-group">
+                        <input id="auction-activity-datetime-range" type="text" autocomplete="off" placeholder="<?php esc_attr_e( 'Select Date Range', 'dokan' ); ?>" value="<?php echo esc_attr( $localized_date ); ?> "/>
+                        <input name="_auction_dates_from" id="_auction_dates_from" type="hidden" value="<?php echo esc_attr( $date_from ); ?>" readonly="">
+                        <input name="_auction_dates_to" id="_auction_dates_to" type="hidden" value="<?php echo esc_attr( $date_to ); ?>" readonly="">
+                    </div>
+                    <div class="dokan-form-group">
                         <button type="submit" name="auction_activity_date_filter" class="dokan-btn dokan-btn-theme"><span class="fa fa-filter"></span> <?php esc_html_e( 'Filter', 'dokan' ); ?></button>
                         <button id="auction-clear-filter-button" type="button" name="clear_filter" style="margin-left: 16px;" class="dokan-btn"><span style="font-size: 16px; vertical-align: middle;" class="fa fa-undo"></span> <?php esc_html_e( 'Reset', 'dokan' ); ?></button>
                     </div>
 
+                    <?php wp_nonce_field( 'dokan-auction-activity', 'auction_activity_nonce', false ); ?>
+                </form>
+
+                <form>
                     <div class="search-box">
-                        <input type="text" class="dokan-form-control" name="auction_activity_search" value="<?php echo esc_attr( $search_string ); ?>">
+                        <input type="text" class="dokan-form-control" name="auction_activity_search" value="<?php echo esc_attr( $search_string ); ?>" placeholder="<?php esc_attr_e( 'Search By Auction, Name, Email', 'dokan' ); ?>">
                         <button type="submit" class="dokan-btn"><?php esc_html_e( 'Search', 'dokan' ); ?></button>
                     </div>
 
@@ -77,7 +85,7 @@ $activities = dokan_auction_get_activity();
 
                 <?php if ( 0 === count( $activities ) ) : ?>
                     <tr>
-                        <td><?php esc_html_e( 'No Auction Activity Found!', 'dokan' ); ?></td>
+                        <td><?php esc_html_e( 'No Auctions Activity Found!', 'dokan' ); ?></td>
                     </tr>
                 <?php endif; ?>
 
@@ -147,14 +155,32 @@ $activities = dokan_auction_get_activity();
 <script>
     ;(function($) {
         $( document ).ready( function() {
-            $('.auction-datepicker').datetimepicker( {
-                dateFormat : 'yy-mm-dd',
-                currentText: dokan.datepicker.now,
-                closeText: dokan.datepicker.done,
-                timeText: dokan.datepicker.time,
-                hourText: dokan.datepicker.hour,
-                minuteText: dokan.datepicker.minute
-            } );
+            let localeData = {
+                format: dokan_get_daterange_picker_format( dokan_helper.i18n_date_format + ' ' + dokan_helper.i18n_time_format  ),
+                ...dokan_helper.daterange_picker_local
+            };
+
+            const date_time_range = $('#auction-activity-datetime-range');
+
+            date_time_range.daterangepicker({
+                autoUpdateInput : false,
+                locale          : localeData,
+                timePicker      : true,
+            });
+
+            date_time_range.on( 'apply.daterangepicker', function( ev, picker ) {
+                $( this ).val( picker.startDate.format( localeData.format ) + ' - ' + picker.endDate.format( localeData.format ) );
+
+                $("#_auction_dates_from").val(picker.startDate.format('YYYY-MM-DD HH:mm'));
+                $("#_auction_dates_to").val(picker.endDate.format('YYYY-MM-DD HH:mm'));
+            });
+
+            date_time_range.on( 'cancel.daterangepicker', function( ev, picker ) {
+                $( this ).val('');
+
+                $("#_auction_dates_from").val('');
+                $("#_auction_dates_to").val('');
+            });
 
             $( '#auction-clear-filter-button' ).on( 'click', function () {
                 window.location = window.location.href.split("?")[0];

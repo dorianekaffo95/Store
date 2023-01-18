@@ -164,9 +164,13 @@ class Dokan_Geolocation_Vendor_Dashboard {
         $dokan_geo_address   = get_user_meta( $store_id, 'dokan_geo_address', true );
         $use_store_settings  = 'yes';
 
-        $use_store_settings = ! empty( $_POST['_dokan_geolocation_use_store_settings'] ) && 'no' === sanitize_text_field( $_POST['_dokan_geolocation_use_store_settings'] ) ? 'no' : 'yes';
+        if ( ! empty( $_POST['_dokan_geolocation_use_store_settings'] ) ) {
+            $use_store_settings = 'no' === sanitize_text_field( wp_unslash( $_POST['_dokan_geolocation_use_store_settings'] ) ) ? 'no' : 'yes';
 
-        update_post_meta( $post_id, '_dokan_geolocation_use_store_settings', $use_store_settings );
+            update_post_meta( $post_id, '_dokan_geolocation_use_store_settings', $use_store_settings );
+        } else {
+            $use_store_settings = $this->use_store_settings( $post_id );
+        }
 
         if ( 'yes' !== $use_store_settings ) {
             $dokan_geo_latitude_post  = get_post_meta( $post_id, 'dokan_geo_latitude', true );

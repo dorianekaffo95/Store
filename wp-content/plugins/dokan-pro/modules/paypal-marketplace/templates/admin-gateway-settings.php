@@ -8,6 +8,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 return apply_filters(
     'dokan_paypal_marketplace_admin_gateway_settings', [
+        'shipping_tax_fee_recipient_notice' => [
+            'title'       => __( 'Note', 'dokan' ),
+            'type'        => 'title',
+            /* translators: %s: URL */
+            'description' => wp_kses(
+                __( 'For this payment gateway, <strong>Shipping Fee Recipient</strong> and <strong>Tax Fee Recipient</strong> will be set to <strong>Seller</strong>. Otherwise, in case of partial refund, you will not be able to refund shipping or tax fee from admin commission.', 'dokan' ),
+                [
+                    'strong' => [],
+                ]
+            ),
+        ],
         'enabled'        => [
             'title'   => __( 'Enable/Disable', 'dokan' ),
             'type'    => 'checkbox',

@@ -12,5 +12,5 @@
 </style>
 
 <a href="#report-abuse" class="dokan-report-abuse-button">
-    <i class="fa fa-flag"></i> <?php echo esc_html( $label ); ?>
+    <i class="fas fa-flag"></i> <?php echo esc_html( $label ); ?>
 </a>

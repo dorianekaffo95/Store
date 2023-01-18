@@ -1,5 +1,6 @@
 <?php
 
+use WeDevs\Dokan\ProductCategory\Helper;
 use WeDevs\Dokan\Walkers\TaxonomyDropdown;
 global $post, $product;
 
@@ -118,7 +119,7 @@ do_action( 'dokan_edit_auction_product_content_before' );
                                 <div class="instruction-inside<?php echo $instruction_class; ?>">
                                     <input type="hidden" name="feat_image_id" class="dokan-feat-image-id" value="<?php echo $feat_image_id; ?>">
 
-                                    <i class="fa fa-cloud-upload"></i>
+                                    <i class="fas fa-cloud-upload-alt"></i>
                                     <a href="#" class="dokan-feat-image-btn btn btn-sm"><?php _e( 'Upload a product cover image', 'dokan' ); ?></a>
                                 </div>
 
@@ -156,7 +157,7 @@ do_action( 'dokan_edit_auction_product_content_before' );
                                                 }
                                                 ?>
                                                 <li class="add-image add-product-images tips" data-title="<?php _e( 'Add gallery image', 'dokan' ); ?>">
-                                                    <a href="#" class="add-product-images"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                                                    <a href="#" class="add-product-images"><i class="fas fa-plus" aria-hidden="true"></i></a>
                                                 </li>
                                             </ul>
 
@@ -175,64 +176,14 @@ do_action( 'dokan_edit_auction_product_content_before' );
                             <div class="dokan-form-group dokan-auction-post-excerpt">
                                 <?php dokan_post_input_box( $post_id, 'post_excerpt', array( 'placeholder' => 'Short description about the product...', 'value' => $post->post_excerpt ), 'textarea' ); ?>
                             </div>
-
-                            <?php if ( dokan_get_option( 'product_category_style', 'dokan_selling', 'single' ) == 'single' ): ?>
-                                <div class="dokan-form-group dokan-auction-category">
-                                    <label for="product_cat" class="form-label"><?php _e( 'Category', 'dokan' ); ?></label>
+                            <div class="dokan-form-group dokan-auction-category">
                                     <?php
-                                    $product_cat = -1;
-                                    $term = array();
-                                    $term = wp_get_post_terms( $post_id, 'product_cat', array( 'fields' => 'ids') );
+                                        $data = Helper::get_saved_products_category( $post_id );
+                                        $data['from'] = 'edit_booking_product';
 
-                                    if ( $term ) {
-                                        $product_cat = reset( $term );
-                                    }
-
-                                    $category_args =  array(
-                                        'show_option_none' => __( '- Select a category -', 'dokan' ),
-                                        'hierarchical'     => 1,
-                                        'hide_empty'       => 0,
-                                        'name'             => 'product_cat',
-                                        'id'               => 'product_cat',
-                                        'taxonomy'         => 'product_cat',
-                                        'title_li'         => '',
-                                        'class'            => 'product_cat dokan-form-control dokan-select2',
-                                        'exclude'          => '',
-                                        'selected'         => $product_cat,
-                                    );
-
-                                    wp_dropdown_categories( apply_filters( 'dokan_product_cat_dropdown_args', $category_args ) );
-                                ?>
-                                    <div class="dokan-product-cat-alert dokan-hide">
-                                        <?php _e('Please choose a category!', 'dokan'); ?>
-                                    </div>
-                                </div>
-                            <?php elseif ( dokan_get_option( 'product_category_style', 'dokan_selling', 'single' ) == 'multiple' ): ?>
-                                <div class="dokan-form-group dokan-auction-category">
-                                    <label for="product_cat" class="form-label"><?php _e( 'Category', 'dokan' ); ?></label>
-                                    <?php
-                                    $term = array();
-                                    $term = wp_get_post_terms( $post_id, 'product_cat', array( 'fields' => 'ids') );
-                                    include_once DOKAN_LIB_DIR.'/class.taxonomy-walker.php';
-                                    $drop_down_category = wp_dropdown_categories( array(
-                                        'show_option_none' => __( '', 'dokan' ),
-                                        'hierarchical'     => 1,
-                                        'hide_empty'       => 0,
-                                        'name'             => 'product_cat[]',
-                                        'id'               => 'product_cat',
-                                        'taxonomy'         => 'product_cat',
-                                        'title_li'         => '',
-                                        'class'            => 'product_cat dokan-form-control dokan-select2',
-                                        'exclude'          => '',
-                                        'selected'         => $term,
-                                        'echo'             => 0,
-                                        'walker'           => new TaxonomyDropdown( $post_id )
-                                    ) );
-
-                                    echo str_replace( '<select', '<select data-placeholder="'.__( 'Select product category', 'dokan' ).'" multiple="multiple" ', $drop_down_category );
+                                        dokan_get_template_part('products/dokan-category-header-ui', '', $data );
                                     ?>
-                                </div>
-                            <?php endif; ?>
+                            </div>
 
                             <div class="dokan-form-group dokan-auction-tags">
                                 <label for="product_tag" class="form-label"><?php _e( 'Tags', 'dokan' ); ?></label>
@@ -266,7 +217,7 @@ do_action( 'dokan_edit_auction_product_content_before' );
                     <div class="product-edit-new-container">
                         <div class="dokan-edit-row dokan-auction-general-sections dokan-clearfix">
                             <div class="dokan-section-heading" data-togglehandler="dokan_product_inventory">
-                                <h2><i class="fa fa-cubes" aria-hidden="true"></i> <?php _e( 'General Options', 'dokan' ) ?></h2>
+                                <h2><i class="fas fa-cubes" aria-hidden="true"></i> <?php _e( 'General Options', 'dokan' ) ?></h2>
                                 <p><?php _e( 'Manage your auction product data', 'dokan' ); ?></p>
                                 <div class="dokan-clearfix"></div>
                             </div>
@@ -313,7 +264,7 @@ do_action( 'dokan_edit_auction_product_content_before' );
                                             <label for="_auction_sealed">
                                                 <input type="checkbox" name="_auction_sealed" value="yes" id="_auction_sealed" <?php checked( $_auction_sealed, 'yes' ); ?>>
                                                 <?php _e( 'Enable sealed bidding for this auction product', 'dokan' );?>
-                                                <i class="fa fa-question-circle tips" data-title="<?php _e( 'In this type of auction all bidders simultaneously submit sealed bids so that no bidder knows the bid of any other participant. The highest bidder pays the price they submitted. If two bids with same value are placed for auction the one which was placed first wins the auction.', 'dokan' ); ?>"></i>
+                                                <i class="fas fa-question-circle tips" data-title="<?php _e( 'In this type of auction all bidders simultaneously submit sealed bids so that no bidder knows the bid of any other participant. The highest bidder pays the price they submitted. If two bids with same value are placed for auction the one which was placed first wins the auction.', 'dokan' ); ?>"></i>
                                             </label>
                                         </div>
                                     </div>
@@ -387,16 +338,16 @@ do_action( 'dokan_edit_auction_product_content_before' );
                                 <?php if ( $_auction_dates_to_timestamp && ( time() > $_auction_dates_to_timestamp ) ) : ?>
                                 <div class="dokan-auction-date-relist">
                                     <div class="content-half-part dokan-auction-dates-from">
-                                        <label class="dokan-control-label" for="_auction_dates_from"><?php _e( 'Relist Auction Start date', 'dokan' ); ?></label>
+                                        <label class="dokan-control-label" for="_relist_auction_dates_from"><?php esc_html_e( 'Relist Auction Start date', 'dokan' ); ?></label>
                                         <div class="dokan-form-group">
-                                            <input class="dokan-form-control auction-datepicker" name="_auction_dates_from" id="_relist_auction_dates_from" type="text" value="<?php echo esc_attr( $_auction_dates_from ); ?>" style="width: 97%;" readonly>
+                                            <input class="dokan-form-control auction-datepicker" name="_relist_auction_dates_from" id="_relist_auction_dates_from" type="text" value="<?php echo esc_attr( $_auction_dates_from ); ?>" style="width: 97%;" readonly>
                                         </div>
                                     </div>
 
                                     <div class="content-half-part dokan-auction-dates-to">
-                                        <label class="dokan-control-label" for="_auction_dates_to"><?php _e( 'Relist Auction End date', 'dokan' ); ?></label>
+                                        <label class="dokan-control-label" for="_relist_auction_dates_to"><?php esc_html_e( 'Relist Auction End date', 'dokan' ); ?></label>
                                         <div class="dokan-form-group">
-                                            <input class="dokan-form-control auction-datepicker" name="_auction_dates_to" id="_relist_auction_dates_to" type="text" value="<?php echo esc_attr( $_auction_dates_to ); ?>" readonly>
+                                            <input class="dokan-form-control auction-datepicker" name="_relist_auction_dates_to" id="_relist_auction_dates_to" type="text" value="<?php echo esc_attr( $_auction_dates_to ); ?>" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -447,7 +398,7 @@ do_action( 'dokan_edit_auction_product_content_before' );
 
                         <div class="dokan-edit-row dokan-auction-other-sections dokan-clearfix">
                             <div class="dokan-section-heading" data-togglehandler="dokan_other_options">
-                                <h2><i class="fa fa-cog" aria-hidden="true"></i> <?php _e( 'Other Options', 'dokan' ); ?></h2>
+                                <h2><i class="fas fa-cog" aria-hidden="true"></i> <?php _e( 'Other Options', 'dokan' ); ?></h2>
                                 <p><?php _e( 'Set your extra product options', 'dokan' ); ?></p>
                                 <div class="dokan-clearfix"></div>
                             </div>
@@ -489,7 +440,7 @@ do_action( 'dokan_edit_auction_product_content_before' );
                                 </div>
                             </div>
                         </div><!-- .dokan-other-options -->
-
+                        <?php do_action( 'dokan_product_edit_after_options', $post_id ); ?>
                         <?php do_action( 'dokan_product_edit_after_main', $post, $post_id ); ?>
                     </div>
 

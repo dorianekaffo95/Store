@@ -1,5 +1,5 @@
 <?php
-
+use WeDevs\Dokan\Cache;
 /**
  * Class Dokan_WC_Booking_Helper
  *
@@ -65,5 +65,52 @@ class Dokan_WC_Booking_Helper {
         }
 
         return false;
+    }
+
+    /**
+     * This method will return booking status counts by seller id
+     *
+     * @since 3.7.1 moved this function here from module.php
+     *
+     * @param $seller_id
+     *
+     * @return object
+     */
+    public static function get_booking_status_counts_by( $seller_id ) {
+        global $wpdb;
+
+        $statuses = array_unique( array_merge( get_wc_booking_statuses(), get_wc_booking_statuses( 'user' ), get_wc_booking_statuses( 'cancel' ) ) );
+        $statuses = array_fill_keys( array_keys( array_flip( $statuses ) ), 0 );
+        $counts   = $statuses + [ 'total' => 0 ];
+
+        $cache_group = "bookings_{$seller_id}";
+        $cache_key   = 'bookings_count';
+        $results     = Cache::get( $cache_key, $cache_group );
+
+        if ( false === $results ) {
+            $meta_key = '_booking_seller_id';
+
+            $sql = "Select post_status
+            From $wpdb->posts as p
+            LEFT JOIN $wpdb->postmeta as pm ON p.ID = pm.post_id
+            WHERE
+            pm.meta_key = %s AND
+            pm.meta_value = %d AND
+            p.post_status != 'trash' ";
+
+            // @codingStandardsIgnoreLine
+            $results = $wpdb->get_results( $wpdb->prepare( $sql, $meta_key, $seller_id ) );
+
+            Cache::set( $cache_key, $results, $cache_group );
+        }
+
+        foreach ( $results as $status ) {
+            if ( isset( $counts[ $status->post_status ] ) ) {
+                $counts[ $status->post_status ] += 1;
+                $counts['total']                += 1;
+            }
+        }
+
+        return (object) $counts;
     }
 }

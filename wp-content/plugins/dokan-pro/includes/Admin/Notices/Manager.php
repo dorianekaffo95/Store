@@ -13,7 +13,8 @@ class Manager {
      */
     public function __construct() {
         $this->init_classes();
-        $this->init_hooks();
+        // temporary disabling Dokan Pro Survey so not removing the existing codebase
+        //$this->init_hooks();
     }
 
     /**
@@ -36,22 +37,9 @@ class Manager {
      * @return void
      */
     private function init_hooks() {
-        // limited time table rate shipping remove notice, will be removed in near future
-        add_action( 'dokan_loaded', [ $this, 'display_table_rate_shipping_notice' ], 20 );
-    }
-
-    /**
-     * Needed extra wrapper because Manager class was loaded on Dokan pro constractor and module object was loading later on
-     *
-     * @since 3.4.3
-     *
-     * @return void
-     */
-    public function display_table_rate_shipping_notice() {
-        if ( count( dokan_pro()->module->get_available_modules()  ) <= 4 && current_user_can( 'manage_woocommerce' ) ) {
-            add_filter( 'dokan_admin_notices', [ $this, 'remove_table_rate_shipping_module_notice' ] );
-            add_action( 'wp_ajax_dismiss_table_rate_shipping_module', [ $this, 'ajax_dismiss_table_rate_shipping_module' ] );
-        }
+        // dokan pro survey notices
+        add_filter( 'dokan_admin_promo_notices', [ $this, 'dokan_pro_survey_notice' ] );
+        add_action( 'wp_ajax_dismiss_dokan_pro_survey_notice', [ $this, 'ajax_dismiss_dokan_pro_survey_notice' ] );
     }
 
     /**
@@ -63,28 +51,39 @@ class Manager {
      *
      * @return array
      */
-    public function remove_table_rate_shipping_module_notice( $notices ) {
-        if ( 'yes' === get_option( 'dismiss_table_rate_shipping_module', 'no' ) ) {
+    public function dokan_pro_survey_notice( $notices ) {
+        if ( 'yes' === get_option( 'dismiss_dokan_pro_survey_notice', 'no' ) ) {
             return $notices;
         }
 
         $notices[] = [
-            'type'        => 'alert',
-            'title'       => __( 'Table Rate Shipping will be removed from Dokan Starter package in the next release.', 'dokan' ),
+            'type'        => 'info',
+            'title'       => __( 'Would you mind spending 5-7 minutes to improve Dokan Pro by answering 7 simple questions?', 'dokan' ),
             /* translators: %s permalink settings url */
-            'description' => __( 'Due to a technical error on our end, we deployed the Table rate shipping module to the Starter package. The module will be disabled to Starter plan users in a few weeks. We apologize for the mistake and the inconvenience caused. If you want to continue availing the functionalities of the module, please upgrade to the Professional plan. You may use this coupon code to avail a 30% discount: <strong>UpgradeDokan30</strong>', 'dokan' ),
+            'description' => '',
             'priority'    => 1,
             'show_close_button' => true,
             'ajax_data'   => [
-                'action' => 'dismiss_table_rate_shipping_module',
-                'nonce'  => wp_create_nonce( 'dismiss_table_rate_shipping_nonce' ),
+                'action' => 'dismiss_dokan_pro_survey_notice',
+                'nonce'  => wp_create_nonce( 'dismiss_dokan_pro_survey_removed_nonce' ),
             ],
             'actions'     => [
                 [
                     'type'   => 'primary',
-                    'text'   => __( 'Upgrade Now', 'dokan' ),
-                    'action' => 'https://wedevs.com/dokan/pricing',
+                    'text'   => __( 'Take the Survey', 'dokan' ),
+                    'action' => 'https://wedevs.com/dokan/survey',
                     'target' => '_blank',
+                ],
+                [
+                    'type'   => 'secondary',
+                    'text'   => __( 'Already Participated', 'dokan' ),
+                    'loading_text'   => __( 'Please wait...', 'dokan' ),
+                    'completed_text' => __( 'Done', 'dokan' ),
+                    'reload'         => true,
+                    'ajax_data'   => [
+                        'action' => 'dismiss_dokan_pro_survey_notice',
+                        'nonce'  => wp_create_nonce( 'dismiss_dokan_pro_survey_removed_nonce' ),
+                    ],
                 ],
             ],
         ];
@@ -99,16 +98,16 @@ class Manager {
      *
      * @return void
      */
-    public function ajax_dismiss_table_rate_shipping_module() {
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'dismiss_table_rate_shipping_nonce' ) ) {
+    public function ajax_dismiss_dokan_pro_survey_notice() {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), 'dismiss_dokan_pro_survey_removed_nonce' ) ) {
             wp_send_json_error( __( 'Invalid nonce', 'dokan' ) );
         }
 
-        if ( ! current_user_can( 'manage_woocommerce' ) ) {
-            wp_send_json_error( __( 'You have no permission to do that', 'dokan-lite' ) );
+        if ( ! current_user_can( 'activate_plugins' ) ) {
+            wp_send_json_error( __( 'You do not have permission to perform this action.', 'dokan' ) );
         }
 
-        update_option( 'dismiss_table_rate_shipping_module', 'yes' );
+        update_option( 'dismiss_dokan_pro_survey_notice', 'yes' );
 
         wp_send_json_success();
     }

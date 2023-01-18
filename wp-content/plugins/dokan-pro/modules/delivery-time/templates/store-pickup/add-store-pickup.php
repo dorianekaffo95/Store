@@ -93,10 +93,10 @@ wp_add_inline_script( 'dokan-store-location-pickup-script', 'let dokan_vendor_de
                                 <td colspan="5"><?php echo wp_kses_post( Helper::get_formatted_vendor_store_pickup_location( $location, ' ' ) ); ?></td>
                                 <td colspan="2" class="store-pickup-location-action-wrapper" style="display: flex;">
                                     <?php if ( ( 0 === $key && ! $is_address_verified ) || 0 !== $key ) : ?>
-                                        <button class="dokan-btn dokan-btn-default dokan-btn-sm store-pickup-location-edit-btn" data-location="<?php echo htmlspecialchars( wp_json_encode( $location ) ); ?>" data-location-index="<?php echo esc_attr( $key ); ?>"><span class="fa fa-pencil"></span></button>
+                                        <button class="dokan-btn dokan-btn-default dokan-btn-sm store-pickup-location-edit-btn" data-location="<?php echo htmlspecialchars( wp_json_encode( $location ) ); ?>" data-location-index="<?php echo esc_attr( $key ); ?>"><span class="fas fa-pencil-alt"></span></button>
                                     <?php endif; ?>
                                     <?php if ( 0 !== $key ) : ?>
-                                        <button class="dokan-btn dokan-btn-default dokan-btn-sm store-pickup-location-delete-btn" data-location-index="<?php echo esc_attr( $key ); ?>"><span class="fa fa-trash"></span></button>
+                                        <button class="dokan-btn dokan-btn-default dokan-btn-sm store-pickup-location-delete-btn" data-location-index="<?php echo esc_attr( $key ); ?>"><span class="fas fa-trash"></span></button>
                                     <?php endif; ?>
                                 </td>
                             </tr>

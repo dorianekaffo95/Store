@@ -48,6 +48,6 @@ if ( 'show' === $opt_show_image_swatch ) {
 	<?php do_action( 'woocommerce_product_addons_panel_option_row', isset( $post ) ? $post : null, $addon, $loop, $option ); ?>
 
 	<div class="wc-pao-addon-content-remove">
-		<button type="button" class="wc-pao-remove-option dokan-btn dokan-btn-theme dokan-btn-sm">x</button>
+		<button type="button" class="wc-pao-remove-option dokan-btn dokan-btn-danger dokan-btn-sm">x</button>
 	</div>
 </div>

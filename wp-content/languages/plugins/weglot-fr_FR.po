@@ -2,12 +2,12 @@
 # This file is distributed under the same license as the Plugins - Weglot Translate &#8211; Translate your WordPress website and go multilingual - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-07-07 17:34:44+0000\n"
+"PO-Revision-Date: 2022-08-04 11:57:27+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: GlotPress/3.0.0-alpha.2\n"
+"X-Generator: GlotPress/4.0.0-alpha.1\n"
 "Language: fr\n"
 "Project-Id-Version: Plugins - Weglot Translate &#8211; Translate your WordPress website and go multilingual - Stable (latest release)\n"
 
@@ -24,44 +24,44 @@ msgstr "Quand vous modifiez vos traductions dans Weglot, n’oubliez pas de vide
 msgid "The translation URL feature is now available in your Weglot account (Requires Advanced plan minimum) : %1$sTranslate URL slugs%2$s."
 msgstr "La fonction de traduction d’URL est maintenant disponible dans votre compte Weglot (Plan avancé nécessaire au minimum) : %1$sTraduire les slugs d’URL%2$s."
 
-#: templates/admin/pages/tabs/appearance.php:216
+#: templates/admin/pages/tabs/appearance.php:224
 msgid "Brazil"
 msgstr "Brésil"
 
-#: templates/admin/pages/tabs/appearance.php:215
+#: templates/admin/pages/tabs/appearance.php:223
 msgid "Portugal (default)"
 msgstr "Portugal"
 
-#: templates/admin/pages/tabs/appearance.php:210
+#: templates/admin/pages/tabs/appearance.php:218
 msgid "China"
 msgstr "Chine"
 
-#: templates/admin/pages/tabs/appearance.php:209
+#: templates/admin/pages/tabs/appearance.php:217
 msgid "Taiwan (default)"
 msgstr "Taïwan"
 
-#: templates/admin/pages/tabs/appearance.php:208
+#: templates/admin/pages/tabs/appearance.php:216
 msgid "Choose Traditional Chinese flag:"
 msgstr "Choisissez le drapeau chinois traditionnel :"
 
-#: templates/admin/pages/tabs/appearance.php:205
-#: templates/admin/pages/tabs/appearance.php:211
+#: templates/admin/pages/tabs/appearance.php:213
+#: templates/admin/pages/tabs/appearance.php:219
 msgid "Hong Kong"
 msgstr "Hong Kong"
 
-#: templates/admin/pages/tabs/appearance.php:204
+#: templates/admin/pages/tabs/appearance.php:212
 msgid "Taiwan"
 msgstr "Taïwan"
 
-#: templates/admin/pages/tabs/appearance.php:203
+#: templates/admin/pages/tabs/appearance.php:211
 msgid "China (default)"
 msgstr "Chine (par défaut)"
 
-#: templates/admin/pages/tabs/appearance.php:202
+#: templates/admin/pages/tabs/appearance.php:210
 msgid "Choose Simplified Chinese flag:"
 msgstr "Choisissez le drapeau chinois simplifié :"
 
-#: templates/admin/pages/tabs/advanced.php:71
+#: templates/admin/pages/tabs/advanced.php:77
 msgid "Manage URL to exclude"
 msgstr "Gérer l’URL à exclure"
 
@@ -93,7 +93,7 @@ msgstr "Réinitialiser toutes les URL personnalisées de Weglot"
 msgid "All customs URLs was reseted."
 msgstr "Toutes les URL personnalisées ont été réinitialisées."
 
-#: templates/admin/pages/tabs/status.php:147
+#: templates/admin/pages/tabs/status.php:140
 msgid "Empty"
 msgstr "Vide"
 
@@ -147,7 +147,7 @@ msgstr "[WooCommerce] : Empêcher le rechargement du panier"
 msgid "Hide the current language"
 msgstr "Masquer la langue actuelle"
 
-#: src/actions/front/class-front-menu-weglot.php:122
+#: src/actions/front/class-front-menu-weglot.php:125
 msgid "Choose your language"
 msgstr "Choisir votre langue"
 
@@ -185,7 +185,7 @@ msgstr "Mode privé"
 msgid "Weglot Translate: You need to activate package php-json. If you need help, please contact your host or just ask us directly at support@weglot.com."
 msgstr "Weglot Translate : Vous devez activer le paquet php-json. Si vous avez besoin d’aide, veuillez contacter votre hébergeur ou nous demander directement à support@weglot.com."
 
-#: templates/admin/pages/tabs/status.php:161
+#: templates/admin/pages/tabs/status.php:154
 msgid "Custom URLS"
 msgstr "URL personnalisées"
 
@@ -216,7 +216,7 @@ msgstr "Dans l’offre gratuite, vous pouvez choisir une langue et utiliser un m
 msgid "If you don't have an account, you can create one in 20 seconds !"
 msgstr "Si vous n’avez pas de compte, vous pouvez en créer un en 20 secondes !"
 
-#: templates/admin/pages/tabs/advanced.php:109
+#: templates/admin/pages/tabs/advanced.php:118
 msgid "Other options (Optional)"
 msgstr "Autres options (facultatif)"
 
@@ -224,67 +224,67 @@ msgstr "Autres options (facultatif)"
 msgid "Destination languages"
 msgstr "Langues de destination"
 
-#: weglot.php:176
+#: weglot.php:175
 msgid "%s Update Rollback"
 msgstr "Retour en arrière de mise à jour de %s"
 
-#: templates/admin/pages/tabs/status.php:134
+#: templates/admin/pages/tabs/status.php:127
 msgid "Exclude URLs"
 msgstr "Exclure des URL"
 
-#: templates/admin/pages/tabs/status.php:117
+#: templates/admin/pages/tabs/status.php:110
 msgid "Weglot environment"
 msgstr "Environnement Weglot"
 
-#: templates/admin/pages/tabs/status.php:106
+#: templates/admin/pages/tabs/status.php:99
 msgid "Module mod_rewrite"
 msgstr "Module mod_rewrite"
 
-#: templates/admin/pages/tabs/status.php:100
+#: templates/admin/pages/tabs/status.php:93
 msgid "We need a minimum PHP version : 5.4."
 msgstr "Nous avons besoin d’une version minimale de PHP : 5.4."
 
-#: templates/admin/pages/tabs/status.php:90
+#: templates/admin/pages/tabs/status.php:83
 msgid "Server info"
 msgstr "Informations serveur"
 
-#: templates/admin/pages/tabs/status.php:85
+#: templates/admin/pages/tabs/status.php:78
 msgid "Server environment"
 msgstr "Environnement serveur"
 
-#: templates/admin/pages/tabs/status.php:76
+#: templates/admin/pages/tabs/status.php:69
 msgid "Language"
 msgstr "Langue"
 
-#: templates/admin/pages/tabs/status.php:72
+#: templates/admin/pages/tabs/status.php:65
 msgid "Permalink Structure"
 msgstr "Structure des permaliens"
 
-#: templates/admin/pages/tabs/status.php:64
+#: templates/admin/pages/tabs/status.php:57
 msgid "WordPress Debug mode"
 msgstr "Mode de débogage WordPress"
 
-#: templates/admin/pages/tabs/status.php:58
+#: templates/admin/pages/tabs/status.php:51
 msgid "Is multisite"
 msgstr "Est multisite"
 
-#: templates/admin/pages/tabs/status.php:50
+#: templates/admin/pages/tabs/status.php:43
 msgid "Weglot version"
 msgstr "Version de Weglot"
 
-#: templates/admin/pages/tabs/status.php:46
+#: templates/admin/pages/tabs/status.php:39
 msgid "Site URL"
 msgstr "URL du site"
 
-#: templates/admin/pages/tabs/status.php:42
+#: templates/admin/pages/tabs/status.php:35
 msgid "Home URL"
 msgstr "URL de la page d’accueil"
 
-#: templates/admin/pages/tabs/advanced.php:103
+#: templates/admin/pages/tabs/advanced.php:111
 msgid "Add a block to exclude"
 msgstr "Ajouter un bloc à exclure"
 
-#: templates/admin/pages/tabs/advanced.php:58
+#: templates/admin/pages/tabs/advanced.php:63
 msgid "Translation Exclusion (Optional)"
 msgstr "Exclusion de traduction (facultatif)"
 
@@ -308,32 +308,32 @@ msgstr "Exclusion d’URL"
 msgid "Original language"
 msgstr "Langue par défaut"
 
-#: templates/admin/pages/tabs/appearance.php:315
+#: templates/admin/pages/tabs/appearance.php:328
 msgid "You can place the button in a menu area. Go to %1$sAppearance → Menus%2$s and drag and drop the Weglot Translate Custom link where you want."
 msgstr "Vous pouvez placer le bouton dans une zone de menu. Allez sur %1$sApparence → Menus%2$s et glissez-déposez le lien Weglot Translate personnalisé où vous voulez."
 
 #. translators: 1 HTML Tag, 2 HTML Tag
-#: templates/admin/pages/tabs/appearance.php:305
+#: templates/admin/pages/tabs/appearance.php:317
 msgid "Warning, this feature will be depreciated. We strongly advise you to uncheck the option and use and use the functionality: \"In menu\"."
 msgstr "Avertissement, cette fonctionnalité sera dépréciée. Nous vous conseillons vivement de décocher l’option et d'utiliser la fonctionnalité : « Dans le menu »."
 
-#: templates/admin/pages/tabs/appearance.php:290
+#: templates/admin/pages/tabs/appearance.php:301
 msgid "In menu (Weglot translate V1) ?"
 msgstr "Dans le menu (Weglot Translate V1) ?"
 
-#: templates/admin/pages/tabs/appearance.php:59
+#: templates/admin/pages/tabs/appearance.php:65
 msgid "Button preview"
 msgstr "Prévisualisation du bouton"
 
-#: templates/admin/pages/tabs/appearance.php:51
+#: templates/admin/pages/tabs/appearance.php:56
 msgid "Language button design"
 msgstr "Conception du bouton de langue"
 
-#: templates/admin/pages/tabs/appearance.php:27
+#: templates/admin/pages/tabs/appearance.php:28
 msgid "Is dropdown"
 msgstr "Est une liste déroulante"
 
-#: templates/admin/pages/tabs/appearance.php:17
+#: templates/admin/pages/tabs/appearance.php:18
 msgid "Is fullname"
 msgstr "Est le nom complet"
 
@@ -392,17 +392,17 @@ msgstr "Ajouter au menu"
 
 #: src/actions/admin/class-customize-menu-weglot.php:119
 msgid "Weglot switcher"
-msgstr "Commutateur d’option"
+msgstr "Sélecteur de langue"
 
-#: templates/admin/pages/tabs/status.php:94
+#: templates/admin/pages/tabs/status.php:87
 msgid "PHP Version"
 msgstr "Version de PHP"
 
-#: templates/admin/pages/tabs/status.php:54
+#: templates/admin/pages/tabs/status.php:47
 msgid "WordPress version"
 msgstr "Version de WordPress"
 
-#: templates/admin/pages/tabs/appearance.php:194
+#: templates/admin/pages/tabs/appearance.php:202
 msgid "Oman"
 msgstr "Oman"
 
@@ -428,87 +428,87 @@ msgstr "Choisissez les langues dans lesquelles vous voulez traduire. Les langues
 msgid "https://weglot.com/"
 msgstr "https://weglot.com/"
 
-#: templates/admin/pages/tabs/appearance.php:199
+#: templates/admin/pages/tabs/appearance.php:207
 msgid "Yemen"
 msgstr "Yémen"
 
-#: templates/admin/pages/tabs/appearance.php:198
+#: templates/admin/pages/tabs/appearance.php:206
 msgid "United Arab Emirates"
 msgstr "Emirats Arabes Unis"
 
-#: templates/admin/pages/tabs/appearance.php:197
+#: templates/admin/pages/tabs/appearance.php:205
 msgid "Tunisia"
 msgstr "Tunisie"
 
-#: templates/admin/pages/tabs/appearance.php:196
+#: templates/admin/pages/tabs/appearance.php:204
 msgid "Syria"
 msgstr "Syrie"
 
-#: templates/admin/pages/tabs/appearance.php:195
+#: templates/admin/pages/tabs/appearance.php:203
 msgid "Qatar"
 msgstr "Qatar"
 
-#: templates/admin/pages/tabs/appearance.php:193
+#: templates/admin/pages/tabs/appearance.php:201
 msgid "Morocco"
 msgstr "Maroc"
 
-#: templates/admin/pages/tabs/appearance.php:192
+#: templates/admin/pages/tabs/appearance.php:200
 msgid "Libya"
 msgstr "Libye"
 
-#: templates/admin/pages/tabs/appearance.php:191
+#: templates/admin/pages/tabs/appearance.php:199
 msgid "Lebanon"
 msgstr "Liban"
 
-#: templates/admin/pages/tabs/appearance.php:190
+#: templates/admin/pages/tabs/appearance.php:198
 msgid "Kuwait"
 msgstr "Koweït"
 
-#: templates/admin/pages/tabs/appearance.php:189
+#: templates/admin/pages/tabs/appearance.php:197
 msgid "Jordan"
 msgstr "Jordanie"
 
-#: templates/admin/pages/tabs/appearance.php:188
+#: templates/admin/pages/tabs/appearance.php:196
 msgid "Iraq"
 msgstr "Irak"
 
-#: templates/admin/pages/tabs/appearance.php:187
+#: templates/admin/pages/tabs/appearance.php:195
 msgid "Egypt"
 msgstr "Égypte"
 
-#: templates/admin/pages/tabs/appearance.php:186
+#: templates/admin/pages/tabs/appearance.php:194
 msgid "Algeria"
 msgstr "Algérie"
 
-#: templates/admin/pages/tabs/appearance.php:185
+#: templates/admin/pages/tabs/appearance.php:193
 msgid "Saudi Arabia (default)"
 msgstr "Arabie Saoudite (par défaut)"
 
-#: templates/admin/pages/tabs/appearance.php:184
+#: templates/admin/pages/tabs/appearance.php:192
 msgid "Choose Arabic flag:"
 msgstr "Choisissez le drapeau arabe :"
 
-#: templates/admin/pages/tabs/appearance.php:181
+#: templates/admin/pages/tabs/appearance.php:189
 msgid "Luxemburg"
 msgstr "Luxembourg"
 
-#: templates/admin/pages/tabs/appearance.php:180
+#: templates/admin/pages/tabs/appearance.php:188
 msgid "Switzerland"
 msgstr "Suisse"
 
-#: templates/admin/pages/tabs/appearance.php:178
+#: templates/admin/pages/tabs/appearance.php:186
 msgid "Belgium"
 msgstr "Belgique"
 
-#: templates/admin/pages/tabs/appearance.php:177
+#: templates/admin/pages/tabs/appearance.php:185
 msgid "France (default)"
 msgstr "France (par défaut)"
 
-#: templates/admin/pages/tabs/appearance.php:176
+#: templates/admin/pages/tabs/appearance.php:184
 msgid "Choose French flag:"
 msgstr "Choisissez le drapeau français :"
 
-#: templates/admin/pages/tabs/appearance.php:122
+#: templates/admin/pages/tabs/appearance.php:128
 msgid "Rectangle shiny"
 msgstr "Rectangle brillant"
 
@@ -554,237 +554,237 @@ msgstr "Cochez si vous souhaitez rediriger les utilisateurs en fonction de la la
 msgid "Auto redirection"
 msgstr "Redirection automatique"
 
-#: templates/admin/pages/tabs/status.php:154
+#: templates/admin/pages/tabs/status.php:147
 msgid "Exclude Blocks"
 msgstr "Exclure des blocs"
 
-#: templates/admin/pages/tabs/advanced.php:60
+#: templates/admin/pages/tabs/advanced.php:65
 msgid "By default, every page is translated. You can exclude parts of a page or a full page here."
 msgstr "Par défaut, chaque page est traduite. Vous pouvez exclure des parties d’une page ou une page complète ici."
 
-#: templates/admin/pages/tabs/appearance.php:333
+#: templates/admin/pages/tabs/appearance.php:346
 msgid "You can add the code &lt;div id=&quot;weglot_here&quot;&gt;&lt;/div&gt; wherever you want in the source code of your HTML page. The button will appear at this place."
 msgstr "Vous pouvez ajouter le code &lt;div id=&quot;weglot_here&quot;&gt;&lt;/div&gt; là où vous voulez dans le code source de votre page HTML. Le bouton apparaîtra à cet endroit."
 
-#: templates/admin/pages/tabs/appearance.php:331
+#: templates/admin/pages/tabs/appearance.php:344
 msgid "In the source code?"
 msgstr "Dans le code source ?"
 
-#: templates/admin/pages/tabs/appearance.php:327
+#: templates/admin/pages/tabs/appearance.php:340
 msgid "You can use the Weglot shortcode [weglot_switcher] wherever you want to place the button."
 msgstr "Vous pouvez utiliser le code court Weglot [weglot_switcher] où vous voulez placer le bouton."
 
-#: templates/admin/pages/tabs/appearance.php:325
+#: templates/admin/pages/tabs/appearance.php:338
 msgid "With a shortcode?"
 msgstr "Avec un code court ?"
 
-#: templates/admin/pages/tabs/appearance.php:321
+#: templates/admin/pages/tabs/appearance.php:334
 msgid "You can place the button in a widget area. Go to %1$sAppearance → Widgets%2$s and drag and drop the Weglot Translate widget where you want."
 msgstr "Vous pouvez placer le bouton dans une zone de widgets. Allez sur %1$sApparence → Widgets%2$s et glissez-déposez le widget Weglot Translate où vous voulez."
 
-#: templates/admin/pages/tabs/appearance.php:319
+#: templates/admin/pages/tabs/appearance.php:332
 msgid "As a widget?"
 msgstr "Comme Widget ?"
 
-#: templates/admin/pages/tabs/appearance.php:313
+#: templates/admin/pages/tabs/appearance.php:326
 msgid "In menu?"
 msgstr "Dans le menu ?"
 
-#: templates/admin/pages/tabs/appearance.php:283
+#: templates/admin/pages/tabs/appearance.php:294
 msgid "Where will the language button be on my website? By default, bottom right."
 msgstr "Où se trouvera le bouton de langue sur mon site ? Par défaut, en bas à droite."
 
-#: templates/admin/pages/tabs/appearance.php:279
+#: templates/admin/pages/tabs/appearance.php:290
 msgid "Language button position"
 msgstr "Position du bouton de langue"
 
-#: templates/admin/pages/tabs/appearance.php:38
+#: templates/admin/pages/tabs/appearance.php:39
 msgid "Don't change it unless you want a specific style for your button."
 msgstr "Ne changez rien sauf si vous voulez un style de bouton spécifique."
 
-#: templates/admin/pages/tabs/appearance.php:37
+#: templates/admin/pages/tabs/appearance.php:38
 msgid "Override CSS"
 msgstr "Remplacer le CSS"
 
-#: templates/admin/pages/tabs/appearance.php:18
+#: templates/admin/pages/tabs/appearance.php:19
 msgid "Check if you want the name of the language. Don't check if you want the language code."
 msgstr "Cochez si vous voulez le nom de la langue. Ne cochez pas si vous voulez le code de la langue."
 
-#: templates/admin/pages/tabs/appearance.php:23
+#: templates/admin/pages/tabs/appearance.php:24
 msgid "Check if you want to display the name of languages."
 msgstr "Cochez si vous souhaitez afficher le nom des langues."
 
-#: templates/admin/pages/tabs/appearance.php:22
+#: templates/admin/pages/tabs/appearance.php:23
 msgid "With name"
 msgstr "Avec nom"
 
-#: templates/admin/pages/tabs/appearance.php:218
+#: templates/admin/pages/tabs/appearance.php:226
 msgid "If you want to use a different flag, just ask us."
 msgstr "Si vous souhaitez utiliser un drapeau différent, contactez-nous."
 
-#: templates/admin/pages/tabs/appearance.php:214
+#: templates/admin/pages/tabs/appearance.php:222
 msgid "Choose Portuguese flag:"
 msgstr "Choisissez le drapeau portugais :"
 
-#: templates/admin/pages/tabs/appearance.php:173
+#: templates/admin/pages/tabs/appearance.php:181
 msgid "Panama"
 msgstr "Panama"
 
-#: templates/admin/pages/tabs/appearance.php:172
+#: templates/admin/pages/tabs/appearance.php:180
 msgid "Puerto Rico"
 msgstr "Porto Rico"
 
-#: templates/admin/pages/tabs/appearance.php:171
+#: templates/admin/pages/tabs/appearance.php:179
 msgid "Costa Rica"
 msgstr "Costa Rica"
 
-#: templates/admin/pages/tabs/appearance.php:170
+#: templates/admin/pages/tabs/appearance.php:178
 msgid "Nicaragua"
 msgstr "Nicaragua"
 
-#: templates/admin/pages/tabs/appearance.php:169
+#: templates/admin/pages/tabs/appearance.php:177
 msgid "El Salvador"
 msgstr "Salvador"
 
-#: templates/admin/pages/tabs/appearance.php:168
+#: templates/admin/pages/tabs/appearance.php:176
 msgid "Paraguay"
 msgstr "Paraguay"
 
-#: templates/admin/pages/tabs/appearance.php:167
+#: templates/admin/pages/tabs/appearance.php:175
 msgid "Honduras"
 msgstr "Honduras"
 
-#: templates/admin/pages/tabs/appearance.php:166
+#: templates/admin/pages/tabs/appearance.php:174
 msgid "Dominican Republic"
 msgstr "République Dominicaine"
 
-#: templates/admin/pages/tabs/appearance.php:165
+#: templates/admin/pages/tabs/appearance.php:173
 msgid "Cuba"
 msgstr "Cuba"
 
-#: templates/admin/pages/tabs/appearance.php:164
+#: templates/admin/pages/tabs/appearance.php:172
 msgid "Guatemala"
 msgstr "Guatemala"
 
-#: templates/admin/pages/tabs/appearance.php:163
+#: templates/admin/pages/tabs/appearance.php:171
 msgid "Ecuador"
 msgstr "Équateur"
 
-#: templates/admin/pages/tabs/appearance.php:162
+#: templates/admin/pages/tabs/appearance.php:170
 msgid "Chile"
 msgstr "Chili"
 
-#: templates/admin/pages/tabs/appearance.php:161
+#: templates/admin/pages/tabs/appearance.php:169
 msgid "Venezuela"
 msgstr "Venezuela"
 
-#: templates/admin/pages/tabs/appearance.php:160
+#: templates/admin/pages/tabs/appearance.php:168
 msgid "Uruguay"
 msgstr "Uruguay"
 
-#: templates/admin/pages/tabs/appearance.php:159
+#: templates/admin/pages/tabs/appearance.php:167
 msgid "Bolivia"
 msgstr "Bolivie"
 
-#: templates/admin/pages/tabs/appearance.php:158
+#: templates/admin/pages/tabs/appearance.php:166
 msgid "Peru"
 msgstr "Pérou"
 
-#: templates/admin/pages/tabs/appearance.php:157
+#: templates/admin/pages/tabs/appearance.php:165
 msgid "Colombia"
 msgstr "Colombie"
 
-#: templates/admin/pages/tabs/appearance.php:156
+#: templates/admin/pages/tabs/appearance.php:164
 msgid "Argentina"
 msgstr "Argentine"
 
-#: templates/admin/pages/tabs/appearance.php:155
+#: templates/admin/pages/tabs/appearance.php:163
 msgid "Mexico"
 msgstr "Mexique"
 
-#: templates/admin/pages/tabs/appearance.php:154
+#: templates/admin/pages/tabs/appearance.php:162
 msgid "Spain (default)"
 msgstr "Espagne (par défaut)"
 
-#: templates/admin/pages/tabs/appearance.php:153
+#: templates/admin/pages/tabs/appearance.php:161
 msgid "Choose Spanish flag:"
 msgstr "Choisissez le drapeau espagnol :"
 
-#: templates/admin/pages/tabs/appearance.php:150
+#: templates/admin/pages/tabs/appearance.php:158
 msgid "Ireland"
 msgstr "Irlande"
 
-#: templates/admin/pages/tabs/appearance.php:149
+#: templates/admin/pages/tabs/appearance.php:157
 msgid "Jamaica"
 msgstr "Jamaïque"
 
-#: templates/admin/pages/tabs/appearance.php:148
+#: templates/admin/pages/tabs/appearance.php:156
 msgid "New Zealand"
 msgstr "Nouvelle-Zélande"
 
-#: templates/admin/pages/tabs/appearance.php:147
-#: templates/admin/pages/tabs/appearance.php:179
+#: templates/admin/pages/tabs/appearance.php:155
+#: templates/admin/pages/tabs/appearance.php:187
 msgid "Canada"
 msgstr "Canada"
 
-#: templates/admin/pages/tabs/appearance.php:146
+#: templates/admin/pages/tabs/appearance.php:154
 msgid "Australia"
 msgstr "Australie"
 
-#: templates/admin/pages/tabs/appearance.php:145
+#: templates/admin/pages/tabs/appearance.php:153
 msgid "United States"
 msgstr "Etats-Unis"
 
-#: templates/admin/pages/tabs/appearance.php:144
+#: templates/admin/pages/tabs/appearance.php:152
 msgid "United Kingdom (default)"
 msgstr "Royaume-Uni (par défaut)"
 
-#: templates/admin/pages/tabs/appearance.php:143
+#: templates/admin/pages/tabs/appearance.php:151
 msgid "Choose English flag:"
 msgstr "Choisissez le drapeau anglais :"
 
-#: templates/admin/pages/tabs/appearance.php:139
+#: templates/admin/pages/tabs/appearance.php:145
 msgid "Change country flags"
 msgstr "Changez les drapeaux"
 
-#: templates/admin/pages/tabs/appearance.php:136
+#: templates/admin/pages/tabs/appearance.php:142
 msgid "Circle"
 msgstr "Cercle"
 
-#: templates/admin/pages/tabs/appearance.php:129
+#: templates/admin/pages/tabs/appearance.php:135
 msgid "Square"
 msgstr "Carré"
 
-#: templates/admin/pages/tabs/appearance.php:115
+#: templates/admin/pages/tabs/appearance.php:121
 msgid "Rectangle mat"
 msgstr "Rectangle mat"
 
-#: templates/admin/pages/tabs/appearance.php:12
+#: templates/admin/pages/tabs/appearance.php:13
 msgid "Type of flags"
 msgstr "Type de drapeaux"
 
-#: templates/admin/pages/tabs/appearance.php:33
+#: templates/admin/pages/tabs/appearance.php:34
 msgid "Check if you want flags in the language button."
 msgstr "Cochez si vous souhaitez avoir des drapeaux dans votre bouton de choix de langue"
 
-#: templates/admin/pages/tabs/appearance.php:32
+#: templates/admin/pages/tabs/appearance.php:33
 msgid "With flags"
 msgstr "Avec des drapeaux"
 
-#: templates/admin/pages/tabs/appearance.php:28
+#: templates/admin/pages/tabs/appearance.php:29
 msgid "Check if you want the button to be a dropdown box."
 msgstr "Cochez si vous voulez que le bouton soit une liste déroulante."
 
-#: templates/admin/pages/tabs/appearance.php:51
-#: templates/admin/pages/tabs/appearance.php:279
+#: templates/admin/pages/tabs/appearance.php:56
+#: templates/admin/pages/tabs/appearance.php:290
 msgid "(Optional)"
 msgstr "(facultatif)"
 
-#: templates/admin/pages/tabs/status.php:126
+#: templates/admin/pages/tabs/status.php:119
 msgid "Destination Language"
 msgstr "Langue de destination"
 
-#: templates/admin/pages/tabs/status.php:122
+#: templates/admin/pages/tabs/status.php:115
 msgid "Original Language"
 msgstr "Langue d’origine"
 
@@ -816,7 +816,7 @@ msgstr "Bravo ! Votre site est désormais multilingue."
 msgid "Close"
 msgstr "Fermer"
 
-#: src/widgets/class-widget-selector-weglot.php:70
+#: src/widgets/class-widget-selector-weglot.php:68
 msgid "Title:"
 msgstr "Titre :"
 

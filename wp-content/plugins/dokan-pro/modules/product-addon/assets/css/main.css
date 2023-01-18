@@ -326,7 +326,8 @@ a.wc-pao-expand-all:active, a.wc-pao-expand-all:focus {
 .wc-pao-addon.open .wc-pao-addon-toggle:before {
 	content: "\f0d8";
 	display: inline-block;
-	font: normal normal normal 20px/1 FontAwesome;
+	font-family: 'Font Awesome\ 5 Free';
+	font-weight: 900;
 	speak: none;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
@@ -336,7 +337,8 @@ a.wc-pao-expand-all:active, a.wc-pao-expand-all:focus {
 .wc-pao-addon.closed .wc-pao-addon-toggle:before {
 	content: "\f0d7";
 	display: inline-block;
-	font: normal normal normal 20px/1 FontAwesome;
+	font-family: 'Font Awesome\ 5 Free';
+	font-weight: 900;
 	speak: none;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

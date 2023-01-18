@@ -5,18 +5,6 @@ namespace WeDevs\DokanPro\Modules\Elementor\Tags;
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 
 class StoreProductFilter extends TagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 3.3.0
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *

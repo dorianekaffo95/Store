@@ -46,13 +46,13 @@
                     class="dokan-btn dokan-btn-default dokan-btn-sm"
                     id="dokan-seller-vacation-save-edit"
                     disabled
-                ><i class="fa fa-check"></i> <span><?php _e( 'Save', 'dokan' ); ?></span></button>
+                ><i class="fas fa-check"></i> <span><?php _e( 'Save', 'dokan' ); ?></span></button>
                 <button
                     type="button"
                     class="dokan-btn dokan-btn-default dokan-btn-sm"
                     id="dokan-seller-vacation-cancel-edit"
                     disabled
-                ><i class="fa fa-times"></i> <?php _e( 'Cancel', 'dokan' ); ?></button>
+                ><i class="fas fa-times"></i> <?php _e( 'Cancel', 'dokan' ); ?></button>
             </div>
         </div>
 

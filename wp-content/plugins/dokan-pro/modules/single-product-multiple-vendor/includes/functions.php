@@ -111,18 +111,27 @@ function dokan_spmv_update_clone_visibilities( $map_id ) {
 
         switch ( $show_order ) {
             case 'max_price':
-                $diff = $b_price - $a_price;
+                $diff = (float) $b_price - (float) $a_price;
                 break;
 
-            case 'min_price':
             default:
-                $diff = $a_price - $b_price;
+                $diff = (float) $a_price - (float) $b_price;
                 break;
         }
 
         $has_diff = $diff || false;
 
-        return apply_filters( 'dokan_spmv_cloned_product_order', $diff, $a, $b, $show_order );
+        $diff = apply_filters( 'dokan_spmv_cloned_product_order', $diff, $a, $b, $show_order );
+
+        if ( $diff < 0 ) { // because the return value must be an integer
+            $diff = -1;
+        } elseif ( $diff > 0 ) {
+            $diff = 1;
+        } else {
+            $diff = 0;
+        }
+
+        return $diff;
     } );
 
     // if we don't have a diff based on admin settings, then show only first created product

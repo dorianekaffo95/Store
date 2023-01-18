@@ -6,10 +6,10 @@ $booking_display_cost = get_post_meta( $post_id, '_wc_display_cost', true )
 
 <div class="cost_fields dokan-edit-row dokan-clearfix">
     <div class="dokan-section-heading" data-togglehandler="cost_fields">
-        <h2><i class="fa fa-money" aria-hidden="true"></i> <?php _e( 'Costs', 'dokan' ) ?></h2>
+        <h2><i class="far fa-money-bill-alt" aria-hidden="true"></i> <?php _e( 'Costs', 'dokan' ) ?></h2>
         <p><?php _e( 'Set Costs options', 'dokan' ) ?></p>
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>
@@ -17,7 +17,7 @@ $booking_display_cost = get_post_meta( $post_id, '_wc_display_cost', true )
         <div class="dokan-form-group content-half-part">
             <label for="_wc_booking_cost" class="form-label"><?php _e( 'Base cost', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'One-off cost for the booking as a whole.', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
             <?php dokan_post_input_box( $post_id, '_wc_booking_cost', array( 'min' => '0', 'step' => '0.1', 'value' => $booking_cost ), 'number' ); ?>
@@ -27,7 +27,7 @@ $booking_display_cost = get_post_meta( $post_id, '_wc_display_cost', true )
         <div class="dokan-form-group content-half-part">
             <label for="_wc_booking_block_cost" class="form-label"><?php _e( 'Block cost', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'This is the cost per block booked. All other costs (for resources and persons) are added to this.', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
             <?php dokan_post_input_box( $post_id, '_wc_booking_block_cost', array( 'min' => '0', 'step' => '0.1', 'value' => $booking_block_cost ), 'number' ); ?>
@@ -37,7 +37,7 @@ $booking_display_cost = get_post_meta( $post_id, '_wc_display_cost', true )
         <div class="dokan-form-group">
             <label for="_wc_display_cost" class="form-label"><?php _e( 'Display cost', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'The cost is displayed to the user on the frontend. Leave blank to have it calculated for you. If a booking has varying costs, this will be prefixed with the word "from:".', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
             <?php dokan_post_input_box( $post_id, '_wc_display_cost', array( 'min' => '0', 'step' => '0.1', 'value' => $booking_display_cost ), 'number' ); ?>
@@ -55,11 +55,11 @@ $booking_display_cost = get_post_meta( $post_id, '_wc_display_cost', true )
                         <th></th>
                         <th><?php _e( 'Base cost', 'dokan' ); ?>&nbsp;
                             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Enter a cost for this rule. Applied to the booking as a whole.', 'dokan' ); ?>">
-                                <i class="fa fa-question-circle"></i>
+                                <i class="fas fa-question-circle"></i>
                             </span>
                         <th><?php _e( 'Block cost', 'dokan' ); ?>&nbsp;
                             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Enter a cost for this rule. Applied to each booking block.', 'dokan' ); ?>">
-                                <i class="fa fa-question-circle"></i>
+                                <i class="fas fa-question-circle"></i>
                             </span>
                             <!--<a class="tips" data-tip="<?php // _e( 'Enter a cost for this rule. Applied to each booking block.', 'dokan' );   ?>">[?]</a></th>-->
                         <th class="remove" width="1%">&nbsp;</th>

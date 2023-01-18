@@ -5,18 +5,6 @@ namespace WeDevs\DokanPro\Modules\Elementor\Tags;
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 
 class StoreSocialProfile extends TagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 2.9.11
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *
@@ -65,6 +53,6 @@ class StoreSocialProfile extends TagBase {
             }
         }
 
-        echo json_encode( $links );
+        echo wp_json_encode( $links );
     }
 }

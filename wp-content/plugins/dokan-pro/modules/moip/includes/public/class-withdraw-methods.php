@@ -76,6 +76,9 @@ class Dokan_Moip_Withdraw {
      */
     public function init_filters() {
         add_filter( 'dokan_withdraw_methods', array( $this, 'register_withdraw_method' ) );
+        add_filter( 'dokan_withdraw_method_settings_title', [ $this, 'get_heading' ], 10, 2 );
+        add_filter( 'dokan_withdraw_method_icon', [ $this, 'get_icon' ], 10, 2 );
+        add_filter( 'dokan_is_seller_connected_to_payment_method', [ $this, 'is_seller_connected' ], 10, 3 );
     }
 
     /**
@@ -124,7 +127,7 @@ class Dokan_Moip_Withdraw {
      * @return array
      */
     public function register_withdraw_method( $methods ) {
-        if ( isset( $this->settings['enabled'] ) && $this->settings['enabled'] !== 'yes' ) {
+        if ( ! isset( $this->settings['enabled'] ) || $this->settings['enabled'] !== 'yes' ) {
             return $methods;
         }
 
@@ -258,6 +261,65 @@ class Dokan_Moip_Withdraw {
         if ( ! $instance ) {
             return $instance = new static(); //phpcs:ignore
         }
+    }
+
+    /**
+     * Get the Withdrawal method icon
+     *
+     * @since 3.5.6
+     *
+     * @param string $method_icon
+     * @param string $method_key
+     *
+     * @return string
+     */
+    public function get_icon( $method_icon, $method_key ) {
+        if ( in_array( $method_key, [ 'moip', 'dokan-moip-connect' ], true ) ) {
+            $method_icon = MOIP_ASSETS . '/images/wirecard-withdraw-method.svg';
+        }
+
+        return $method_icon;
+    }
+
+    /**
+     * Get the heading for this payment's settings page
+     *
+     * @since 3.5.6
+     *
+     * @param string $heading
+     * @param string $slug
+     *
+     * @return string
+     */
+    public function get_heading( $heading, $slug ) {
+        if ( false !== strpos( $slug, 'dokan-moip-connect' ) ) {
+            $heading = __( 'Wirecard(MOIP) Settings', 'dokan' );
+        }
+
+        return $heading;
+    }
+
+    /**
+     * Get if a seller is connected to this payment method
+     *
+     * @since 3.6.1
+     *
+     * @param bool $connected
+     * @param string $payment_method_id
+     * @param int $seller_id
+     *
+     * @return bool
+     */
+    public function is_seller_connected( $connected, $payment_method_id, $seller_id ) {
+        if ( 'dokan-moip-connect' === $payment_method_id ) {
+            $vendor_moip_account = get_user_meta( $seller_id, 'vendor_moip_account' );
+
+            if ( '' !== $vendor_moip_account ) {
+                $connected = true;
+            }
+        }
+
+        return $connected;
     }
 }
 

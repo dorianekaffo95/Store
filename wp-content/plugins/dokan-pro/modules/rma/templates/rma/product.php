@@ -1,9 +1,9 @@
 <div class="dokan-rma-options dokan-edit-row dokan-clearfix hide_if_external">
     <div class="dokan-section-heading" data-togglehandler="dokan_rma_options">
-        <h2><i class="fa fa-undo" aria-hidden="true"></i> <?php _e( 'RMA Options', 'dokan' ); ?></h2>
+        <h2><i class="fas fa-undo-alt" aria-hidden="true"></i> <?php _e( 'RMA Options', 'dokan' ); ?></h2>
         <p><?php _e( 'Set your return and warranty settings for override global settings', 'dokan' ) ?></p>
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>
@@ -20,8 +20,8 @@
         <div class="dokan-product-rma-option-wrapper">
             <div class="dokan-form-group">
                 <label class="form-label" for="dokan-rma-label"><?php _e( 'Label: ', 'dokan' ); ?>
-                    <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Warrany label what customer will be see', 'dokan' ); ?>">
-                        <i class="fa fa-question-circle"></i>
+                    <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Warranty label what customer will see', 'dokan' ); ?>">
+                        <i class="fas fa-question-circle"></i>
                     </span>
                 </label>
 
@@ -31,7 +31,7 @@
             <div class="dokan-form-group">
                 <label class="form-label" for="dokan-rma-type"><?php _e( 'Type: ', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Warranty and Return Type', 'dokan' ); ?>">
-                        <i class="fa fa-question-circle"></i>
+                        <i class="fas fa-question-circle"></i>
                     </span>
                 </label>
                 <select name="warranty_type" id="dokan-warranty-type" class="dokan-form-control">
@@ -44,7 +44,7 @@
             <div class="dokan-form-group show_if_included_warranty">
                 <label class="form-label" for="dokan-rma-type"><?php _e( 'Length: ', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Warranty length, How many times( day, weeks month, years ) you want to give warranty ', 'dokan' ); ?>">
-                        <i class="fa fa-question-circle"></i>
+                        <i class="fas fa-question-circle"></i>
                     </span>
                 </label>
                 <select name="warranty_length" id="dokan-warranty-length" class="dokan-form-control">
@@ -57,7 +57,7 @@
             <div class="dokan-form-group content-half-part hide_if_lifetime show_if_included_warranty" style="padding-right: 10px;">
                 <label class="form-label" for="dokan-rma-type"><?php _e( 'Length Value: ', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Warranty length value', 'dokan' ); ?>">
-                        <i class="fa fa-question-circle"></i>
+                        <i class="fas fa-question-circle"></i>
                     </span>
                 </label>
                 <input type="number" class="dokan-form-control" min="0" step="1" name="warranty_length_value" value="<?php echo $rma_settings['length_value']; ?>">
@@ -66,7 +66,7 @@
             <div class="dokan-form-group content-half-part hide_if_lifetime show_if_included_warranty">
                 <label class="form-label" for="dokan-warranty-length-duration"><?php _e( 'Length Duration: ', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Warranty length, How many times( day, weeks month, years ) you want to give warranty ', 'dokan' ); ?>">
-                        <i class="fa fa-question-circle"></i>
+                        <i class="fas fa-question-circle"></i>
                     </span>
                 </label>
                 <select name="warranty_length_duration" id="dokan-warranty-length-duration" class="dokan-form-control">
@@ -82,8 +82,8 @@
 
                 <div class="dokan-form-group">
                     <label class="form-label" for="dokan-warranty-length-duration"><?php _e( 'Refund Reasons: ', 'dokan' ); ?>
-                        <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Select your return reasonas which will be displayed in customer end', 'dokan' ); ?>">
-                            <i class="fa fa-question-circle"></i>
+                        <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Select your return reasons which will be displayed in customer end', 'dokan' ); ?>">
+                            <i class="fas fa-question-circle"></i>
                         </span>
                     </label>
                     <?php foreach ( $reasons as $reason_key => $reason_value ): ?>
@@ -102,7 +102,7 @@
             <div class="dokan-form-group show_if_addon_warranty">
                 <label class="form-label" for="dokan-warranty-length-duration"><?php _e( 'Add on Warranty settings: ', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Warranty length, How many times( day, weeks month, years ) you want to give warranty ', 'dokan' ); ?>">
-                        <i class="fa fa-question-circle"></i>
+                        <i class="fas fa-question-circle"></i>
                     </span>
                 </label>
                 <table class="dokan-table dokan-rma-addon-warranty-table">
@@ -134,8 +134,8 @@
                                     </td>
 
                                     <td width="20%">
-                                        <a href="#" class="dokan-btn dokan-btn-default add-item"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                                        <a href="#" class="dokan-btn dokan-btn-default remove-item"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                        <a href="#" class="dokan-btn dokan-btn-default add-item"><i class="fas fa-plus" aria-hidden="true"></i></a>
+                                        <a href="#" class="dokan-btn dokan-btn-default remove-item"><i class="far fa-trash-alt" aria-hidden="true"></i></a>
                                     </td>
                                 </tr>
                             <?php endforeach ?>
@@ -158,8 +158,8 @@
                                 </td>
 
                                 <td width="20%">
-                                    <a href="#" class="dokan-btn dokan-btn-default add-item"><i class="fa fa-plus" aria-hidden="true"></i></a>
-                                    <a href="#" class="dokan-btn dokan-btn-default remove-item"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                    <a href="#" class="dokan-btn dokan-btn-default add-item"><i class="fas fa-plus" aria-hidden="true"></i></a>
+                                    <a href="#" class="dokan-btn dokan-btn-default remove-item"><i class="far fa-trash-alt" aria-hidden="true"></i></a>
                                 </td>
                             </tr>
                         <?php endif ?>
@@ -170,7 +170,7 @@
             <div class="dokan-form-group">
                 <label class="form-label" for="dokan-warranty-length-duration"><?php _e( 'RMA Policy: ', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" data-placement="bottom" data-original-title="<?php _e( 'Your store return and warranty policy', 'dokan' ); ?>">
-                        <i class="fa fa-question-circle"></i>
+                        <i class="fas fa-question-circle"></i>
                     </span>
                 </label>
                 <?php wp_editor( $rma_settings['policy'], 'warranty_policy', [ 'editor_height' => 50, 'quicktags' => false, 'media_buttons' => false, 'teeny' => true, 'editor_class' => 'dokan_warranty_policy' ] ); ?>

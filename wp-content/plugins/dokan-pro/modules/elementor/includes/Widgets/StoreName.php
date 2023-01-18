@@ -71,8 +71,8 @@ class StoreName extends Widget_Heading {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->update_control(
             'title',
@@ -103,7 +103,7 @@ class StoreName extends Widget_Heading {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return string
      */
     protected function get_html_wrapper_class() {
         return parent::get_html_wrapper_class() . ' dokan-store-name elementor-page-title elementor-widget-' . parent::get_name();

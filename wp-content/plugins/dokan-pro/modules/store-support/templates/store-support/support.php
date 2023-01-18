@@ -1,7 +1,7 @@
 <?php
 $dss              = dokan_pro()->module->store_support;
 $topic_id         = get_query_var( 'support' );
-$base_ticket_date = ! empty( $ticket_date ) ? dokan_format_date( $ticket_date ) : '';
+$base_ticket_date = ! empty( $ticket_start_date ) && ! empty( $ticket_end_date ) ? dokan_format_date( $ticket_start_date ) . ' - ' . dokan_format_date( $ticket_end_date ) : '';
 
 if ( ! empty( $topic_id ) && is_numeric( $topic_id ) ) {
     $topic = $dss->get_single_topic( $topic_id, dokan_get_current_user_id() );
@@ -52,8 +52,9 @@ if ( ! empty( $topic_id ) && is_numeric( $topic_id ) ) {
             </div>
 
             <div class="dokan-form-group">
-                <input type="text" class="dokan-form-control" id="support_ticket_date_filter" placeholder="<?php esc_attr_e( 'Date of Creation', 'dokan' ); ?>" value="<?php echo esc_attr( $base_ticket_date ); ?>">
-                <input type="hidden" name="ticket_date" id="support_ticket_date_filter_alt" value="<?php echo esc_attr( $ticket_date ); ?>" />
+                <input type="text" class="dokan-form-control" id="support_ticket_date_filter" placeholder="<?php esc_attr_e( 'Select Date Range', 'dokan' ); ?>" value="<?php echo esc_attr( $base_ticket_date ); ?>" autocomplete="off">
+                <input type="hidden" name="ticket_start_date" id="support_ticket_start_date_filter_alt" value="<?php echo esc_attr( $ticket_start_date ); ?>" />
+                <input type="hidden" name="ticket_end_date" id="support_ticket_end_date_filter_alt" value="<?php echo esc_attr( $ticket_end_date ); ?>" />
             </div>
 
             <div class="dokan-form-group">

@@ -46,6 +46,15 @@ do_action( 'dokan_dashboard_content_after' );
     .woocommerce-exporter-wrapper .wc-progress-steps li.active::before, .woocommerce-importer-wrapper .wc-progress-steps li.active::before, .woocommerce-progress-form-wrapper .wc-progress-steps li.active::before {
         border-color: #fd8f6f;
     }
+    .dokan-dashboard-wrap .dashboard-content-area .woocommerce-progress-form-wrapper .wc-progress-steps li.done::before {
+        background-color: #fff !important;
+    }
+    .dokan-dashboard-wrap .dashboard-content-area .wc-actions button[type='submit'],
+    .dokan-dashboard-wrap .dashboard-content-area .woocommerce-importer .wc-actions a.button,
+    .dokan-dashboard-wrap .dashboard-content-area .woocommerce-importer .wc-actions a.button:hover {
+        box-shadow: none;
+        text-shadow: none;
+    }
     .woocommerce-importer-advanced.hidden {
         display: none;
     }

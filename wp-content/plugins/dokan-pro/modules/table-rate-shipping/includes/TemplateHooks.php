@@ -123,7 +123,7 @@ class TemplateHooks {
     public function load_settings_header( $header, $query_vars ) {
         if ( in_array( $query_vars, [ 'table-rate-shipping', 'distance-rate-shipping' ], true ) ) {
             $settings_url = dokan_get_navigation_url( 'settings/shipping' ) . '#/settings';
-            $header       = sprintf( '%s <span style="position:absolute; right:0px;"><a href="%s" class="dokan-btn dokan-btn-default"><i class="fa fa-gear"></i> %s</a></span>', __( 'Shipping Settings', 'dokan' ), $settings_url, __( 'Click here to add Shipping Policies', 'dokan' ) );
+            $header       = sprintf( '%s <span style="position:absolute; right:0px;"><a href="%s" class="dokan-btn dokan-btn-default"><i class="fas fa-cog"></i> %s</a></span>', __( 'Shipping Settings', 'dokan' ), $settings_url, __( 'Click here to add Shipping Policies', 'dokan' ) );
         }
 
         return $header;

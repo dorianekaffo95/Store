@@ -3,7 +3,9 @@
 namespace WeDevs\DokanPro\Modules\Booking;
 
 use WeDevs\Dokan\Cache;
+use WeDevs\Dokan\ProductCategory\Helper;
 use WeDevs\DokanPro\Modules\Booking\BookingCache;
+use WeDevs\Dokan\ProductCategory\Categories;
 
 /**
  * Dokan_WC_Booking class
@@ -20,10 +22,6 @@ class Module {
      * @var string
      */
     public $version = null;
-
-    private $depends_on           = array();
-    private $dependency_error     = array();
-    private $dependency_not_found = false;
 
     /**
      * Constructor for the Dokan_WC_Booking class
@@ -50,14 +48,11 @@ class Module {
         // flush rewrite rules
         add_action( 'woocommerce_flush_rewrite_rules', [ $this, 'flush_rewrite_rules' ] );
 
-        $this->depends_on['wc_bookings'] = array(
-            'name'   => 'WC_Bookings',
-            /* translators: %1$s: string %2$s: string */
-            'notice' => sprintf( __( 'Dokan <b> WooCommerce Booking</b> requires %1$sWooCommerce Bookings plugin%2$s to be installed & activated!', 'dokan' ), '<a target="_blank" href="https://woocommerce.com/products/woocommerce-bookings/">', '</a>' ),
-        );
+        include_once DOKAN_WC_BOOKING_DIR . '/includes/DependencyNotice.php';
 
-        if ( ! $this->check_if_has_dependency() ) {
-            add_filter( 'dokan_admin_notices', [ $this, 'dependency_notice' ] );
+        $dependency = new DependencyNotice();
+
+        if ( $dependency->is_missing_dependency() ) {
             return;
         }
 
@@ -112,27 +107,11 @@ class Module {
         // Clear addon notices on manual booking creation
         add_action( 'template_redirect', [ $this, 'clear_addons_validation_notices' ], 10 );
 
+        add_action( 'dokan_new_product_before_product_area', array( $this, 'load_add_category_modal' ), 10 );
+        add_action( 'dokan_edit_product_before_product_area', array( $this, 'load_add_category_modal' ), 10 );
+
         // Init accommodation booking
         $this->init_accommodation_booking();
-    }
-
-    /**
-     * Check whether is their has any dependency or not
-     *
-     * @return boolean
-     */
-    public function check_if_has_dependency() {
-        $res = true;
-
-        foreach ( $this->depends_on as $class ) {
-            if ( ! class_exists( $class['name'] ) ) {
-                $this->dependency_error[] = $class['notice'];
-                $res = false;
-                $this->dependency_not_found = true;
-            }
-        }
-
-        return $res;
     }
 
     /**
@@ -172,36 +151,6 @@ class Module {
         $types['booking'] = __( 'Bookable Product', 'dokan' );
 
         return $types;
-    }
-
-    /**
-     * Print error notice if dependency not active
-     *
-     * @since 1.0.0
-     *
-     * @param array $notices
-     *
-     * @return array
-     */
-    public function dependency_notice( $notices ) {
-        foreach ( $this->dependency_error as $error ) {
-            $notices[] = [
-                'type'        => 'alert',
-                'title'       => __( 'Dokan WooCommerce Booking Integration module is almost ready!', 'dokan' ),
-                'description' => $error,
-                'priority'    => 10,
-                'actions'     => [
-                    [
-                        'type'   => 'primary',
-                        'text'   => __( 'Get Now', 'dokan' ),
-                        'target' => '_blank',
-                        'action' => esc_url( 'https://woocommerce.com/products/woocommerce-bookings/' ),
-                    ],
-                ],
-            ];
-        }
-
-        return $notices;
     }
 
     /**
@@ -264,91 +213,133 @@ class Module {
         global $wp;
 
         if ( ! is_admin() && isset( $wp->query_vars['booking'] ) ) {
-            global $post, $wp_scripts;
-
             /**
              * All styles goes here
              */
             // @codingStandardsIgnoreLine
-            wp_enqueue_style( 'dokan_wc_booking-styles', plugins_url( 'assets/css/style.css', __FILE__ ), false, date( 'Ymd' ) );
+            wp_enqueue_style( 'dokan_wc_booking-styles' );
+
             /**
              * All scripts goes here
              */
-            wp_enqueue_script( 'dokan_wc_booking-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), $this->version, true );
+            wp_enqueue_script( 'dokan_wc_booking-scripts' );
 
             // Accommodation scripts
             $this->enqueue_accommodation_scripts();
-
-            $jquery_version = isset( $wp_scripts->registered['jquery-ui-core']->ver ) ? $wp_scripts->registered['jquery-ui-core']->ver : '1.9.2';
-
-            $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-            wp_register_script( 'wc_bookings_writepanel_js', DOKAN_WC_BOOKING_PLUGIN_ASSET . '/js/writepanel.min.js', array( 'jquery', 'jquery-ui-datepicker' ), DOKAN_WC_BOOKING_PLUGIN_VERSION, true );
-            wp_register_script( 'wc_bookings_settings_js', WC_BOOKINGS_PLUGIN_URL . '/assets/js/settings' . $suffix . '.js', array( 'jquery' ), WC_BOOKINGS_VERSION, true );
-            wp_register_script( 'jquery-tiptip', WC()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), WC_VERSION, true );
-            $post_id = isset( $post->ID ) ? $post->ID : '';
-
-            if ( dokan_is_seller_dashboard() ) {
-                // @codingStandardsIgnoreLine
-                if ( isset( $_GET['product_id'] ) ) {
-                    // @codingStandardsIgnoreLine
-                    $post_id = $_GET['product_id'];
-                } else {
-                    $post_id = '';
-                }
-            }
-
-            $params = array(
-                'i18n_remove_person'  => esc_js( __( 'Are you sure you want to remove this person type?', 'dokan' ) ),
-                'nonce_delete_person' => wp_create_nonce( 'delete-bookable-person' ),
-                'nonce_add_person'    => wp_create_nonce( 'add-bookable-person' ),
-                'nonce_unlink_person' => wp_create_nonce( 'unlink-bookable-person' ),
-                'i18n_remove_resource'  => esc_js( __( 'Are you sure you want to remove this resource?', 'dokan' ) ),
-                'nonce_delete_resource' => wp_create_nonce( 'delete-bookable-resource' ),
-                'nonce_add_resource'    => wp_create_nonce( 'add-bookable-resource' ),
-                'i18n_minutes' => esc_js( __( 'minutes', 'dokan' ) ),
-                'i18n_days'    => esc_js( __( 'days', 'dokan' ) ),
-                'i18n_new_resource_name' => esc_js( __( 'Enter a name for the new resource', 'dokan' ) ),
-                'post'                   => $post_id,
-                'plugin_url'             => WC()->plugin_url(),
-                'ajax_url'               => admin_url( 'admin-ajax.php' ),
-                'calendar_image'         => WC()->plugin_url() . '/assets/images/calendar.png',
-            );
-
-            wp_localize_script( 'wc_bookings_writepanel_js', 'wc_bookings_writepanel_js_params', $params );
 
             wp_enqueue_script( 'jquery-ui-datepicker' );
             wp_enqueue_script( 'wc_bookings_writepanel_js' );
             wp_enqueue_script( 'jquery-tiptip' );
 
-            wp_enqueue_style( 'wc_bookings_admin_styles', DOKAN_WC_BOOKING_PLUGIN_ASSET . '/css/admin.css', null, DOKAN_WC_BOOKING_PLUGIN_VERSION );
-            wp_enqueue_style( 'woocommerce_admin_styles', WC()->plugin_url() . '/assets/css/admin.css', null, WC_VERSION );
-            // @codingStandardsIgnoreLine
-            wp_enqueue_style( 'jquery-ui-style', '//ajax.googleapis.com/ajax/libs/jqueryui/' . $jquery_version . '/themes/smoothness/jquery-ui.css' );
+            wp_enqueue_style( 'wc_bookings_admin_styles' );
+            wp_enqueue_style( 'woocommerce_admin_styles' );
+
+            wp_enqueue_style( 'jquery-ui-style' );
 
             add_filter( 'dokan_dashboard_nav_active', array( $this, 'set_booking_menu_as_active' ) );
 
-            wp_register_script( 'wc-enhanced-select', WC()->plugin_url() . '/assets/js/admin/wc-enhanced-select' . $suffix . '.js', array( 'jquery', 'selectWoo' ), WC_VERSION );
-            wp_localize_script(
-                'wc-enhanced-select', 'wc_enhanced_select_params', array(
-                    'i18n_matches_1'            => _x( 'One result is available, press enter to select it.', 'enhanced select', 'dokan' ),
-                    'i18n_matches_n'            => _x( '%qty% results are available, use up and down arrow keys to navigate.', 'enhanced select', 'dokan' ),
-                    'i18n_no_matches'           => _x( 'No matches found', 'enhanced select', 'dokan' ),
-                    'i18n_ajax_error'           => _x( 'Loading failed', 'enhanced select', 'dokan' ),
-                    'i18n_input_too_short_1'    => _x( 'Please enter 1 or more characters', 'enhanced select', 'dokan' ),
-                    'i18n_input_too_short_n'    => _x( 'Please enter %qty% or more characters', 'enhanced select', 'dokan' ),
-                    'i18n_input_too_long_1'     => _x( 'Please delete 1 character', 'enhanced select', 'dokan' ),
-                    'i18n_input_too_long_n'     => _x( 'Please delete %qty% characters', 'enhanced select', 'dokan' ),
-                    'i18n_selection_too_long_1' => _x( 'You can only select 1 item', 'enhanced select', 'dokan' ),
-                    'i18n_selection_too_long_n' => _x( 'You can only select %qty% items', 'enhanced select', 'dokan' ),
-                    'i18n_load_more'            => _x( 'Loading more results&hellip;', 'enhanced select', 'dokan' ),
-                    'i18n_searching'            => _x( 'Searching&hellip;', 'enhanced select', 'dokan' ),
-                    'ajax_url'                  => admin_url( 'admin-ajax.php' ),
-                    'search_customers_nonce'    => wp_create_nonce( 'search-customers' ),
-                )
-            );
-
             wp_enqueue_script( 'wc-enhanced-select' );
         }
+
+        // Multi-step category box ui.
+        if ( ( isset( $wp->query_vars['booking'] ) && $wp->query_vars['booking'] === 'new-product' ) || ( isset( $wp->query_vars['booking'] ) && $wp->query_vars['booking'] === 'edit' ) ) {
+            wp_enqueue_style( 'dokan-product-category-ui-css' );
+            wp_enqueue_script( 'product-category-ui' );
+
+            $categories = new Categories();
+            $all_categories = $categories->get();
+
+            $data = [
+                'categories' => $all_categories,
+                'is_single'  => Helper::product_category_selection_is_single(),
+                'i18n'       => [
+                    'select_a_category' => __( 'Select a category', 'dokan' ),
+                    'duplicate_category' => __( 'This category has already been selected', 'dokan' ),
+                ],
+            ];
+
+            wp_localize_script( 'product-category-ui', 'dokan_product_category_data', $data );
+        }
+    }
+
+    /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        global $post, $wp_scripts;
+        list( $suffix, $script_version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan_wc_booking-styles', plugins_url( 'assets/css/style.css', __FILE__ ), [], $script_version );
+        wp_register_script( 'dokan_wc_booking-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), $script_version, true );
+
+        $accommodation_i18n = \Dokan_Booking_Accommodation_Helper::get_accommodation_booking_i18n_strings();
+
+        wp_register_script( 'dokan_accommodation_booking_script', plugins_url( 'assets/js/accommodation.js', __FILE__ ), [ 'jquery', 'dokan-util-helper' ], $script_version, true );
+        wp_localize_script( 'dokan_accommodation_booking_script', 'dokan_accommodation_i18n', $accommodation_i18n );
+
+        wp_register_script( 'wc_bookings_writepanel_js', DOKAN_WC_BOOKING_PLUGIN_ASSET . '/js/writepanel.min.js', array( 'jquery', 'jquery-ui-datepicker' ), $script_version, true );
+        wp_register_script( 'wc_bookings_settings_js', WC_BOOKINGS_PLUGIN_URL . '/assets/js/settings' . $suffix . '.js', array( 'jquery' ), WC_BOOKINGS_VERSION, true );
+        wp_register_script( 'jquery-tiptip', WC()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip' . $suffix . '.js', array( 'jquery' ), WC_VERSION, true );
+
+        $post_id = isset( $post->ID ) ? $post->ID : '';
+
+        if ( dokan_is_seller_dashboard() ) {
+            // @codingStandardsIgnoreLine
+            if ( isset( $_GET['product_id'] ) ) {
+                // @codingStandardsIgnoreLine
+                $post_id = absint( wp_unslash( $_GET['product_id'] ) );
+            } else {
+                $post_id = '';
+            }
+        }
+
+        $params = array(
+            'i18n_remove_person'     => esc_js( __( 'Are you sure you want to remove this person type?', 'dokan' ) ),
+            'nonce_delete_person'    => wp_create_nonce( 'delete-bookable-person' ),
+            'nonce_add_person'       => wp_create_nonce( 'add-bookable-person' ),
+            'nonce_unlink_person'    => wp_create_nonce( 'unlink-bookable-person' ),
+            'i18n_remove_resource'   => esc_js( __( 'Are you sure you want to remove this resource?', 'dokan' ) ),
+            'nonce_delete_resource'  => wp_create_nonce( 'delete-bookable-resource' ),
+            'nonce_add_resource'     => wp_create_nonce( 'add-bookable-resource' ),
+            'i18n_minutes'           => esc_js( __( 'minutes', 'dokan' ) ),
+            'i18n_days'              => esc_js( __( 'days', 'dokan' ) ),
+            'i18n_new_resource_name' => esc_js( __( 'Enter a name for the new resource', 'dokan' ) ),
+            'post'                   => $post_id,
+            'plugin_url'             => WC()->plugin_url(),
+            'ajax_url'               => admin_url( 'admin-ajax.php' ),
+            'calendar_image'         => WC()->plugin_url() . '/assets/images/calendar.png',
+        );
+
+        wp_localize_script( 'wc_bookings_writepanel_js', 'wc_bookings_writepanel_js_params', $params );
+
+        wp_register_style( 'wc_bookings_admin_styles', DOKAN_WC_BOOKING_PLUGIN_ASSET . '/css/admin.css', null, DOKAN_WC_BOOKING_PLUGIN_VERSION );
+        wp_register_style( 'woocommerce_admin_styles', WC()->plugin_url() . '/assets/css/admin.css', null, WC_VERSION );
+        // @codingStandardsIgnoreLine
+
+        $jquery_version = isset( $wp_scripts->registered['jquery-ui-core']->ver ) ? $wp_scripts->registered['jquery-ui-core']->ver : '1.9.2';
+        wp_register_style( 'jquery-ui-style', '//ajax.googleapis.com/ajax/libs/jqueryui/' . $jquery_version . '/themes/smoothness/jquery-ui.css' );
+
+        wp_register_script( 'wc-enhanced-select', WC()->plugin_url() . '/assets/js/admin/wc-enhanced-select' . $suffix . '.js', array( 'jquery', 'selectWoo' ), WC_VERSION );
+        wp_localize_script(
+            'wc-enhanced-select', 'wc_enhanced_select_params', array(
+                'i18n_matches_1'            => _x( 'One result is available, press enter to select it.', 'enhanced select', 'dokan' ),
+                'i18n_matches_n'            => _x( '%qty% results are available, use up and down arrow keys to navigate.', 'enhanced select', 'dokan' ),
+                'i18n_no_matches'           => _x( 'No matches found', 'enhanced select', 'dokan' ),
+                'i18n_ajax_error'           => _x( 'Loading failed', 'enhanced select', 'dokan' ),
+                'i18n_input_too_short_1'    => _x( 'Please enter 1 or more characters', 'enhanced select', 'dokan' ),
+                'i18n_input_too_short_n'    => _x( 'Please enter %qty% or more characters', 'enhanced select', 'dokan' ),
+                'i18n_input_too_long_1'     => _x( 'Please delete 1 character', 'enhanced select', 'dokan' ),
+                'i18n_input_too_long_n'     => _x( 'Please delete %qty% characters', 'enhanced select', 'dokan' ),
+                'i18n_selection_too_long_1' => _x( 'You can only select 1 item', 'enhanced select', 'dokan' ),
+                'i18n_selection_too_long_n' => _x( 'You can only select %qty% items', 'enhanced select', 'dokan' ),
+                'i18n_load_more'            => _x( 'Loading more results&hellip;', 'enhanced select', 'dokan' ),
+                'i18n_searching'            => _x( 'Searching&hellip;', 'enhanced select', 'dokan' ),
+                'ajax_url'                  => admin_url( 'admin-ajax.php' ),
+                'search_customers_nonce'    => wp_create_nonce( 'search-customers' ),
+            )
+        );
     }
 
     /**
@@ -357,15 +348,12 @@ class Module {
      * @return void
      */
     public function init_hooks() {
-        if ( $this->dependency_not_found ) {
-            return;
-        }
-
         add_filter( 'dokan_get_dashboard_nav', array( $this, 'add_booking_page' ), 11, 1 );
         add_action( 'dokan_load_custom_template', array( $this, 'load_template_from_plugin' ) );
         add_filter( 'dokan_query_var_filter', array( $this, 'register_booking_queryvar' ) );
         add_filter( 'dokan_add_new_product_redirect', array( $this, 'set_redirect_url' ), 10, 2 );
         add_filter( 'dokan_product_listing_exclude_type', array( $this, 'exclude_booking_type_from_product_listing' ) );
+        add_action( 'delete_post', array( $this, 'handle_deleted_bookable_product' ), 10, 1 );
 
         // Init Cache
         include_once DOKAN_WC_BOOKING_DIR . '/includes/BookingCache.php';
@@ -389,6 +377,8 @@ class Module {
         add_filter( 'woocommerce_email_classes', array( $this, 'load_dokan_booking_new_emails' ), 14 );
         add_filter( 'woocommerce_email_actions', array( $this, 'register_dokan_booking_new_actions' ) );
         add_filter( 'dokan_email_list', array( $this, 'set_email_template_directory' ) );
+
+        $this->register_scripts();
     }
     public function load_dokan_booking_cancelled_emails( $wc_emails ) {
         $wc_emails['Dokan_Email_Booking_Cancelled'] = include DOKAN_WC_BOOKING_DIR . '/includes/emails/class-dokan-booking-email-cancelled.php';
@@ -472,7 +462,7 @@ class Module {
 
         $urls['booking'] = array(
             'title' => __( 'Booking', 'dokan' ),
-            'icon'  => '<i class="fa fa-calendar"></i>',
+            'icon'  => '<i class="far fa-calendar-alt"></i>',
             'url'   => dokan_get_navigation_url( 'booking' ),
             'pos'   => 180,
         );
@@ -602,6 +592,14 @@ class Module {
         $is_virtual = 'on' === $_virtual ? 'yes' : 'no';
         update_post_meta( $post_id, '_virtual', $is_virtual );
 
+
+        if ( ! empty( $post_data['chosen_product_cat'] ) ) {
+            $chosen_cat = Helper::product_category_selection_is_single() ? [ reset( $post_data['chosen_product_cat'] ) ] : $post_data['chosen_product_cat'];
+        } else {
+            $chosen_cat = [ absint( get_option( 'default_product_cat' ) ) ];
+        }
+        Helper::set_object_terms_from_chosen_categories( $product->get_id(), $chosen_cat );
+
         $product->save();
 
         /**
@@ -667,6 +665,7 @@ class Module {
             'post_status'  => 'publish',
             'post_author'  => dokan_get_current_user_id(),
             'post_type'    => 'bookable_resource',
+            'meta_input'   => [ 'qty' => 1 ],
         );
         $resource_id = wp_insert_post( $resource );
         $edit_url    = dokan_get_navigation_url( 'booking' ) . 'resources/edit/?id=' . $resource_id;
@@ -883,44 +882,6 @@ class Module {
 
         wp_safe_redirect( wp_get_referer() );
         die();
-    }
-
-    public static function get_booking_status_counts_by( $seller_id ) {
-        global $wpdb;
-
-        $statuses = array_unique( array_merge( get_wc_booking_statuses(), get_wc_booking_statuses( 'user' ), get_wc_booking_statuses( 'cancel' ) ) );
-        $statuses = array_fill_keys( array_keys( array_flip( $statuses ) ), 0 );
-        $counts   = $statuses + [ 'total' => 0 ];
-
-        $cache_group = "bookings_{$seller_id}";
-        $cache_key   = 'bookings_count';
-        $results     = Cache::get( $cache_key, $cache_group );
-
-        if ( false === $results ) {
-            $meta_key = '_booking_seller_id';
-
-            $sql = "Select post_status
-            From $wpdb->posts as p
-            LEFT JOIN $wpdb->postmeta as pm ON p.ID = pm.post_id
-            WHERE
-            pm.meta_key = %s AND
-            pm.meta_value = %d AND
-            p.post_status != 'trash' ";
-
-            // @codingStandardsIgnoreLine
-            $results = $wpdb->get_results( $wpdb->prepare( $sql, $meta_key, $seller_id ) );
-
-            Cache::set( $cache_key, $results, $cache_group );
-        }
-
-        foreach ( $results as $status ) {
-            if ( isset( $counts[ $status->post_status ] ) ) {
-                $counts[ $status->post_status ] += 1;
-                $counts['total']                += 1;
-            }
-        }
-
-        return (object) $counts;
     }
 
     public function change_booking_status() {
@@ -1380,16 +1341,45 @@ class Module {
      * @return void
      */
     public function enqueue_accommodation_scripts() {
-        // Accommodation Booking
-        $accommodation_i18n = \Dokan_Booking_Accommodation_Helper::get_accommodation_booking_i18n_strings();
-        $time_format        = wc_time_format();
-
-        wp_enqueue_script( 'dokan_accommodation_booking_script', plugins_url( 'assets/js/accommodation.js', __FILE__ ), [ 'jquery' ], DOKAN_PRO_PLUGIN_VERSION, true );
-        wp_localize_script( 'dokan_accommodation_booking_script', 'dokan_accommodation_i18n', $accommodation_i18n );
-        wp_localize_script( 'dokan_accommodation_booking_script', 'dokan_accommodation_time', [ 'format' => $time_format] );
+        wp_enqueue_script( 'dokan_accommodation_booking_script' );
 
         // Timepicker
         wp_enqueue_style( 'dokan-timepicker' );
         wp_enqueue_script( 'dokan-timepicker' );
+    }
+
+    /**
+     * Unlink the resources on delete of bookable products
+     *
+     * @since 3.5.2
+     *
+     * @param $post_id
+     */
+    public function handle_deleted_bookable_product( $post_id ) {
+        $product = wc_get_product( absint( $post_id ) );
+
+        if ( ! is_a( $product, 'WC_Product' ) || 'booking' !== $product->get_type() ) {
+            return;
+        }
+
+        \WC_Bookings_Tools::unlink_resource( $post_id );
+    }
+
+    /**
+     * Returns new category select ui html elements.
+     *
+     * @since 3.7.5
+     *
+     * @return html
+     */
+    public function load_add_category_modal() {
+        /**
+         * Checking if dokan dashboard or add product page or product edit page or product list.
+         * Because without those page we don't need to load category modal.
+         */
+        global $wp;
+        if ( ( isset( $wp->query_vars['booking'] ) && $wp->query_vars['booking'] === 'new-product' ) || ( isset( $wp->query_vars['booking'] ) && $wp->query_vars['booking'] === 'edit' ) ) {
+            dokan_get_template_part( 'products/dokan-category-ui', '', array() );
+        }
     }
 }

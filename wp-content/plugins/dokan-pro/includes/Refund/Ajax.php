@@ -39,8 +39,8 @@ class Ajax {
 
         $request->set_required(
             [
-                'order_id',
-                'refund_amount',
+                'order_id'      => _x( 'Order ID', 'Refund request required parameter', 'dokan' ),
+                'refund_amount' => _x( 'Refund amount', 'Refund request required parameter', 'dokan' ),
             ]
         );
 

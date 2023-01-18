@@ -2,6 +2,7 @@
 
 namespace WeDevs\WeMail\Core\Ecommerce\Platforms;
 
+use WeDevs\WeMail\Rest\Resources\Ecommerce\WooCommerce\CategoryResource;
 use WeDevs\WeMail\Traits\Singleton;
 use WeDevs\WeMail\Core\Ecommerce\Settings;
 use WeDevs\WeMail\Rest\Resources\Ecommerce\WooCommerce\OrderResource;
@@ -71,6 +72,7 @@ class WooCommerce extends AbstractPlatform {
                 'page'          => isset( $args['page'] ) ? intval( $args['page'] ) : 1,
                 'paginate'      => true,
                 'status'        => [ 'completed', 'refunded', 'on-hold', 'processing', 'cancelled', 'failed' ],
+                'type'          => [ 'shop_order', 'shop_order_refund' ],
             ]
         );
 
@@ -105,9 +107,13 @@ class WooCommerce extends AbstractPlatform {
      * @param $order_id
      * @param $status_from
      * @param $status_to
-     * @param $order
+     * @param $order \WC_Order
      */
     public function handle_order( $order_id, $status_from, $status_to, $order ) {
+        if ( ! $this->is_valid_order_item( $order->get_type() ) ) {
+            return;
+        }
+
         if ( ! Settings::instance()->is_enabled() ) {
             return;
         }
@@ -131,6 +137,10 @@ class WooCommerce extends AbstractPlatform {
         }
 
         $order = wc_get_order( $refund_id );
+
+        if ( ! $this->is_valid_order_item( $order->get_type() ) ) {
+            return;
+        }
 
         wemail()->api
             ->send_json()
@@ -169,7 +179,7 @@ class WooCommerce extends AbstractPlatform {
      * @param \WP_Post $post
      */
     public function delete_order( $order_id, \WP_Post $post ) {
-        if ( $post->post_type !== 'shop_order' ) {
+        if ( ! $this->is_valid_order_item( $post->post_type ) ) {
             return;
         }
 
@@ -199,5 +209,36 @@ class WooCommerce extends AbstractPlatform {
 
     public function get_name() {
         return 'woocommerce';
+    }
+
+    /**
+     * Get WooCommerce categories
+     *
+     * @param array $args
+     *
+     * @return array
+     */
+    public function categories( array $args = [] ) {
+        $terms = get_terms(
+            [
+				'taxonomy'   => 'product_cat',
+				'hide_empty' => false,
+			]
+        );
+
+        return [
+            'data' => CategoryResource::collection( $terms ),
+        ];
+    }
+
+    /**
+     * Check if it is valid order item
+     *
+     * @param $type
+     *
+     * @return bool|false
+     */
+    protected function is_valid_order_item( $type ) {
+        return (bool) preg_match( '/^shop_order(_refund)?$/', $type );
     }
 }

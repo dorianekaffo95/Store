@@ -7,24 +7,6 @@ use \WeDevs\DokanPro\Products;
 class Module {
 
     /**
-     * The plugins which are dependent for this plugin
-     *
-     * @since 1.0.0
-     *
-     * @var array
-     */
-    private $depends_on = array();
-
-    /**
-     * Displa dependency error if not present
-     *
-     * @since 1.0.0
-     *
-     * @var array
-     */
-    private $dependency_error = array();
-
-    /**
      * Constructor for the Dokan_VSP class
      *
      * Sets up all the appropriate hooks and actions
@@ -34,18 +16,15 @@ class Module {
      * @uses add_action()
      */
     public function __construct() {
-        $this->depends_on['WC_Subscriptions'] = array(
-            'name'   => 'WC_Subscriptions',
-            /* translators: WooCommerce subscription plugin link */
-            'notice' => sprintf( __( 'Dokan <b>Vendor Subscription Product</b> requires %1$sWooCommerce Subscriptions plugin%2$s to be installed & activated first !', 'dokan' ), '<a target="_blank" href="https://woocommerce.com/products/woocommerce-subscriptions/">', '</a>' ),
-        );
+        $this->define();
 
-        if ( ! $this->check_if_has_dependency() ) {
-            add_filter( 'dokan_admin_notices', [ $this, 'dependency_notice' ] );
+        include_once DOKAN_VSP_DIR_INC_DIR . '/DependencyNotice.php';
+
+        $dependency = new DependencyNotice();
+
+        if ( $dependency->is_missing_dependency() ) {
             return;
         }
-
-        $this->define();
 
         $this->includes();
 
@@ -120,6 +99,8 @@ class Module {
         add_filter( 'woocommerce_order_item_needs_processing', [ $this, 'order_needs_processing' ], 10, 2 );
         add_filter( 'dokan_get_product_types', [ $this, 'add_subscription_type_product' ] );
 
+        add_action( 'init', [ $this, 'register_scripts' ] );
+
         // store subscription type product, per product commission.
         add_action( 'woocommerce_process_product_meta_subscription', [ Products::class, 'save_per_product_commission_options' ], 15 );
         add_action( 'woocommerce_process_product_meta_variable-subscription', [ Products::class, 'save_per_product_commission_options' ], 15 );
@@ -189,63 +170,15 @@ class Module {
     }
 
     /**
-     * Print error notice if dependency not active
+     * Register scripts
      *
-     * @since 1.0.0
-     *
-     * @param array $notices
-     *
-     * @return array
+     * @since 3.7.4
      */
-    public function dependency_notice( $notices ) {
-        foreach ( $this->dependency_error as $error ) {
-            $notices[] = [
-                'type'        => 'alert',
-                'title'       => __( 'Dokan Product Subscription module is almost ready!', 'dokan' ),
-                'description' => $error,
-                'priority'    => 10,
-                'actions'     => [
-                    [
-                        'type'   => 'primary',
-                        'text'   => __( 'Get Now', 'dokan' ),
-                        'target' => '_blank',
-                        'action' => esc_url( 'https://woocommerce.com/products/woocommerce-subscriptions/' ),
-                    ],
-                ],
-            ];
-        }
+    public function register_scripts() {
+        list( $suffix, $script_version ) = dokan_get_script_suffix_and_version();
 
-        return $notices;
-    }
-
-    /**
-     * Check whether is their has any dependency or not
-     *
-     * @return boolean
-     */
-    public function check_if_has_dependency() {
-        $res = true;
-
-        foreach ( $this->depends_on as $class ) {
-            if ( ! class_exists( $class['name'] ) ) {
-                $this->dependency_error[] = $class['notice'];
-                $res = false;
-            }
-        }
-
-        return $res;
-    }
-
-    /**
-     * Enqueue scripts
-     *
-     * @since 1.0.0
-     *
-     * @return void
-     */
-    public function enqueue_scripts() {
-        wp_enqueue_style( 'dokan-vsp-style', DOKAN_VSP_DIR_ASSETS_DIR . '/css/style.css', false, DOKAN_PLUGIN_VERSION, 'all' );
-        wp_enqueue_script( 'dokan-vsp-script', DOKAN_VSP_DIR_ASSETS_DIR . '/js/scripts.js', array( 'jquery' ), DOKAN_PLUGIN_VERSION, true );
+        wp_register_style( 'dokan-vsp-style', DOKAN_VSP_DIR_ASSETS_DIR . '/css/style.css', false, $script_version, 'all' );
+        wp_register_script( 'dokan-vsp-script', DOKAN_VSP_DIR_ASSETS_DIR . '/js/scripts.js', array( 'jquery' ), $script_version, true );
 
         $billing_period_strings = \WC_Subscriptions_Synchroniser::get_billing_period_ranges();
 
@@ -261,6 +194,18 @@ class Module {
         ];
 
         wp_localize_script( 'jquery', 'dokanVPS', apply_filters( 'wc_vps_params', $params ) );
+    }
+
+    /**
+     * Enqueue scripts
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
+    public function enqueue_scripts() {
+        wp_enqueue_style( 'dokan-vsp-style' );
+        wp_enqueue_script( 'dokan-vsp-script' );
     }
 
     /**

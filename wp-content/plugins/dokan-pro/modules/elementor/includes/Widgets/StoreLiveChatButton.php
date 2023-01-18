@@ -58,8 +58,8 @@ class StoreLiveChatButton extends DokanButton {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->update_control(
             'text',
@@ -70,7 +70,7 @@ class StoreLiveChatButton extends DokanButton {
                 ],
                 'selectors' => [
                     '{{WRAPPER}} > .elementor-widget-container > .elementor-button-wrapper > .dokan-store-live-chat-btn' => 'width: auto; margin: 0;',
-                ]
+                ],
             ]
         );
 
@@ -116,57 +116,56 @@ class StoreLiveChatButton extends DokanButton {
      */
     protected function render() {
         if ( ! dokan_is_store_page() ) {
-            parent::render();
-        }
-
-        if ( ! class_exists( \WeDevs\DokanPro\Modules\LiveChat\Chat::class ) ) {
             return;
         }
 
-        $id = dokan_elementor()->get_store_data( 'id' );
-
-        if ( ! $id ) {
+        // check if module is active
+        if ( ! dokan_pro()->module->is_active( 'live_chat' ) ) {
             return;
         }
 
-        $store = dokan()->vendor->get( $id )->get_shop_info();
-
-        if ( ! isset( $store['live_chat'] ) || $store['live_chat'] !== 'yes' ) {
-            return;
-        }
-
+        // check if admin settings is enabled
         if ( dokan_get_option( 'chat_button_seller_page', 'dokan_live_chat' ) !== 'on' ) {
             return;
         }
 
-        $chatter = dokan_pro()->module->live_chat->chat->provider;
+        $id = dokan_elementor()->get_store_data( 'id' );
+        if ( ! $id ) {
+            return;
+        }
 
+        // check if admin enabled live chat for this store
+        $store = dokan()->vendor->get( $id )->get_shop_info();
+        if ( ! isset( $store['live_chat'] ) || $store['live_chat'] !== 'yes' ) {
+            return;
+        }
+
+        $chatter = dokan_pro()->module->live_chat->chat->provider;
         if ( is_null( $chatter ) ) {
             return;
         }
 
+        parent::render();
+
         if ( ! is_user_logged_in() && 'talkjs' === $chatter->get_name() ) {
-            parent::render();
             return $chatter->login_to_chat();
         }
 
-        parent::render();
-
         switch ( $chatter->get_name() ) {
-            case 'talkjs' :
+            case 'talkjs':
                 echo do_shortcode( '[dokan-live-chat]' );
                 break;
-            case 'messenger' :
+            case 'messenger':
                 $page_id = ! empty( $store['fb_page_id'] ) ? $store['fb_page_id'] : '';
                 echo do_shortcode( sprintf( '[dokan-live-chat-messenger page_id="%s"]', $page_id ) );
                 break;
-            case 'tawkto' :
+            case 'tawkto':
                 $tawk_property_id = ! empty( $store['tawkto_property_id'] ) ? $store['tawkto_property_id'] : '';
                 $tawk_widget_id   = ! empty( $store['tawkto_widget_id'] ) ? $store['tawkto_widget_id'] : '';
 
                 echo do_shortcode( sprintf( '[dokan-live-chat-tawkto property_id="%s" widget_id="%s"]', $tawk_property_id, $tawk_widget_id ) );
                 break;
-            case 'whatsapp' :
+            case 'whatsapp':
                 $whatsapp_number = ! empty( $store['whatsapp_number'] ) ? $store['whatsapp_number'] : '';
 
                 echo do_shortcode( sprintf( '[dokan-live-chat-whatsapp number="%s"]', $whatsapp_number ) );

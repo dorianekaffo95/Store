@@ -56,12 +56,26 @@ class Storefront {
      * @return void
      */
     public function reset_style() {
-        if ( ! dokan_is_store_listing() ) {
-            return;
+        $style = '';
+
+        // Check if the current page is dokan vendor dashboard page
+        if ( dokan_is_seller_dashboard() ) {
+            // Styles to fix date range picker js broken layout issue
+            $style .= '.daterangepicker .calendar-table td, .daterangepicker .calendar-table th { padding: 5px 10px; } .daterangepicker td.in-range { background-color: #ebf4f8 !important; } .daterangepicker td.active, .daterangepicker td.active:hover { background-color: #357ebd !important; }';
         }
 
-        $style = '#dokan-seller-listing-wrap .store-content .store-data-container .store-data h2 a {text-decoration: none}';
-        $style .= '#dokan-seller-listing-wrap .store-content .store-data-container .store-data h2 {font-size: 24px; margin: 20px 0 10px 0}';
+        // Check if the current page is dokan store listing page.
+        if ( dokan_is_store_listing() ) {
+            $style .= '#dokan-seller-listing-wrap .store-content .store-data-container .store-data h2 a {text-decoration: none}';
+            $style .= '#dokan-seller-listing-wrap .store-content .store-data-container .store-data h2 {font-size: 24px; margin: 20px 0 10px 0}';
+        }
+
+        // Check if dokan pro elementor module activated and the current page is dokan single store page or elementor edit page.
+        if ( function_exists( 'dokan_elementor' ) && method_exists( dokan_elementor(), 'missing_dependencies' ) && ! dokan_elementor()->missing_dependencies() && ( dokan_is_store_page() || dokan_elementor()->is_edit_or_preview_mode() ) ) {
+            $style .= '@media(min-width: 768px) { .elementor-widget-container .dokan-store-product-section li.product.type-product.status-publish { width: 30.3%; float: left; margin-right: 4.3%; } }';
+        }
+
+        $style .= '.woocommerce-noreviews::before, .woocommerce-info::before, .woocommerce-error::before {font-weight: 900;}';
 
         wp_add_inline_style( 'dokan-style', $style );
     }

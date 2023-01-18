@@ -39,6 +39,8 @@ class Dokan_Booking_Accommodation_Manager {
             return;
         }
 
+        $product = new \WC_Product_Booking( $product->get_id() );
+
         if ( ! $product || ! $product->is_type( 'booking' ) ) {
             return;
         }

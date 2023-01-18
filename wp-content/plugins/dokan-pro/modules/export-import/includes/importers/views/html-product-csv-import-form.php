@@ -110,7 +110,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</script>
 	<div class="wc-actions">
 		<a href="#" class="woocommerce-importer-toggle-advanced-options" data-hidetext="<?php esc_attr_e( 'Hide advanced options', 'dokan' ); ?>" data-showtext="<?php esc_attr_e( 'Show advanced options', 'dokan' ); ?>"><?php esc_html_e( 'Show advanced options', 'dokan' ); ?></a>
-		<button type="submit" class="button button-primary button-next" value="<?php esc_attr_e( 'Continue', 'dokan' ); ?>" name="save_step"><?php esc_html_e( 'Continue', 'dokan' ); ?></button>
+		<button type="submit" class="dokan-btn dokan-btn-theme button button-primary button-next" value="<?php esc_attr_e( 'Continue', 'dokan' ); ?>" name="save_step"><?php esc_html_e( 'Continue', 'dokan' ); ?></button>
 		<?php wp_nonce_field( 'woocommerce-csv-importer' ); ?>
 	</div>
 </form>

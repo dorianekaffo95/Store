@@ -2,6 +2,7 @@
 
 namespace WeDevs\DokanPro\Modules\Elementor\Abstracts;
 
+use Elementor\Modules\DynamicTags\Module;
 use WeDevs\DokanPro\Modules\Elementor\Bootstrap;
 use Elementor\Core\DynamicTags\Data_Tag;
 
@@ -26,6 +27,6 @@ abstract class DataTagBase extends Data_Tag {
      * @return array
      */
     public function get_categories() {
-        return [ \Elementor\Modules\DynamicTags\Module::BASE_GROUP ];
+        return [ Module::BASE_GROUP ];
     }
 }

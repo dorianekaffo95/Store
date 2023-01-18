@@ -291,7 +291,7 @@ class Helper {
             $tip = esc_attr( $tip );
         }
 
-        $message = '<i class="fa fa-question-circle tips" aria-hidden="true" data-title="' . $tip . '"></i>';
+        $message = '<i class="fas fa-question-circle tips" aria-hidden="true" data-title="' . $tip . '"></i>';
         if ( $echo ) {
             echo $message;
         } else {

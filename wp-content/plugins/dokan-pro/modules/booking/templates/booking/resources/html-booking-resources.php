@@ -1,9 +1,9 @@
 <div id="bookings_resources" class="bookings_resources_tab dokan-edit-row dokan-clearfix">
     <div class="dokan-section-heading" data-togglehandler="bookings_resources">
-        <h2><i class="fa fa-plus-square" aria-hidden="true"></i> <?php _e( 'Additional Resources', 'dokan' ) ?></h2>
+        <h2><i class="fas fa-plus-square" aria-hidden="true"></i> <?php _e( 'Additional Resources', 'dokan' ) ?></h2>
         <p><?php _e( 'Set Available Resources', 'dokan' ) ?></p>
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>
@@ -11,7 +11,7 @@
         <div class="dokan-form-group">
             <label for="_wc_booking_resource_label" class="form-label"><?php _e( 'Label', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'The label shown on the frontend if the resource is customer defined.', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
             <?php dokan_post_input_box( $post_id, 'wc_booking_resource_label', array( 'placeholder' => __( 'Type', 'dokan' ), 'value' => $booking_resource_label, 'name' => '_wc_booking_resource_label' ), 'text' ); ?>
@@ -19,7 +19,7 @@
         <div id="resource_options" class="dokan-input-group options_group">
             <label for="_wc_booking_resources_assignment" class="form-label"><?php _e( 'Resources are...', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Customer selected resources allow customers to choose one from the booking form.', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
             <select name="_wc_booking_resources_assignment" id="_wc_booking_resources_assignment" class="dokan-form-control short" style="width: auto; margin-right: 7px;">

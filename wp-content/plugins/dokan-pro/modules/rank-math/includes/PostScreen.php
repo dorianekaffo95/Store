@@ -2,9 +2,9 @@
 
 namespace WeDevs\DokanPro\Modules\RankMath;
 
-use RankMath\Admin\Metabox\Post_Screen;
-
 defined( 'ABSPATH' ) || exit;
+
+use RankMath\Admin\Metabox\Post_Screen;
 
 /**
  * Class for post screen handler

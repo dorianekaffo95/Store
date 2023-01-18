@@ -19,6 +19,7 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 $tracking_link = sprintf( '<a href="%s" target="_blank">%s</a>', $tracking_info->provider_url, __( 'Click Here to Track Your Order', 'dokan' ) );
 $item_qty      = json_decode( $tracking_info->item_qty );
 $line_items    = $order->get_items( 'line_item' );
+$text_align    = is_rtl() ? 'right' : 'left';
 ?>
 
 <?php /* translators: %s: Customer first name */ ?>

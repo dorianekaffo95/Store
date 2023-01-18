@@ -74,6 +74,51 @@ input.dokan-v-cancel-btn{
    font-weight: normal !important;
 }
 
+#dokan-seller-address-proof .dokan-vendor-proof-alert {
+    color: #f05025;
+    font-style: italic;
+}
+
+#dokan-seller-address-proof .vendor_img_container {
+    display: inline-block;
+    position: relative;
+    margin-top: 15px;
+}
+
+#dokan-seller-address-proof .vendor_img_container:hover .dokan-close {
+    cursor: pointer;
+    transform: scale(1);
+}
+
+#dokan-seller-address-proof .vendor_img_container img {
+    width: 80px;
+    height: 80px !important;
+    border-radius: 50%;
+}
+
+#dokan-seller-address-proof .vendor_img_container .dokan-close {
+    top: 0;
+    left: 0;
+    width: 80px;
+    color: #f00;
+    height: 80px;
+    opacity: 0.7;
+    position: absolute;
+    font-size: 70px;
+    transform: scale(0);
+    transition: .3s ease-in-out;
+    background: #000;
+    text-align: center;
+    padding-top: 5px;
+    border-radius: 50%;
+    text-decoration: none !important;
+}
+
+#dokan-seller-address-proof .vendor_img_container .dokan-close:hover {
+    color: #f00;
+    opacity: .7;
+}
+
 #dokan-verification-list i{
     display: inline-block;
     vertical-align: middle;

@@ -4,7 +4,6 @@ namespace WeDevs\DokanPro\Modules\DeliveryTime;
 
 use DateInterval;
 use DatePeriod;
-use DateTime;
 use Exception;
 use WeDevs\DokanPro\Modules\DeliveryTime\StorePickup\Helper as StorePickupHelper;
 

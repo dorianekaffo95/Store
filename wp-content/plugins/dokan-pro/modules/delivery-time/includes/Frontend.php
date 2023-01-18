@@ -192,7 +192,7 @@ class Frontend {
                 'delivery_date'          => $delivery_date,
                 'delivery_time_slot'     => $delivery_time_slot,
                 'selected_delivery_type' => $selected_delivery_type,
-			], $data, $vendor_id
+            ], $data, $vendor_id
         );
 
         Helper::save_delivery_time_date_slot( $data );

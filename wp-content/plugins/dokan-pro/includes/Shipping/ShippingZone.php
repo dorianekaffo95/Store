@@ -16,7 +16,7 @@ class ShippingZone {
      *
      * @since 1.0.0
      *
-     * @return void
+     * @return array
      */
     public static function get_zones() {
         $data_store = \WC_Data_Store::load( 'shipping-zone' );
@@ -84,7 +84,7 @@ class ShippingZone {
      *
      * @since 2.8.0
      *
-     * @return void
+     * @return array
      */
     public static function get_zone( $zone_id ) {
         $zone      = array();
@@ -105,7 +105,7 @@ class ShippingZone {
      *
      * @since 2.8.0
      *
-     * @return void
+     * @return int|\WP_Error
      */
     public static function add_shipping_methods( $data ) {
         global $wpdb;
@@ -138,6 +138,8 @@ class ShippingZone {
             return new \WP_Error( 'method-not-added', __( 'Shipping method not added successfully', 'dokan' ) );
         }
 
+        \WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' ); // needed to invalidate cache set in get_zone_matching_package method
+
         return $wpdb->insert_id;
     }
 
@@ -146,7 +148,7 @@ class ShippingZone {
      *
      * @since 2.8.0
      *
-     * @return void
+     * @return bool|\mysqli_result|\WP_Error
      */
     public static function delete_shipping_methods( $data ) {
         global $wpdb;
@@ -169,6 +171,8 @@ class ShippingZone {
          */
         do_action( 'dokan_delete_shipping_zone_methods', $data['zone_id'], $data['instance_id'] );
 
+        \WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' ); // needed to invalidate cache set in get_zone_matching_package method
+
         return $result;
     }
 
@@ -177,7 +181,7 @@ class ShippingZone {
      *
      * @since 2.8.0
      *
-     * @return void
+     * @return array
      */
     public static function get_shipping_methods( $zone_id, $seller_id ) {
         global $wpdb;
@@ -235,7 +239,7 @@ class ShippingZone {
      *
      * @since 2.8.0
      *
-     * @return void
+     * @return array|false
      */
     public static function update_shipping_method( $args ) {
         global $wpdb;
@@ -251,6 +255,8 @@ class ShippingZone {
         $updated = $wpdb->update( $table_name, $data, array( 'instance_id' => $args['instance_id'] ), array( '%s', '%d', '%d', '%s' ) );
 
         if ( $updated ) {
+            \WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' ); // needed to invalidate cache set in get_zone_matching_package method
+
             return $data;
         }
 
@@ -262,7 +268,7 @@ class ShippingZone {
      *
      * @since 2.8.0
      *
-     * @return void
+     * @return bool|\WP_Error
      */
     public static function toggle_shipping_method( $data ) {
         global $wpdb;
@@ -278,6 +284,8 @@ class ShippingZone {
         if ( ! $updated ) {
             return new \WP_Error( 'method-not-toggled', __( 'Method enable or disable not working', 'dokan' ) );
         }
+
+        \WC_Cache_Helper::invalidate_cache_group( 'shipping_zones' ); // needed to invalidate cache set in get_zone_matching_package method
 
         return true;
     }
@@ -323,7 +331,7 @@ class ShippingZone {
      *
      * @since 2.8.0
      *
-     * @return void
+     * @return bool
      */
     public static function save_location( $location, $zone_id, $seller_id = 0 ) {
         global $wpdb;
@@ -386,7 +394,7 @@ class ShippingZone {
      *
      * @param  array $package Shipping package.
      *
-     * @return WC_Shipping_Zone
+     * @return \WC_Shipping_Zone
      */
     public static function get_zone_matching_package( $package ) {
         $country          = strtoupper( wc_clean( $package['destination']['country'] ) );

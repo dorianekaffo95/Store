@@ -77,7 +77,7 @@ class StoreCoupons extends Widget_Base {
      *
      * @return void
      */
-    protected function _register_controls() {
+    protected function register_controls() {
         $fields = [
             'title' => [
                 'section_title' => __( 'Title', 'dokan' ),

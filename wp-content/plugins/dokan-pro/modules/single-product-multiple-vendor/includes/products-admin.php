@@ -15,6 +15,7 @@ class Dokan_SPMV_Products_Admin {
         add_action( 'wp_ajax_dokan_spmv_products_admin_search_vendors', [ $this, 'search_vendors' ] );
         add_action( 'wp_ajax_dokan_spmv_products_admin_assign_vendors', [ $this, 'assign_vendors' ] );
         add_action( 'wp_ajax_dokan_spmv_products_admin_delete_clone_product', [ $this, 'delete_clone_product' ] );
+        add_action( 'init', [ $this, 'register_scripts' ] );
     }
 
     /**
@@ -53,6 +54,18 @@ class Dokan_SPMV_Products_Admin {
     }
 
     /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan-spmv-products-admin', DOKAN_SPMV_ASSETS_DIR . '/css/dokan-spmv-products-admin' . $suffix . '.css', [], $version );
+        wp_register_script( 'dokan-spmv-products-admin', DOKAN_SPMV_ASSETS_DIR . '/js/dokan-spmv-products-admin' . $suffix . '.js', [ 'jquery', 'dokan_pro_admin' ], $version, true );
+    }
+
+    /**
      * Enqueue scripts in product editing admin page
      *
      * @since 2.9.8
@@ -64,14 +77,11 @@ class Dokan_SPMV_Products_Admin {
     public function enqueue_scripts( $hook ) {
         global $post;
 
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
         if ( $hook == 'post-new.php' || $hook == 'post.php' ) {
             if ( 'product' === $post->post_type ) {
-                wp_enqueue_style( 'dokan-spmv-products-admin', DOKAN_SPMV_ASSETS_DIR . '/css/dokan-spmv-products-admin' . $suffix . '.css', [], DOKAN_PRO_PLUGIN_VERSION );
-                wp_enqueue_script( 'dokan-spmv-products-admin', DOKAN_SPMV_ASSETS_DIR . '/js/dokan-spmv-products-admin' . $suffix . '.js', [ 'jquery', 'dokan_pro_admin' ], DOKAN_PRO_PLUGIN_VERSION, true );
-                add_filter( 'dokan_admin_localize_param', [ $this, 'add_localize_params' ]);
+                wp_enqueue_style( 'dokan-spmv-products-admin' );
+                wp_enqueue_script( 'dokan-spmv-products-admin' );
+                add_filter( 'dokan_admin_localize_param', [ $this, 'add_localize_params' ] );
             }
         }
     }

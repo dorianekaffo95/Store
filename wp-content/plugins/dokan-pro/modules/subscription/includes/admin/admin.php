@@ -13,6 +13,7 @@ class DPS_Admin {
     public function __construct() {
         $this->response = '';
 
+        add_action( 'init', array( $this, 'register_scripts' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
         add_action( 'dokan-vue-admin-scripts', array( $this, 'vue_admin_enqueue_scripts' ) );
 
@@ -300,15 +301,26 @@ class DPS_Admin {
         }
     }
 
+    /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dps-custom-style', DPS_URL . '/assets/css/style' . $suffix . '.css', false, $version );
+        wp_register_script( 'dps-custom-admin-js', DPS_URL . '/assets/js/admin-script' . $suffix . '.js', array( 'jquery' ), $version, true );
+        wp_register_style( 'dps-subscription', DPS_URL . '/assets/css/subscription' . $suffix . '.css', [], $version );
+        wp_register_script( 'dps-subscription', DPS_URL . '/assets/js/subscription' . $suffix . '.js', array( 'jquery', 'dokan-vue-vendor', 'dokan-vue-bootstrap' ), $version, true );
+    }
+
     public function admin_enqueue_scripts() {
         // Get admin screen id
         $screen = get_current_screen();
 
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
-        wp_enqueue_style( 'dps-custom-style', DPS_URL . '/assets/css/style' . $suffix . '.css', false, dokan_current_datetime()->format( 'Ymd' ) );
-        wp_enqueue_script( 'dps-custom-admin-js', DPS_URL . '/assets/js/admin-script' . $suffix . '.js', array( 'jquery' ), dokan_current_datetime()->format( 'Ymd' ), true );
+        wp_enqueue_style( 'dps-custom-style' );
+        wp_enqueue_script( 'dps-custom-admin-js' );
 
         wp_localize_script(
             'dps-custom-admin-js', 'dokanSubscription', array(
@@ -324,11 +336,8 @@ class DPS_Admin {
     }
 
     public function vue_admin_enqueue_scripts() {
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
-        wp_enqueue_style( 'dps-subscription', DPS_URL . '/assets/css/subscription' . $suffix . '.css', [], false );
-        wp_enqueue_script( 'dps-subscription', DPS_URL . '/assets/js/subscription' . $suffix . '.js', array( 'jquery', 'dokan-vue-vendor', 'dokan-vue-bootstrap' ), dokan_current_datetime()->format( 'Ymd' ), true );
+        wp_enqueue_style( 'dps-subscription' );
+        wp_enqueue_script( 'dps-subscription' );
     }
 
     /**
@@ -493,6 +502,8 @@ class DPS_Admin {
             )
         );
 
+        do_action( 'dps_subscription_product_fields_after_pack_validity' );
+
         woocommerce_wp_select(
             array(
                 'id'            => '_subscription_product_admin_commission_type',
@@ -595,6 +606,7 @@ class DPS_Admin {
         $r['value']         = 'id';
         $r['selected']      = ! empty( $selected_cat ) ? array_map( 'absint', $selected_cat ) : '';
         $r['orderby']       = 'name';
+        $r['parent']        = 0;
 
         $categories = get_terms( 'product_cat', $r );
         include_once WC()->plugin_path() . '/includes/walkers/class-product-cat-dropdown-walker.php';
@@ -718,6 +730,8 @@ class DPS_Admin {
         echo '</p>';
         echo '</div>';
 
+        wp_nonce_field( 'dps_product_fields_nonce', 'dps_product_pack' );
+
         do_action( 'dps_subscription_product_fields' );
     }
 
@@ -728,6 +742,10 @@ class DPS_Admin {
      * @param integer $post_id
      */
     public static function general_fields_save( $post_id ) {
+        if ( ! isset( $_POST['dps_product_pack'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['dps_product_pack'] ) ), 'dps_product_fields_nonce' ) ) {
+            return;
+        }
+
         if ( ! isset( $_POST['product-type'] ) || sanitize_text_field( wp_unslash( $_POST['product-type'] ) ) !== 'product_pack' ) {
             return;
         }
@@ -740,94 +758,78 @@ class DPS_Admin {
         wp_set_post_terms( $post_id, $visibility_term, 'product_visibility', false );
         update_post_meta( $post_id, '_visibility', 'hidden' );
 
-        $woocommerce_no_of_product_field = $_POST['_no_of_product'];
-
-        if ( ! empty( $woocommerce_no_of_product_field ) ) {
+        $woocommerce_no_of_product_field = isset( $_POST['_no_of_product'] ) ? intval( wp_unslash( $_POST['_no_of_product'] ) ) : '';
+        if ( $woocommerce_no_of_product_field !== '' ) {
             update_post_meta( $post_id, '_no_of_product', $woocommerce_no_of_product_field );
         }
 
-        $woocommerce_pack_validity_field = $_POST['_pack_validity'];
-
-        if ( isset( $woocommerce_pack_validity_field ) ) {
+        $woocommerce_pack_validity_field = isset( $_POST['_pack_validity'] ) ? intval( wp_unslash( $_POST['_pack_validity'] ) ) : '';
+        if ( $woocommerce_pack_validity_field !== '' ) {
             update_post_meta( $post_id, '_pack_validity', $woocommerce_pack_validity_field );
         }
 
         if ( ! empty( $_POST['_subscription_product_admin_commission_type'] ) ) {
-            update_post_meta( $post_id, '_subscription_product_admin_commission_type', $_POST['_subscription_product_admin_commission_type'] );
+            update_post_meta( $post_id, '_subscription_product_admin_commission_type', sanitize_text_field( wp_unslash( $_POST['_subscription_product_admin_commission_type'] ) ) );
         }
 
-        update_post_meta( $post_id, '_subscription_product_admin_commission', wc_format_decimal( $_POST['_subscription_product_admin_commission'] ) );
-        update_post_meta( $post_id, '_subscription_product_admin_additional_fee', wc_format_decimal( $_POST['_subscription_product_admin_additional_fee'] ) );
+        if ( isset( $_POST['_subscription_product_admin_commission'] ) ) {
+            update_post_meta( $post_id, '_subscription_product_admin_commission', wc_format_decimal( sanitize_text_field( wp_unslash( $_POST['_subscription_product_admin_commission'] ) ) ) );
+        }
+
+        if ( isset( $_POST['_subscription_product_admin_additional_fee'] ) ) {
+            update_post_meta( $post_id, '_subscription_product_admin_additional_fee', wc_format_decimal( sanitize_text_field( wp_unslash( $_POST['_subscription_product_admin_additional_fee'] ) ) ) );
+        }
 
         if ( ! empty( $_POST['dokan_subscription_allowed_product_types'] ) ) {
-            update_post_meta( $post_id, 'dokan_subscription_allowed_product_types', wc_clean( $_POST['dokan_subscription_allowed_product_types'] ) );
+            update_post_meta( $post_id, 'dokan_subscription_allowed_product_types', wc_clean( wp_unslash( $_POST['dokan_subscription_allowed_product_types'] ) ) );
         } else {
             delete_post_meta( $post_id, 'dokan_subscription_allowed_product_types' );
         }
 
         if ( ! empty( $_POST['_vendor_allowed_categories'] ) ) {
-            update_post_meta( $post_id, '_vendor_allowed_categories', wc_clean( $_POST['_vendor_allowed_categories'] ) );
+            update_post_meta( $post_id, '_vendor_allowed_categories', wc_clean( wp_unslash( $_POST['_vendor_allowed_categories'] ) ) );
         } else {
             delete_post_meta( $post_id, '_vendor_allowed_categories' );
         }
 
         $woocommerce_enable_gallery_restriction = isset( $_POST['_enable_gallery_restriction'] ) ? 'yes' : 'no';
+        update_post_meta( $post_id, '_enable_gallery_restriction', wc_clean( $woocommerce_enable_gallery_restriction ) );
 
-        if ( ! empty( $woocommerce_enable_gallery_restriction ) ) {
-            update_post_meta( $post_id, '_enable_gallery_restriction', wc_clean( $woocommerce_enable_gallery_restriction ) );
-        }
-
-        $gallery_image_restriction_count = ! empty( $_POST['_gallery_image_restriction_count'] ) && $_POST['_gallery_image_restriction_count'] >= 0 ? intval( wp_unslash( $_POST['_gallery_image_restriction_count'] ) ) : -1;
-
+        $gallery_image_restriction_count = isset( $_POST['_gallery_image_restriction_count'] ) && intval( $_POST['_gallery_image_restriction_count'] ) >= 0 ? intval( wp_unslash( $_POST['_gallery_image_restriction_count'] ) ) : -1;
         if ( $woocommerce_enable_gallery_restriction === 'yes' ) {
             update_post_meta( $post_id, '_gallery_image_restriction_count', $gallery_image_restriction_count );
-        }
-
-        if ( $woocommerce_enable_gallery_restriction === 'no' ) {
+        } elseif ( $woocommerce_enable_gallery_restriction === 'no' ) {
             delete_post_meta( $post_id, '_gallery_image_restriction_count' );
         }
 
         $dokan_subscription_enable_trial = isset( $_POST['dokan_subscription_enable_trial'] ) ? 'yes' : 'no';
+        update_post_meta( $post_id, 'dokan_subscription_enable_trial', $dokan_subscription_enable_trial );
 
-        if ( ! empty( $dokan_subscription_enable_trial ) ) {
-            update_post_meta( $post_id, 'dokan_subscription_enable_trial', wc_clean( $dokan_subscription_enable_trial ) );
-        }
-
-        $dokan_subscription_trail_range = isset( $_POST['dokan_subscription_trail_range'] ) ? $_POST['dokan_subscription_trail_range'] : '1';
-
+        $dokan_subscription_trail_range = isset( $_POST['dokan_subscription_trail_range'] ) ? intval( wp_unslash( $_POST['dokan_subscription_trail_range'] ) ) : 1;
         if ( ! empty( $dokan_subscription_trail_range ) ) {
-            update_post_meta( $post_id, 'dokan_subscription_trail_range', wc_clean( $dokan_subscription_trail_range ) );
+            update_post_meta( $post_id, 'dokan_subscription_trail_range', $dokan_subscription_trail_range );
         }
 
-        $dokan_subscription_trial_period_types = isset( $_POST['dokan_subscription_trial_period_types'] ) ? $_POST['dokan_subscription_trial_period_types'] : 'days';
-
+        $dokan_subscription_trial_period_types = isset( $_POST['dokan_subscription_trial_period_types'] ) ? sanitize_text_field( wp_unslash( $_POST['dokan_subscription_trial_period_types'] ) ) : 'days';
         if ( ! empty( $dokan_subscription_trial_period_types ) ) {
-            update_post_meta( $post_id, 'dokan_subscription_trial_period_types', wc_clean( $dokan_subscription_trial_period_types ) );
+            update_post_meta( $post_id, 'dokan_subscription_trial_period_types', $dokan_subscription_trial_period_types );
         }
 
         $woocommerce_enable_recurring_field = isset( $_POST['_enable_recurring_payment'] ) ? 'yes' : 'no';
+        update_post_meta( $post_id, '_enable_recurring_payment', $woocommerce_enable_recurring_field );
 
-        if ( ! empty( $woocommerce_enable_recurring_field ) ) {
-            update_post_meta( $post_id, '_enable_recurring_payment', $woocommerce_enable_recurring_field );
-        }
-
-        $woocommerce_subscription_period_interval_field = $_POST['_dokan_subscription_period_interval'];
-
-        if ( ! empty( $woocommerce_enable_recurring_field ) ) {
+        $woocommerce_subscription_period_interval_field = isset( $_POST['_dokan_subscription_period_interval'] ) ? intval( wp_unslash( $_POST['_dokan_subscription_period_interval'] ) ) : '';
+        if ( $woocommerce_enable_recurring_field !== '' ) {
             update_post_meta( $post_id, '_dokan_subscription_period_interval', $woocommerce_subscription_period_interval_field );
         }
 
-        $woocommerce_subscription_period_field = $_POST['_dokan_subscription_period'];
-
-        if ( ! empty( $woocommerce_enable_recurring_field ) ) {
+        $woocommerce_subscription_period_field = isset( $_POST['_dokan_subscription_period'] ) ? sanitize_text_field( wp_unslash( $_POST['_dokan_subscription_period'] ) ) : '';
+        if ( $woocommerce_enable_recurring_field !== '' ) {
             update_post_meta( $post_id, '_dokan_subscription_period', $woocommerce_subscription_period_field );
         }
 
-        $woocommerce_subscription_length_field = $_POST['_dokan_subscription_length'];
-
-        if ( ! empty( $woocommerce_enable_recurring_field ) ) {
-            update_post_meta( $post_id, '_dokan_subscription_length', $woocommerce_subscription_length_field );
-        }
+        $woocommerce_subscription_length_field = isset( $_POST['_dokan_subscription_length'] ) ? intval( wp_unslash( $_POST['_dokan_subscription_length'] ) ) : 0;
+        update_post_meta( $post_id, '_dokan_subscription_length', $woocommerce_subscription_length_field );
 
         do_action( 'dps_process_subcription_product_meta', $post_id );
     }
@@ -841,11 +843,15 @@ class DPS_Admin {
      * @return array
      */
     public static function add_new_section_admin_panael( $sections ) {
-        $sections['dokan_product_subscription'] = array(
-            'id'    => 'dokan_product_subscription',
-            'title' => __( 'Vendor Subscription', 'dokan' ),
-            'icon'  => 'dashicons-controls-repeat',
-        );
+        $sections['dokan_product_subscription'] = [
+            'id'                   => 'dokan_product_subscription',
+            'title'                => __( 'Vendor Subscription', 'dokan' ),
+            'icon_url'             => DPS_URL . '/assets/images/subscription.svg',
+            'description'          => __( 'Manage Subscription Plans', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/modules/how-to-install-use-dokan-subscription/',
+            'settings_title'       => __( 'Vendor Subscription Settings', 'dokan' ),
+            'settings_description' => __( 'Configure marketplace settings to authorize vendors to create subscription products for their stores.', 'dokan' ),
+        ];
 
         return $sections;
     }
@@ -896,22 +902,21 @@ class DPS_Admin {
                 'name'  => 'enable_pricing',
                 'label' => __( 'Enable Product Subscription', 'dokan' ),
                 'desc'  => __( 'Enable product subscription for vendor', 'dokan' ),
-                'type'  => 'checkbox',
+                'type'  => 'switcher',
             ),
-            'enable_subscription_pack_in_reg' => array(
-                'name'          => 'enable_subscription_pack_in_reg',
-                'label'         => __( 'Enable Subscription in registration form', 'dokan' ),
-                'desc'          => __( 'Enable Subscription pack in registration form for new vendor', 'dokan' ),
-                'type'          => 'checkbox',
-                'default'       => 'on',
-                'tooltip'       => __( 'If checked, vendor completes registration only after subscribing to a pack', 'dokan' ),
-                'content_class' => 'dokan_checkbox_up',
-            ),
+            'enable_subscription_pack_in_reg' => [
+                'name'    => 'enable_subscription_pack_in_reg',
+                'label'   => __( 'Enable Subscription in Registration Form', 'dokan' ),
+                'desc'    => __( 'Enable subscription pack in registration form for new vendor', 'dokan' ),
+                'type'    => 'switcher',
+                'default' => 'on',
+                'tooltip' => __( 'If checked, vendor completes registration only after subscribing to a pack', 'dokan' ),
+            ],
             'notify_by_email' => array(
                 'name'  => 'notify_by_email',
                 'label' => __( 'Enable Email Notification', 'dokan' ),
                 'desc'  => __( 'Enable notification by email for vendor during end of the package expiration', 'dokan' ),
-                'type'  => 'checkbox',
+                'type'  => 'switcher',
             ),
             'no_of_days_before_mail' => array(
                 'name'    => 'no_of_days_before_mail',
@@ -937,30 +942,34 @@ class DPS_Admin {
                 'name'    => 'cancelling_email_subject',
                 'label'   => __( 'Cancelling Email Subject', 'dokan' ),
                 'desc'    => __( 'Enter subject text for canceled subscriptions email notification', 'dokan' ),
-                'type'    => 'text',
+                'type'    => 'textarea',
+                'rows'    => 3,
                 'default' => __( 'Subscription Package Cancel notification', 'dokan' ),
             ),
             'cancelling_email_body' => array(
                 'name'  => 'cancelling_email_body',
-                'label' => __( 'Cancelling Email body', 'dokan' ),
+                'label' => __( 'Cancelling Email Body', 'dokan' ),
                 'desc'  => __( 'Enter body text for canceled subscriptions email notification', 'dokan' ),
                 'type'  => 'textarea',
+                'rows'  => 4,
                 'default' => __( 'Dear subscriber, Your subscription has expired. Please renew your package to continue using it.', 'dokan' ),
             ),
             'alert_email_subject' => array(
                 'name'    => 'alert_email_subject',
                 'label'   => __( 'Alert Email Subject', 'dokan' ),
                 'desc'    => __( 'Enter subject text for package end notification alert email', 'dokan' ),
-                'type'    => 'text',
+                'type'    => 'textarea',
+                'rows'    => 3,
                 'default' => __( 'Subscription Ending Soon', 'dokan' ),
             ),
-            'alert_email_body' => array(
-                'name'  => 'alert_email_body',
-                'label' => __( 'Alert Email body', 'dokan' ),
-                'desc'  => __( 'Enter body text for package end notification alert email', 'dokan' ),
-                'type'  => 'textarea',
+            'alert_email_body' => [
+                'name'    => 'alert_email_body',
+                'label'   => __( 'Alert Email body', 'dokan' ),
+                'desc'    => __( 'Enter body text for package end notification alert email', 'dokan' ),
+                'type'    => 'textarea',
+                'rows'    => 4,
                 'default' => __( 'Dear subscriber, Your subscription will be ending soon. Please renew your package in a timely manner for continued usage.', 'dokan' ),
-            ),
+            ],
         );
 
         if ( dokan_pro()->module->product_subscription->is_dokan_plugin() ) {
@@ -1081,6 +1090,7 @@ class DPS_Admin {
                 $r['value']         = 'id';
                 $r['orderby']       = 'name';
                 $r['selected']      = ! empty( $selected_cat ) ? array_map( 'absint', $selected_cat ) : '';
+                $r['parent']        = 0;
 
                 $categories = get_terms( 'product_cat', $r );
 

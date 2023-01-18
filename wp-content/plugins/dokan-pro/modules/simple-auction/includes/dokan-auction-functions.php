@@ -125,20 +125,25 @@ function dokan_auction_get_activity( $count = false ) {
     $nonce_check = isset( $_GET['auction_activity_nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_GET['auction_activity_nonce'] ) ), 'dokan-auction-activity' );
 
     // Getting filter params
-    $date_from = $nonce_check && isset( $_GET['_auction_dates_from'] ) ? esc_sql( wp_unslash( $_GET['_auction_dates_from'] ) ) : false;
-    $date_to   = $nonce_check && isset( $_GET['_auction_dates_to'] ) ? esc_sql( wp_unslash( $_GET['_auction_dates_to'] ) ) : false;
+    $date_from     = $nonce_check && isset( $_GET['_auction_dates_from'] ) ? esc_sql( sanitize_text_field( wp_unslash( $_GET['_auction_dates_from'] ) ) ) : false;
+    $date_to       = $nonce_check && isset( $_GET['_auction_dates_to'] ) ? esc_sql( sanitize_text_field( wp_unslash( $_GET['_auction_dates_to'] ) ) ) : false;
+    $date_to_added = $date_to;
+
+    if ( $date_to_added ) {
+        $date_to_added = dokan_current_datetime()->modify( $date_to )->add( new DateInterval( 'PT1M' ) )->format( 'Y-m-d H:i' );
+    }
 
     // Getting search param
-    $search_string = isset( $_GET['auction_activity_search'] ) ? esc_sql( wp_unslash( $_GET['auction_activity_search'] ) ) : false;
+    $search_string = isset( $_GET['auction_activity_search'] ) ? esc_sql( sanitize_text_field( wp_unslash( $_GET['auction_activity_search'] ) ) ) : false;
 
     // Handling limit query
     $limit_query = $count ? '' : $wpdb->prepare( 'LIMIT %d, %d', $offset, $limit );
 
     // Handling date range query
     if ( $date_from && $date_to ) {
-        $date_from_filter = $wpdb->prepare( ' AND date BETWEEN CAST( %s AS DATETIME ) AND CAST( %s AS DATETIME )', $date_from, $date_to );
+        $date_from_filter = $wpdb->prepare( ' AND date BETWEEN CAST( %s AS DATETIME ) AND CAST( %s AS DATETIME )', $date_from, $date_to_added );
     } elseif ( $date_to ) {
-        $date_from_filter = $wpdb->prepare( ' AND date <= CAST( %s AS DATETIME )', $date_to );
+        $date_from_filter = $wpdb->prepare( ' AND date <= CAST( %s AS DATETIME )', $date_to_added );
     } elseif ( $date_from ) {
         $date_from_filter = $wpdb->prepare( ' AND date >= CAST( %s AS DATETIME )', $date_from );
     }
@@ -146,7 +151,7 @@ function dokan_auction_get_activity( $count = false ) {
     // Handling search query
     if ( $search_string ) {
         $like         = '%' . $wpdb->esc_like( $search_string ) . '%';
-        $search_query = $wpdb->prepare( "AND ( `{$wpdb->users}`.user_nicename LIKE %s OR `{$wpdb->posts}`.post_title LIKE %s )", $like, $like );
+        $search_query = $wpdb->prepare( "AND ( `{$wpdb->users}`.user_nicename LIKE %s OR `{$wpdb->posts}`.post_title LIKE %s OR `{$wpdb->users}`.user_email = %s )", $like, $like, sanitize_email( $search_string ) );
     }
 
     $cache_group = "auction_activities_{$vendor_id}";

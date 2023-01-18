@@ -21,6 +21,122 @@ class Billing {
     public function __construct() {
         // add custom fields under customer billing details
         add_filter( 'woocommerce_billing_fields', [ $this, 'custom_billing_checkout_fields' ], 10, 1 );
+
+        add_filter( 'woocommerce_admin_billing_fields', [ $this, 'cf_in_order_details_billing' ] );
+
+        add_action( 'woocommerce_admin_order_data_after_order_details', [ $this, 'cf_field_styles' ] );
+
+        add_filter( 'woocommerce_customer_meta_fields', [ $this, 'cf_in_user_profile' ] );
+    }
+
+    /**
+     * Get active custom fields with the labels
+     *
+     * @since 3.5.2
+     *
+     * @return array
+     */
+    private function get_active_customer_fields_and_labels() {
+        $customer_fields = Helper::get_customer_fields();
+
+        $customer_fields_labels = [];
+
+        foreach ( $customer_fields as $field ) {
+            switch ( $field ) {
+                case 'billing_dokan_company_id_number':
+                    $customer_fields_labels[ $field ] = Helper::get_customer_company_id_label();
+                    break;
+                case 'billing_dokan_vat_number':
+                    $customer_fields_labels[ $field ] = Helper::get_customer_vat_number_label();
+                    break;
+                case 'billing_dokan_bank_name':
+                    $customer_fields_labels[ $field ] = Helper::get_customer_bank_name_label();
+                    break;
+                case 'billing_dokan_bank_iban':
+                    $customer_fields_labels[ $field ] = Helper::get_customer_bank_iban_label();
+                    break;
+            }
+        }
+
+        return $customer_fields_labels;
+    }
+
+    /**
+     * Add Customer Custom fields to customer profile billing fields
+     *
+     * @since 3.5.2
+     *
+     * @param $fields
+     *
+     * @return array
+     */
+    public function cf_in_user_profile( $fields ) {
+        $customer_fields = $this->get_active_customer_fields_and_labels();
+
+        foreach ( $customer_fields as $field => $label ) {
+            $fields['billing']['fields'][ $field ] = [ 'label' => $label ];
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Add styles for form fields in Order Billing info
+     *
+     * @since 3.5.2
+     *
+     * @param $order
+     */
+    public function cf_field_styles( $order ) {
+        $customer_fields_labels = $this->get_active_customer_fields_and_labels();
+        ?>
+        <style>
+            ._billing_dokan_company_id_number_field, ._billing_dokan_vat_number_field {
+                width: 100% !important;
+            }
+            <?php
+            if ( isset( $customer_fields_labels['billing_dokan_bank_name'] ) && isset( $customer_fields_labels['billing_dokan_bank_iban'] ) ) {
+                ?>
+                ._billing_dokan_bank_iban_field {
+                    float: right !important;
+                    clear: right !important;
+                }
+                <?php
+            } elseif ( isset( $customer_fields_labels['billing_dokan_bank_name'] ) || isset( $customer_fields_labels['billing_dokan_bank_iban'] ) ) {
+                ?>
+                ._billing_dokan_bank_name_field, ._billing_dokan_bank_iban_field {
+                    width: 100% !important;
+                }
+                <?php
+            }
+            ?>
+        </style>
+        <?php
+    }
+
+    /**
+     * Add Customer Custom fields to billing data
+     *
+     * @since 3.5.2
+     *
+     * @param array $billing_fields
+     *
+     * @return array
+     */
+    public function cf_in_order_details_billing( $billing_fields ) {
+        $customer_fields = $this->get_active_customer_fields_and_labels();
+
+        foreach ( $customer_fields as $field => $label ) {
+            $unprefixed_field = substr( $field, 8 );
+
+            $billing_fields[ $unprefixed_field ] = [
+                'type'  => 'text',
+                'label' => $label,
+                'show'  => false,
+            ];
+        }
+
+        return $billing_fields;
     }
 
     /**

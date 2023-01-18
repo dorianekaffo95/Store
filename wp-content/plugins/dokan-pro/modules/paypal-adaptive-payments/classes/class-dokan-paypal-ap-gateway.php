@@ -1,5 +1,7 @@
 <?php
-if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 
 /**
  * Provides a PayPal Adaptive Payment Gateway.
@@ -8,7 +10,7 @@ if ( !defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  */
 class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
 
-    var $notify_url;
+    public $notify_url;
 
     /**
      * Constructor for the gateway.
@@ -17,7 +19,6 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      * @return void
      */
     public function __construct() {
-
         $this->id                 = 'dokan_paypal_adaptive';
         $this->icon               = false;
         $this->has_fields         = true;
@@ -48,7 +49,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
         $this->init_settings();
 
         // Logs
-        if ( 'yes' == $this->debug ) {
+        if ( 'yes' === $this->debug ) {
             $this->log = new WC_Logger();
         }
 
@@ -70,8 +71,8 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      * @access public
      * @return bool
      */
-    function is_valid_for_use() {
-        if ( !in_array( get_woocommerce_currency(), apply_filters( 'woocommerce_paypal_supported_currencies', array( 'AUD', 'BRL', 'CAD', 'MXN', 'NZD', 'HKD', 'SGD', 'USD', 'EUR', 'JPY', 'TRY', 'NOK', 'CZK', 'DKK', 'HUF', 'ILS', 'MYR', 'PHP', 'PLN', 'SEK', 'CHF', 'TWD', 'THB', 'GBP', 'RMB', 'RUB' ) ) ) ) {
+    public function is_valid_for_use() {
+        if ( ! in_array( get_woocommerce_currency(), apply_filters( 'woocommerce_paypal_supported_currencies', array( 'AUD', 'BRL', 'CAD', 'MXN', 'NZD', 'HKD', 'SGD', 'USD', 'EUR', 'JPY', 'TRY', 'NOK', 'CZK', 'DKK', 'HUF', 'ILS', 'MYR', 'PHP', 'PLN', 'SEK', 'CHF', 'TWD', 'THB', 'GBP', 'RMB', 'RUB' ) ), true ) ) {
             return false;
         }
 
@@ -86,8 +87,8 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      */
     public function admin_options() {
         ?>
-        <h3><?php _e( 'Dokan PayPal Adaptive Payments', 'dokan' ); ?></h3>
-        <p><?php _e( 'PayPal Adaptive works by sending payment to multiple user email', 'dokan' ); ?></p>
+        <h3><?php esc_html_e( 'Dokan PayPal Adaptive Payments', 'dokan' ); ?></h3>
+        <p><?php esc_html_e( 'PayPal Adaptive works by sending payment to multiple user email', 'dokan' ); ?></p>
         <div style="display: none;" id="seller-percentage"><?php echo dokan_get_option( 'seller_percentage', 'dokan_selling', '90' ); ?></div>
 
         <?php if ( $this->is_valid_for_use() ) : ?>
@@ -97,8 +98,8 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
             </table><!--/.form-table-->
 
         <?php else : ?>
-            <div class="inline error"><p><strong><?php _e( 'Gateway Disabled', 'dokan' ); ?></strong>: <?php _e( 'PayPal Adaptive does not support your store currency.', 'dokan' ); ?></p></div>
-        <?php
+            <div class="inline error"><p><strong><?php esc_html_e( 'Gateway Disabled', 'dokan' ); ?></strong>: <?php esc_html_e( 'PayPal Adaptive does not support your store currency.', 'dokan' ); ?></p></div>
+			<?php
         endif;
     }
 
@@ -116,14 +117,13 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      * @access public
      * @return void
      */
-    function init_form_fields() {
-
+    public function init_form_fields() {
         $this->form_fields = array(
             'enabled' => array(
                 'title'   => __( 'Enable/Disable', 'dokan' ),
                 'type'    => 'checkbox',
                 'label'   => __( 'Enable PayPal Adaptive', 'dokan' ),
-                'default' => 'no'
+                'default' => 'no',
             ),
             'title' => array(
                 'title'       => __( 'Title', 'dokan' ),
@@ -136,7 +136,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'title'       => __( 'Description', 'dokan' ),
                 'type'        => 'textarea',
                 'description' => __( 'This controls the description which the user sees during checkout.', 'dokan' ),
-                'default'     => __( 'Pay via PayPal Adaptive; you can pay with your credit card if you don\'t have a PayPal account', 'dokan' )
+                'default'     => __( 'Pay via PayPal Adaptive; you can pay with your credit card if you don\'t have a PayPal account', 'dokan' ),
             ),
             'pa_admin_email' => array(
                 'title'       => __( 'PayPal Email', 'dokan' ),
@@ -144,7 +144,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'Please enter your PayPal email address; this is needed in order to take payment.', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'you@youremail.com'
+                'placeholder' => 'you@youremail.com',
             ),
             'payment_process' => array(
                 'title'       => __( 'Payment System', 'dokan' ),
@@ -154,15 +154,15 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'default'     => 'chained',
                 'options'     => array(
                     'chained'  => __( 'Chained Payment', 'dokan' ),
-                    'parallel' => __( 'Parallel Payment', 'dokan' )
-                )
+                    'parallel' => __( 'Parallel Payment', 'dokan' ),
+                ),
             ),
             'single_mode' => array(
                 'title'       => __( 'Mode', 'dokan' ),
                 'label'       => __( 'Single Vendor Mode (Recommended)', 'dokan' ),
                 'type'        => 'checkbox',
                 'default'     => 'yes',
-                'description' => sprintf( __( 'When using this mode, items from <strong>only one</strong> vendor can be purchased in a single order. Works only with <strong>chained payments</strong>. It\'s a good solution for marketplace as disputes/chargebacks will be handled by the vendor, not by admin.<br>Warning : <i>Do not use <b>Chained Payment </b> while <a href="%s" target="_blank">Vendor commission</a> is set to 100%%</i>', 'dokan' ), admin_url().'/admin.php?page=dokan-settings')
+                'description' => sprintf( __( 'When using this mode, items from <strong>only one</strong> vendor can be purchased in a single order. Works only with <strong>chained payments</strong>. It\'s a good solution for marketplace as disputes/chargebacks will be handled by the vendor, not by admin.<br>Warning : <i>Do not use <b>Chained Payment </b> while <a href="%s" target="_blank">Vendor commission</a> is set to 100%%</i>', 'dokan' ), admin_url() . '/admin.php?page=dokan-settings' ),
             ),
             'fees_payer' => array(
                 'title'       => __( 'Fees Payer', 'dokan' ),
@@ -173,13 +173,13 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'options'     => array(
                     'each'  => __( 'Each receiver', 'dokan' ),
                     'admin' => __( 'Admin', 'dokan' ),
-                    'seller' => __( 'Vendor', 'dokan' )
-                )
+                    'seller' => __( 'Vendor', 'dokan' ),
+                ),
             ),
             'send_shipping' => array(
                 'title'       => __( 'Shipping details', 'dokan' ),
                 'label'       => __( 'Send shipping details to PayPal instead of billing.', 'dokan' ),
-                'type'        => 'checkbox'
+                'type'        => 'checkbox',
             ),
             'testmode' => array(
                 'title'       => __( 'PayPal sandbox', 'dokan' ),
@@ -194,7 +194,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'For this payment method your need an application credential', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'username'
+                'placeholder' => 'username',
             ),
             'apppass' => array(
                 'title'       => __( 'API Password', 'dokan' ),
@@ -202,7 +202,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'For this payment method your need an application credential', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'password'
+                'placeholder' => 'password',
             ),
             'appsig' => array(
                 'title'       => __( 'API Signature', 'dokan' ),
@@ -210,7 +210,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'For this payment method your need an application credential', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'signature'
+                'placeholder' => 'signature',
             ),
             'appid' => array(
                 'title'       => __( 'App ID', 'dokan' ),
@@ -218,7 +218,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'For this payment method your need an application credential', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'api appID'
+                'placeholder' => 'api appID',
             ),
             'test_appuser' => array(
                 'title'       => __( 'Sandbox App Username', 'dokan' ),
@@ -226,7 +226,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'For this system please sign up in developer account and get your  application credential', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'username'
+                'placeholder' => 'username',
             ),
             'test_apppass' => array(
                 'title'       => __( 'Sandbox App Password', 'dokan' ),
@@ -234,7 +234,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'For this system please sign up in developer account and get your  application credential', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'password'
+                'placeholder' => 'password',
             ),
             'test_appsig' => array(
                 'title'       => __( 'Sandbox App Signature', 'dokan' ),
@@ -242,7 +242,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'description' => __( 'For this system please sign up in developer account and get your  application credential', 'dokan' ),
                 'default'     => '',
                 'desc_tip'    => true,
-                'placeholder' => 'signature'
+                'placeholder' => 'signature',
             ),
             'max_error' => array(
                 'title'       => __( 'Error Message', 'dokan' ),
@@ -257,7 +257,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 'label'       => __( 'Enable logging', 'dokan' ),
                 'default'     => 'no',
                 'description' => sprintf( __( 'Log PayPal events, such as IPN requests, inside <code>woocommerce/logs/paypal-%s.txt</code>', 'dokan' ), sanitize_file_name( wp_hash( 'paypal' ) ) ),
-            )
+            ),
         );
     }
 
@@ -322,16 +322,19 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      * @param int     $order_id
      * @return array
      */
-    function process_payment( $order_id ) {
-
+    public function process_payment( $order_id ) {
         $receiver   = array();
         $payRequest = new \PayPal\Types\AP\PayRequest();
         $order      = new \WC_Order( $order_id );
 
-        $sub_orders = get_children( array( 'post_parent' => $order_id, 'post_type' => 'shop_order' ) );
+        $sub_orders = get_children(
+            array(
+				'post_parent' => $order_id,
+				'post_type' => 'shop_order',
+            )
+        );
 
         if ( $sub_orders ) {
-
             $sum = 0;
             foreach ( $sub_orders as $key => $order_post ) {
                 $seller_id        = dokan_get_seller_id_by_order( $order_post->ID );
@@ -342,16 +345,16 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                     $seller_pay_email = get_user_by( 'id', $seller_id )->user_email;
                 }
 
-                $receiver[$key] = new \PayPal\Types\AP\Receiver();
-                $receiver[$key]->amount = round( $seller_balance, wc_get_price_decimals() );
-                $receiver[$key]->email  = $seller_pay_email;
+                $receiver[ $key ] = new \PayPal\Types\AP\Receiver();
+                $receiver[ $key ]->amount = round( $seller_balance, wc_get_price_decimals() );
+                $receiver[ $key ]->email  = $seller_pay_email;
 
                 $sum += (float) $seller_balance;
             }
 
-            if ( $this->payment_process == 'chained' ) {
+            if ( $this->payment_process === 'chained' ) {
                 // if single seller mode enabled then we need to exit as we have multiple orders here
-                if ( $this->single_mode == 'yes' ) {
+                if ( $this->single_mode === 'yes' ) {
                     throw new Exception( sprintf( __( 'You have products from multiple-vendor please choose products from Single vendor only', 'dokan' ) ) );
                 }
                 $admin_amount = (string) round( $order->get_total(), wc_get_price_decimals() );
@@ -359,7 +362,6 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
                 $admin_amount = (string) ( round( (float) $order->get_total() - $sum, wc_get_price_decimals() ) );
             }
         } else {
-
             $seller_id        = dokan_get_seller_id_by_order( $order_id );
             $seller_balance   = $this->get_seller_net_balance( $order_id, $seller_id );
             $seller_pay_email = dokan_get_seller_withdraw_mail( $seller_id );
@@ -372,15 +374,13 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
             $receiver[0]->amount = round( $seller_balance, wc_get_price_decimals() );
             $receiver[0]->email  = $seller_pay_email;
 
-            if ( $this->payment_process == 'chained' ) {
-
-                if ( $this->single_mode == 'yes' ) {
+            if ( $this->payment_process === 'chained' ) {
+                if ( $this->single_mode === 'yes' ) {
                     $admin_amount        = (string) ( round( (float) $order->get_total() - (float) $seller_balance, wc_get_price_decimals() ) );
                     $receiver[0]->amount = (string) $order->get_total();
                 } else {
                     $admin_amount = (string) round( $order->get_total(), wc_get_price_decimals() );
                 }
-
             } else {
                 $admin_amount = (string) ( round( (float) $order->get_total() - (float) $seller_balance, wc_get_price_decimals() ) );
             }
@@ -389,26 +389,25 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
         $count = count( $receiver );
 
         if ( $admin_amount > 0 ) {
-            $receiver[$count]         = new PayPal\Types\AP\Receiver();
-            $receiver[$count]->amount = $admin_amount;
-            $receiver[$count]->email  = $this->pa_admin_email;
+            $receiver[ $count ]         = new PayPal\Types\AP\Receiver();
+            $receiver[ $count ]->amount = $admin_amount;
+            $receiver[ $count ]->email  = $this->pa_admin_email;
         }
 
-        if ( $this->payment_process == 'chained' ) {
-
-            if ( $this->single_mode == 'yes' ) {
+        if ( $this->payment_process === 'chained' ) {
+            if ( $this->single_mode === 'yes' ) {
                 $receiver[0]->primary = 'true';
-                if ( 'seller' == $this->fees_payer ) {
+                if ( 'seller' === $this->fees_payer ) {
                     $payRequest->feesPayer = 'PRIMARYRECEIVER';
-                }else if ( 'admin' == $this->fees_payer ) {
+                } elseif ( 'admin' === $this->fees_payer ) {
                     if ( $admin_amount > 0 ) {
                         $payRequest->feesPayer = 'SECONDARYONLY';
                     }
                 }
             } elseif ( $admin_amount > 0 ) {
                 //make admin the primary receiver
-                $receiver[$count]->primary = 'true';
-                if ( 'admin' == $this->fees_payer ) {
+                $receiver[ $count ]->primary = 'true';
+                if ( 'admin' === $this->fees_payer ) {
                     $payRequest->feesPayer = 'PRIMARYRECEIVER';
                 }
                 // else defaults to EACH receiver
@@ -420,30 +419,30 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
         $receiverList                   = new PayPal\Types\AP\ReceiverList( $receiver );
         $payRequest->receiverList       = $receiverList;
 
-        $requestEnvelope                = new PayPal\Types\Common\RequestEnvelope( "en_US" );
+        $requestEnvelope                = new PayPal\Types\Common\RequestEnvelope( 'en_US' );
         $payRequest->requestEnvelope    = $requestEnvelope;
-        $payRequest->actionType         = "PAY";
+        $payRequest->actionType         = 'PAY';
         $payRequest->reverseAllParallelPaymentsOnError         = true;
-        $payRequest->cancelUrl          = esc_url( $order->get_cancel_order_url() );
-        $payRequest->returnUrl          = esc_url( $this->get_return_url( $order ) );
+        $payRequest->cancelUrl          = esc_url_raw( $order->get_cancel_order_url() );
+        $payRequest->returnUrl          = esc_url_raw( $this->get_return_url( $order ) );
         $payRequest->currencyCode       = get_woocommerce_currency();
         $payRequest->ipnNotificationUrl = $this->notify_url;
 
-        if ( 'yes' == $this->testmode ) {
+        if ( 'yes' === $this->testmode ) {
             $sdkConfig = array(
-                "mode"            => "sandbox",
-                "acct1.UserName"  => $this->test_appuser,
-                "acct1.Password"  => $this->test_apppass,
-                "acct1.Signature" => $this->test_appsig,
-                "acct1.AppId"     => "APP-80W284485P519543T"
+                'mode'            => 'sandbox',
+                'acct1.UserName'  => $this->test_appuser,
+                'acct1.Password'  => $this->test_apppass,
+                'acct1.Signature' => $this->test_appsig,
+                'acct1.AppId'     => 'APP-80W284485P519543T',
             );
         } else {
             $sdkConfig = array(
-                "mode"            => "live",
-                "acct1.UserName"  => $this->appuser,
-                "acct1.Password"  => $this->apppass,
-                "acct1.Signature" => $this->appsig,
-                "acct1.AppId"     => $this->appid
+                'mode'            => 'live',
+                'acct1.UserName'  => $this->appuser,
+                'acct1.Password'  => $this->apppass,
+                'acct1.Signature' => $this->appsig,
+                'acct1.AppId'     => $this->appid,
             );
         }
 
@@ -451,7 +450,6 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
         $payResponse             = $adaptivePaymentsService->Pay( $payRequest );
 
         if ( $payResponse->payKey ) {
-
             $shippingAddressInfo = new PayPal\Types\AP\ShippingAddressInfo();
 
             $shippingAddressInfo->addresseeName = dokan_get_prop( $order, 'billing_first_name' ) . ' ' . dokan_get_prop( $order, 'billing_last_name' );
@@ -483,22 +481,22 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
 
         $this->add_log( 'Payment Response: ' . print_r( $payResponse, true ) );
 
-        if ( 'Failure' == $payResponse->responseEnvelope->ack ) {
-            throw new Exception( sprintf( __( 'Paypal Adaptive Error : %s , Error Code : %d', 'dokan' ), $payResponse->error[0]->message, $payResponse->error[0]->errorId ) );
+        if ( 'Failure' === $payResponse->responseEnvelope->ack ) {
+            throw new Exception( sprintf( __( 'Paypal Adaptive Error : %1$s , Error Code : %2$d', 'dokan' ), $payResponse->error[0]->message, $payResponse->error[0]->errorId ) );
         }
         // update paykey reference to find out
-        update_post_meta( $order->id, '_dokan_pap_key', $payResponse->payKey );
+        update_post_meta( $order->get_id(), '_dokan_pap_key', $payResponse->payKey );
 
-        if ( 'yes' == $this->testmode ) {
-            $paypal_url = "https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey=" . $payResponse->payKey;
+        if ( 'yes' === $this->testmode ) {
+            $paypal_url = 'https://www.sandbox.paypal.com/webscr?cmd=_ap-payment&paykey=' . $payResponse->payKey;
         } else {
-            $paypal_url = "https://www.paypal.com/webscr?cmd=_ap-payment&paykey=" . $payResponse->payKey;
+            $paypal_url = 'https://www.paypal.com/webscr?cmd=_ap-payment&paykey=' . $payResponse->payKey;
         }
 
         // Return thankyou redirect
         return array(
             'result'   => 'success',
-            'redirect' => $paypal_url
+            'redirect' => $paypal_url,
         );
     }
 
@@ -527,9 +525,8 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      *
      *  @return boolean true/false
      */
-    function check_ipn_response() {
-
-        if ( 'yes' == $this->testmode ) {
+    public function check_ipn_response() {
+        if ( 'yes' === $this->testmode ) {
             $config = array( 'mode' => 'sandbox' );
         } else {
             $config = array( 'mode' => 'live' );
@@ -538,12 +535,10 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
         $ipnMessage = new PayPal\IPN\PPIPNMessage( '', $config );
 
         if ( $ipnMessage->validate() ) {
-
             $this->add_log( 'IPN Response: ' . print_r( $ipnMessage->getRawData(), true ) );
 
-            do_action( "dokan-valid-paypal-adaptive-request" );
+            do_action( 'dokan-valid-paypal-adaptive-request' );
         } else {
-
             $this->add_log( 'Received invalid response from PayPal Adaptive Payment' );
 
             if ( is_wp_error( $ipnMessage ) ) {
@@ -557,19 +552,18 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      *
      * @return void
      */
-    function successful_request() {
-
-        $posted = $_POST;
+    public function successful_request() {
+        $posted = wp_unslash( $_POST );
         $paykey = isset( $posted['pay_key'] ) ? $posted['pay_key'] : '';
 
-        if ( !$paykey ) {
+        if ( ! $paykey ) {
             $this->add_log( __( 'No pay key found, abort.', 'dokan' ) );
             exit;
         }
 
         $order_id = $this->get_order_by_paykey( $paykey );
 
-        if ( !$order_id ) {
+        if ( ! $order_id ) {
             $this->add_log( sprintf( __( 'No order id found by pay key: %s', 'dokan' ), $paykey ) );
             exit;
         }
@@ -577,7 +571,7 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
         $order = new WC_Order( $order_id );
 
         // yet another check to make sure
-        if ( !isset( $order->id ) || empty( $order->id ) || absint( $order->id ) <= 0 ) {
+        if ( empty( $order->get_id() ) || absint( $order->get_id() ) <= 0 ) {
             $this->add_log( sprintf( __( 'No order found by pay key: %s', 'dokan' ), $paykey ) );
             exit;
         }
@@ -587,82 +581,79 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
         $status = strtolower( $posted['status'] );
 
         switch ( $status ) {
-        case 'completed' :
+			case 'completed':
+				// Check order not already completed
+				if ( $order->status == 'completed' ) {
+					$this->add_log( 'Aborting, Order #' . $order->get_id() . ' is already complete.' );
+					exit;
+				}
 
-            // Check order not already completed
-            if ( $order->status == 'completed' ) {
-                $this->add_log( 'Aborting, Order #' . $order->id . ' is already complete.' );
-                exit;
-            }
+				$order->add_order_note( __( 'IPN payment completed', 'dokan' ) );
+				$order->payment_complete();
 
-            $order->add_order_note( __( 'IPN payment completed', 'dokan' ) );
-            $order->payment_complete();
+				if ( ! empty( $posted['sender_email'] ) ) {
+					update_post_meta( $order_id, "Payer's PayPal address", $posted['sender_email'] );
+				}
 
-            if ( !empty( $posted['sender_email'] ) ) {
-                update_post_meta( $order_id, "Payer's PayPal address", $posted['sender_email'] );
-            }
+				if ( ! empty( $posted['fees_payer'] ) ) {
+					update_post_meta( $order_id, 'Fee Payer', $posted['fees_payer'] );
+				}
 
-            if ( !empty( $posted['fees_payer'] ) ) {
-                update_post_meta( $order_id, 'Fee Payer', $posted['fees_payer'] );
-            }
+				if ( ! empty( $posted['payment_request_date'] ) ) {
+					update_post_meta( $order_id, "PayPal's Date Stamp", $posted['payment_request_date'] );
+				}
 
-            if ( !empty( $posted['payment_request_date'] ) ) {
-                update_post_meta( $order_id, "PayPal's Date Stamp", $posted['payment_request_date'] );
-            }
+                break;
 
-            break;
+			case 'error':
+			case 'reversalerror':
+			case 'denied':
+			case 'expired':
+			case 'failed':
+			case 'voided':
+				// Order failed
+				$order->update_status( 'failed', sprintf( __( 'Payment %s via IPN.', 'dokan' ), strtolower( $posted['status'] ) ) );
 
-        case 'error' :
-        case 'reversalerror':
-        case 'denied' :
-        case 'expired' :
-        case 'failed' :
-        case 'voided' :
-            // Order failed
-            $order->update_status( 'failed', sprintf( __( 'Payment %s via IPN.', 'dokan' ), strtolower( $posted['status'] ) ) );
+                break;
 
-            break;
+			case 'incomplete':
+			case 'processing':
+			case 'pending':
+			case 'created':
+				// order pending
+				$order->update_status( 'on-hold', sprintf( __( 'Payment %s via IPN. Order is pending completion. PayPal will notify this site of further status updates. Or check your PayPal account for further information', 'dokan' ), strtolower( $_POST['status'] ) ) );
 
-        case 'incomplete':
-        case 'processing':
-        case 'pending':
-        case 'created' :
-            // order pending
-            $order->update_status( 'on-hold', sprintf( __( 'Payment %s via IPN. Order is pending completion. PayPal will notify this site of further status updates. Or check your PayPal account for further information', 'dokan' ), strtolower( $_POST['status'] ) ) );
+                break;
 
-            break;
+			case 'refunded':
+				// Handle full refunds, not partial refunds
+				if ( $order->get_total() == ( $posted['mc_gross'] * -1 ) ) {
 
-        case "refunded" :
+					// Mark order as refunded
+					$order->update_status( 'refunded', sprintf( __( 'Payment %s via IPN.', 'dokan' ), strtolower( $posted['status'] ) ) );
 
-            // Handle full refunds, not partial refunds
-            if ( $order->get_total() == ( $posted['mc_gross'] * -1 ) ) {
+					$mailer  = WC()->mailer();
+					$message = $mailer->wrap_message( __( 'Order refunded/reversed', 'dokan' ), sprintf( __( 'Order %1$s has been marked as refunded - PayPal reason code: %2$s', 'dokan' ), $order->get_order_number(), $posted['reason_code'] ) );
 
-                // Mark order as refunded
-                $order->update_status( 'refunded', sprintf( __( 'Payment %s via IPN.', 'dokan' ), strtolower( $posted['status'] ) ) );
+					$mailer->send( get_option( 'admin_email' ), sprintf( __( 'Payment for order %s refunded/reversed', 'dokan' ), $order->get_order_number() ), $message );
+				}
 
-                $mailer  = WC()->mailer();
-                $message = $mailer->wrap_message( __( 'Order refunded/reversed', 'dokan' ), sprintf( __( 'Order %s has been marked as refunded - PayPal reason code: %s', 'dokan' ), $order->get_order_number(), $posted['reason_code'] ) );
+                break;
 
-                $mailer->send( get_option( 'admin_email' ), sprintf( __( 'Payment for order %s refunded/reversed', 'dokan' ), $order->get_order_number() ), $message );
-            }
+			case 'reversed':
+			case 'chargeback':
+				// Mark order as refunded
+				$order->update_status( 'refunded', sprintf( __( 'Payment %s via IPN.', 'dokan' ), strtolower( $posted['status'] ) ) );
 
-            break;
+				$mailer  = WC()->mailer();
+				$message = $mailer->wrap_message( __( 'Order refunded/reversed', 'dokan' ), sprintf( __( 'Order %1$s has been marked as refunded - PayPal reason code: %2$s', 'dokan' ), $order->get_order_number(), $posted['reason_code'] ) );
+				$mailer->send( get_option( 'admin_email' ), sprintf( __( 'Payment for order %s refunded/reversed', 'dokan' ), $order->get_order_number() ), $message );
 
-        case "reversed" :
-        case "chargeback" :
+                break;
 
-            // Mark order as refunded
-            $order->update_status( 'refunded', sprintf( __( 'Payment %s via IPN.', 'dokan' ), strtolower( $posted['status'] ) ) );
-
-            $mailer  = WC()->mailer();
-            $message = $mailer->wrap_message( __( 'Order refunded/reversed', 'dokan' ), sprintf( __( 'Order %s has been marked as refunded - PayPal reason code: %s', 'dokan' ), $order->get_order_number(), $posted['reason_code'] ) );
-            $mailer->send( get_option( 'admin_email' ), sprintf( __( 'Payment for order %s refunded/reversed', 'dokan' ), $order->get_order_number() ), $message );
-
-            break;
-
-        default :
-            // No action
-            break;
+			default:
+				// No action
+                break;
         }
     }
 
@@ -673,15 +664,15 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      * @global $wpdb
      * @param integer $order_id
      * @param integer $seller_id
-     * @return array $results
+     * @return float
      */
-    function get_seller_net_balance( $order_id, $seller_id ) {
+    public function get_seller_net_balance( $order_id, $seller_id ) {
         global $wpdb;
 
-        $table  = $wpdb->prefix . "dokan_orders";
+        $table  = $wpdb->prefix . 'dokan_orders';
         $result = $wpdb->get_var( $wpdb->prepare( "SELECT `net_amount` FROM $table WHERE `order_id` = %d AND `seller_id` = %d", $order_id, $seller_id ) );
 
-        return $result;
+        return floatval( $result );
     }
 
     /**
@@ -691,13 +682,13 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      * @param string  $paykey
      * @return boolean|int
      */
-    function get_order_by_paykey( $paykey ) {
+    public function get_order_by_paykey( $paykey ) {
         global $wpdb;
 
         $sql      = $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = '_dokan_pap_key' AND meta_value = %s", $paykey );
         $order_id = $wpdb->get_var( $sql );
 
-        if ( !$order_id ) {
+        if ( ! $order_id ) {
             return false;
         }
 
@@ -709,8 +700,8 @@ class WC_Dokan_Paypal_Ap_Gateway extends WC_Payment_Gateway {
      *
      * @param string  $message
      */
-    function add_log( $message ) {
-        if ( 'yes' == $this->debug ) {
+    public function add_log( $message ) {
+        if ( 'yes' === $this->debug ) {
             $this->log->add( 'dokan-paypalap', $message );
         }
     }

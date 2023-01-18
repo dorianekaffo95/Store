@@ -5,18 +5,6 @@ namespace WeDevs\DokanPro\Modules\Elementor\Tags;
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 
 class StoreVacationMessage extends TagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 2.9.11
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *
@@ -61,9 +49,8 @@ class StoreVacationMessage extends TagBase {
             $shop_info       = $store->get_shop_info();
 
             $seller_vacation->show_vacation_message( $store->data, $shop_info, true );
-
         } else {
-            echo esc_html_e( 'Store vacation message set in vendor dashboard will show here.', 'dokan' );
+            esc_html_e( 'Store vacation message set in vendor dashboard will show here.', 'dokan' );
         }
     }
 }

@@ -16,7 +16,7 @@ function dokan_save_variations( $post_id ) {
         $upload_image_id                = $_post_data['upload_image_id'];
         $variable_download_limit        = $_post_data['variable_download_limit'];
         $variable_download_expiry       = $_post_data['variable_download_expiry'];
-        $variable_shipping_class        = $_post_data['variable_shipping_class'];
+        $variable_shipping_class        = isset( $_post_data['variable_shipping_class'] ) ? $_post_data['variable_shipping_class'] : [];
         $variable_tax_class             = isset( $_post_data['variable_tax_class'] ) ? $_post_data['variable_tax_class'] : [];
         $variable_menu_order            = $_post_data['variation_menu_order'];
         $variable_sale_price_dates_from = $_post_data['variable_sale_price_dates_from'];
@@ -1350,25 +1350,27 @@ function dokan_add_category_commission_field() {
     <script type="text/javascript">
         // admin additional fee
         ;(function ($) {
-            $('#per_category_admin_commission_type').on('change', function () {
-                var self = $(this),
-                    val = self.val();
+            $(document).ready(() => {
+                $('#per_category_admin_commission_type').on('change', function () {
+                    var self = $(this),
+                        val = self.val();
 
-                if ('combine' === val) {
-                    $('span.additional-fee').removeClass('dokan-hide');
-                    $('.combine-commission-description').text(dokan_admin.combine_commission_desc);
-                } else {
-                    $('span.additional-fee').addClass('dokan-hide');
-                    $('.combine-commission-description').text(dokan_admin.combine_default_desc);
-                }
+                    if ('combine' === val) {
+                        $('span.additional-fee').removeClass('dokan-hide');
+                        $('.combine-commission-description').text(dokan_admin.combine_commission_desc);
+                    } else {
+                        $('span.additional-fee').addClass('dokan-hide');
+                        $('.combine-commission-description').text(dokan_admin.default_commission_desc);
+                    }
 
-                if ('flat' === val) {
-                    $('input[name="per_category_admin_commission"]').removeClass('wc_input_decimal').addClass('wc_input_price');
-                } else {
-                    $('input[name="per_category_admin_commission"]').removeClass('wc_input_price').addClass('wc_input_decimal');
-                }
+                    if ('flat' === val) {
+                        $('input[name="per_category_admin_commission"]').removeClass('wc_input_decimal').addClass('wc_input_price');
+                    } else {
+                        $('input[name="per_category_admin_commission"]').removeClass('wc_input_price').addClass('wc_input_decimal');
+                    }
 
-            }).trigger('change');
+                }).trigger('change');
+            });
         })(jQuery);
     </script>
     <?php
@@ -1472,12 +1474,16 @@ function dokan_edit_category_commission_field( $term ) {
  * @return void
  */
 function dokan_save_category_commission_field( $term_id, $tt_id = '', $taxonomy = '' ) {
+    if ( 'product_cat' !== $taxonomy ) {
+        return;
+    }
+
     $post_data        = wp_unslash( $_POST );//phpcs:ignore WordPress.Security.NonceVerification.Missing
     $commission_type  = '';
     $admin_commission = '';
     $additional_fee   = '';
 
-    if ( isset( $post_data['per_category_admin_commission_type'] ) && 'product_cat' === $taxonomy ) {
+    if ( isset( $post_data['per_category_admin_commission_type'] ) ) {
         $commission_type = $post_data['per_category_admin_commission_type'];
         update_term_meta( $term_id, 'per_category_admin_commission_type', wc_clean( $commission_type ) );
     }

@@ -640,7 +640,7 @@ class DPS_PayPal_Standard_Subscriptions {
                 <div id="message" class="error notice is-dismissible">
                     <p><?php esc_html_e( 'Your Paypal Credentials are not complete', 'dokan' ); ?>.</p>
                     <button type="button" class="notice-dismiss">
-                        <span class="screen-reader-text">Dismiss this notice.</span>
+                        <span class="screen-reader-text"><?php esc_html_e( 'Dismiss this notice.', 'dokan' ); ?></span>
                     </button>
                 </div>
                 <?php

@@ -222,8 +222,8 @@
                     rows += '<td class="dokan-seller-vacation-list-to">' + schedule.to + '</td>';
                     rows += '<td class="dokan-seller-vacation-list-message">' + schedule.message + '</td>';
                     rows += '<td class="dokan-seller-vacation-list-action">';
-                    rows += '<button type="button" class="dokan-btn dokan-btn-default dokan-btn-sm dokan-seller-vacation-remove-schedule" data-index="' + i + '"><i class="fa fa-trash"></i></button>';
-                    rows += '<button type="button" class="dokan-btn dokan-btn-default dokan-btn-sm dokan-seller-vacation-edit-schedule" data-index="' + i + '"><i class="fa fa-pencil"></i></button>';
+                    rows += '<button type="button" class="dokan-btn dokan-btn-default dokan-btn-sm dokan-seller-vacation-remove-schedule" data-index="' + i + '"><i class="far fa-trash-alt"></i></button>';
+                    rows += '<button type="button" class="dokan-btn dokan-btn-default dokan-btn-sm dokan-seller-vacation-edit-schedule" data-index="' + i + '"><i class="fas fa-pencil-alt"></i></button>';
                     rows += '</td>';
                     rows += '</tr>';
                 }

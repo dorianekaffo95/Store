@@ -2,22 +2,11 @@
 
 namespace WeDevs\DokanPro\Modules\Elementor\Tags;
 
+use Elementor\Modules\DynamicTags\Module;
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\DataTagBase;
 use Elementor\Controls_Manager;
 
 class StoreBanner extends DataTagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 2.9.11
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *
@@ -48,7 +37,7 @@ class StoreBanner extends DataTagBase {
      * @return array
      */
     public function get_categories() {
-        return [ \Elementor\Modules\DynamicTags\Module::IMAGE_CATEGORY ];
+        return [ Module::IMAGE_CATEGORY ];
     }
 
     /**
@@ -79,7 +68,7 @@ class StoreBanner extends DataTagBase {
      *
      * @return void
      */
-    protected function _register_controls() {
+    protected function register_controls() {
         $this->add_control(
             'fallback',
             [
@@ -87,7 +76,7 @@ class StoreBanner extends DataTagBase {
                 'type' => Controls_Manager::MEDIA,
                 'default' => [
                     'url' => DOKAN_PLUGIN_ASSEST . '/images/default-store-banner.png',
-                ]
+                ],
             ]
         );
     }

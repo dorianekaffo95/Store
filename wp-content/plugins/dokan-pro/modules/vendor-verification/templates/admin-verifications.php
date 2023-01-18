@@ -241,6 +241,7 @@ $states      = $country_obj->states;
 
                                     $c_country = isset( $countries[ $country_code ] ) ? $countries[ $country_code ] : '';
                                     $c_state   = isset( $states[ $country_code ][ $state_code ] ) ? $states[ $country_code ][ $state_code ] : $state_code;
+                                    $proof_url = ! empty( $val['store_address']['proof'] ) ? $val['store_address']['proof'] : '';
                                     ?>
                                     <p>
                                         <?php echo ! empty( $c_state ) ? $c_state . ', ' : $c_state; ?>
@@ -254,6 +255,17 @@ $states      = $country_obj->states;
                                     <input type="hidden" class="dokan-file-field" value="<?php echo $state_code; ?>" name="store_state">
                                     <input type="hidden" class="dokan-file-field" value="<?php echo $country_code; ?>" name="store_country">
 
+                                    <p class="proof-of-residence" style="text-decoration: underline;">
+                                        <a target="_blank" href="<?php echo esc_url( $proof_url ); ?>">
+                                            <?php esc_html_e( 'Proof of residence', 'dokan' ); ?>
+                                        </a>
+                                        <input
+                                            type="hidden"
+                                            id="proof_of_residence"
+                                            name="proof_of_residence"
+                                            value="<?php echo esc_attr( $proof_url ); ?>"
+                                        />
+                                    </p>
                                 </div>
                                 <div class="row-actions">
                                     <?php if ( $status === 'pending' ) { ?>

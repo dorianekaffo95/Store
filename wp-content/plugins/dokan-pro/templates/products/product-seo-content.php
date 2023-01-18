@@ -11,10 +11,10 @@
 
 <div class="dokan-product-seo dokan-edit-row dokan-clearfix dokan-border-top">
     <div class="dokan-section-heading" data-togglehandler="dokan_product_seo">
-        <h2><i class="fa fa-superpowers" aria-hidden="true"></i> <?php esc_html_e( 'SEO', 'dokan' ); ?></h2>
+        <h2><i class="fab fa-superpowers" aria-hidden="true"></i> <?php esc_html_e( 'SEO', 'dokan' ); ?></h2>
         <p><?php esc_html_e( 'Manage SEO for this product', 'dokan' ); ?></p>
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>
@@ -26,7 +26,7 @@
                 <div class="dokan-form-group">
 
                     <div class="dokan-form-group">
-                        <i class="fa fa-eye"></i> <?php esc_html_e( 'Snippet Preview', 'dokan' ); ?>
+                        <i class="far fa-eye"></i> <?php esc_html_e( 'Snippet Preview', 'dokan' ); ?>
                     </div>
 
                     <div class="seo-snippet">
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class="dokan-form-group">
-                    <div class="dokan-btn snippet-btn"><i class="fa fa-edit"></i> <?php esc_html_e( 'Edit Snippet', 'dokan' ); ?></div>
+                    <div class="dokan-btn snippet-btn"><i class="fas fa-pencil-alt"></i> <?php esc_html_e( 'Edit Snippet', 'dokan' ); ?></div>
                 </div>
                 <div class="dokan-seo-snippet-edit-wrap" style="display:none">
                     <div class="dokan-form-group" style="position: relative;">

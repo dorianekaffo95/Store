@@ -80,7 +80,7 @@ function dokan_seller_sales_statement() {
         $statements = $wpdb->get_results( $wpdb->prepare( $sql, $vendor->id, $start_date, $end_date ) );
     ?>
 
-    <form method="get" class="dokan-form-inline report-filter dokan-clearfix" action="">
+    <form method="get" class="dokan-form-inline report-filter dokan-clearfix" action="" id="dokan-v-dashboard-reports">
         <div class="dokan-form-group">
             <label for="from"><?php _e( 'From:', 'dokan' ); ?></label> <input type="text" class="datepicker" name="start_date" id="from" readonly="readonly" value="<?php echo date_i18n( get_option( 'date_format' ), strtotime( $start_date ) ); ?>" />
         </div>
@@ -503,7 +503,7 @@ function dokan_daily_sales() {
     }
     ?>
 
-    <form method="post" class="dokan-form-inline report-filter dokan-clearfix" action="">
+    <form method="post" class="dokan-form-inline report-filter dokan-clearfix" action="" id="dokan-v-dashboard-reports">
         <div class="dokan-form-group">
             <label for="from"><?php _e( 'From:', 'dokan' ); ?></label> <input type="text" class="datepicker" name="start_date" id="from" readonly="readonly" value="<?php echo date_i18n( get_option( 'date_format' ), strtotime( $start_date ) ); ?>" />
         </div>
@@ -878,7 +878,7 @@ function dokan_top_sellers() {
     $found_products = array_slice( $found_products, 0, 25, true );
     reset( $found_products );
     ?>
-    <form method="post" action="" class="report-filter dokan-form-inline dokan-clearfix">
+    <form method="post" action="" class="report-filter dokan-form-inline dokan-clearfix" id="dokan-v-dashboard-reports">
         <div class="dokan-form-group">
             <label for="from"><?php esc_html_e( 'From:', 'dokan' ); ?></label>
             <input type="text" class="datepicker" name="start_date" id="from" readonly="readonly" value="<?php echo date_i18n( get_option( 'date_format' ), strtotime( $start_date ) ); ?>" />
@@ -891,9 +891,9 @@ function dokan_top_sellers() {
         <div class="dokan-form-group">
             <label for="to"><?php esc_html_e( 'To:', 'dokan' ); ?></label>
             <input type="text" class="datepicker" name="end_date" id="to" readonly="readonly" value="<?php echo date_i18n( get_option( 'date_format' ), strtotime( $end_date ) ); ?>" />
+            <input type="submit" name="dokan_report_filter_top_seller" class="dokan-btn dokan-btn-success dokan-btn-sm dokan-theme" value="<?php esc_attr_e( 'Show', 'dokan' ); ?>" />
         </div>
 
-        <input type="submit" name="dokan_report_filter_top_seller" class="dokan-btn dokan-btn-success dokan-btn-sm dokan-theme" value="<?php esc_attr_e( 'Show', 'dokan' ); ?>" />
     </form>
 
 
@@ -938,7 +938,7 @@ function dokan_top_sellers() {
 function dokan_top_earners() {
     global $wpdb;
     $current_user          = dokan_get_current_user_id();
-    $withdraw_order_status = dokan_get_option( 'withdraw_order_status', 'dokan_withdraw' );
+    $withdraw_order_status = dokan_get_option( 'withdraw_order_status', 'dokan_withdraw', [ 'wc-completed' ] );
 
     $start_date = dokan_current_datetime()->modify( 'first day of this month' )->format( 'Y-m-d' );
     $end_date   = dokan_current_datetime()->format( 'Y-m-d' );
@@ -987,7 +987,7 @@ function dokan_top_earners() {
     $found_products = array_reverse( $found_products, true );
     $found_products = array_slice( $found_products, 0, 25, true );
     reset( $found_products ); ?>
-    <form method="post" action="" class="report-filter dokan-form-inline dokan-clearfix">
+    <form method="post" action="" class="report-filter dokan-form-inline dokan-clearfix" id="dokan-v-dashboard-reports">
         <div class="dokan-form-group">
             <label for="from"><?php _e( 'From:', 'dokan' ); ?></label>
             <input type="text" class="datepicker" name="start_date" id="from" readonly="readonly" value="<?php echo date_i18n( get_option( 'date_format' ), strtotime( $start_date ) ); ?>" />
@@ -999,9 +999,9 @@ function dokan_top_earners() {
         <div class="dokan-form-group">
             <label for="to"><?php esc_html_e( 'To:', 'dokan' ); ?></label>
             <input type="text" class="datepicker" name="end_date" id="to" readonly="readonly" value="<?php echo date_i18n( get_option( 'date_format' ), strtotime( $end_date ) ); ?>" />
+            <input type="submit" name="dokan_report_filter_top_earners" class="dokan-btn dokan-btn-success dokan-btn-sm dokan-theme" value="<?php esc_attr_e( 'Show', 'dokan' ); ?>" />
         </div>
 
-        <input type="submit" name="dokan_report_filter_top_earners" class="dokan-btn dokan-btn-success dokan-btn-sm dokan-theme" value="<?php esc_attr_e( 'Show', 'dokan' ); ?>" />
     </form>
 
     <table class="table table-striped">

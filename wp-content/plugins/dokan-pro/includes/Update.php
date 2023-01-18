@@ -5,7 +5,7 @@ namespace WeDevs\DokanPro;
 /**
  * Dokan Update class
  *
- * Performas license validation and update checking
+ * Performs license validation and update checking
  */
 class Update {
 
@@ -52,6 +52,26 @@ class Update {
     protected function init_appsero() {
         $client = new \Appsero\Client( '8f0a1669-b8db-46eb-9fc4-02ac5bfe89e7', __( 'Dokan Pro', 'dokan' ), DOKAN_PRO_FILE );
 
+        // track plugin install
+        $this->insights = $client->insights();
+
+        if ( false === $this->insights->tracking_allowed() ) {
+            $this->insights->optin();
+        }
+
+        $this->insights->add_extra(
+            [
+                'dokan_pro_version' => DOKAN_PRO_PLUGIN_VERSION,
+                'dokan_pro_plan'    => dokan_pro()->get_plan(),
+                'available_modules' => dokan_pro()->module->get_available_modules(),
+                'activate_modules'  => dokan_pro()->module->get_active_modules(),
+                'wc_version'        => function_exists( 'WC' ) ? WC()->version : null,
+                'dokan_version'     => DOKAN_PLUGIN_VERSION,
+            ]
+        );
+
+        $this->insights->hide_notice()->init_plugin();
+
         // Active license page and checker
         $args = [
             'type'        => 'submenu',
@@ -88,11 +108,11 @@ class Update {
         }
 
         $notices[] = [
-            'type'              => 'alert',
-            'title'             => __( 'Activate Dokan Pro License', 'dokan' ),
-            'description'       => sprintf( __( 'Please <a href="%s">enter</a> your valid <strong>Dokan Pro</strong> plugin license key to unlock more features, premium support and future updates.', 'dokan' ), admin_url( 'admin.php?page=dokan_updates' ) ),
-            'priority'          => 1,
-            'actions'           => [
+            'type'        => 'alert',
+            'title'       => __( 'Activate Dokan Pro License', 'dokan' ),
+            'description' => sprintf( __( 'Please <a href="%1$s">enter</a> your valid <strong>Dokan Pro</strong> plugin license key to unlock more features, premium support and future updates.', 'dokan' ), admin_url( 'admin.php?page=dokan_updates' ) ),
+            'priority'    => 1,
+            'actions'     => [
                 [
                     'type'   => 'primary',
                     'text'   => __( 'Activate License', 'dokan' ),

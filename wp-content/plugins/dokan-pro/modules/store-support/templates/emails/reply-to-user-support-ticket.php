@@ -11,7 +11,7 @@
  * the readme will list any important changes.
  *
  * @author  Dokan
- * 
+ *
  * @version 3.3.4
  */
 
@@ -30,9 +30,10 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 <div style="margin-bottom: 40px;">
     <?php esc_html_e( 'Hi,', 'dokan' ); ?>
 
-	<p><?php esc_html_e( 'A support request has been made by customer on your store ', 'dokan' ); ?> <?php echo esc_html( $email_data['ticket_title'] ); ?></p>
+    <?php /* translators: %s: comment_author */ ?>
+	<p><?php echo esc_html( sprintf( __( '%s has replied to conversation: ', 'dokan' ), $email_data['comment']->comment_author ) ); ?> <b>#<?php echo esc_html( $email_data['ticket_id'] ); ?></b></p>
 
-	<p><?php esc_html_e( 'You can see it by going here: ', 'dokan' ); ?> <a href="<?php echo esc_url( $email_data['account_ticket_url'] ); ?>"><?php echo esc_url( $email_data['account_ticket_url'] ); ?></a></p>
+    <p><b><?php esc_html_e( 'Ticket URL: ', 'dokan' ); ?></b> <a href="<?php echo esc_url( $email_data['account_ticket_url'] ); ?>"><?php echo esc_url( $email_data['account_ticket_url'] ); ?></a></p>
 
 	---
 	<p><?php esc_html_e( 'From', 'dokan' ); ?> <?php echo esc_html( $email_data['store_name'] ); ?></p>

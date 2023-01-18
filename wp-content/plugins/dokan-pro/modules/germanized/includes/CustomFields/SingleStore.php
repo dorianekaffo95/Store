@@ -175,35 +175,35 @@ class SingleStore {
         ?>
         <?php if ( $fields_enabled['dokan_company_name'] && ! empty( $dokan_company_name ) && ! dokan_is_vendor_info_hidden( 'dokan_company_name' ) ) : ?>
             <li class="dokan-company-name">
-                <i class="fa fa-info"></i>
+                <i class="fas fa-info"></i>
                 <?php echo esc_html( $dokan_company_name ); ?>
             </li>
         <?php endif; ?>
 
         <?php if ( $fields_enabled['dokan_company_id_number'] && ! empty( $dokan_company_id_number ) && ! dokan_is_vendor_info_hidden( 'dokan_company_id_number' ) ) : ?>
             <li class="dokan-company-id-number">
-                <i class="fa fa-info"></i>
+                <i class="fas fa-info"></i>
                 <?php echo esc_html( $dokan_company_id_number ); ?>
             </li>
         <?php endif; ?>
 
         <?php if ( $fields_enabled['dokan_vat_number'] && ! empty( $dokan_vat_number ) && ! dokan_is_vendor_info_hidden( 'dokan_vat_number' ) ) : ?>
             <li class="dokan-vat-number">
-                <i class="fa fa-info"></i>
+                <i class="fas fa-info"></i>
                 <?php echo esc_html( $dokan_vat_number ); ?>
             </li>
         <?php endif; ?>
 
         <?php if ( $fields_enabled['dokan_bank_name'] && ! empty( $bank_name ) && ! dokan_is_vendor_info_hidden( 'dokan_bank_name' ) ) : ?>
             <li class="dokan-bank-name">
-                <i class="fa fa-bank"></i>
+                <i class="fas fa-university"></i>
                 <?php echo esc_html( $bank_name ); ?>
             </li>
         <?php endif; ?>
 
         <?php if ( $fields_enabled['dokan_bank_iban'] && ! empty( $bank_iban ) && ! dokan_is_vendor_info_hidden( 'dokan_bank_iban' ) ) : ?>
             <li class="dokan-bank-iban">
-                <i class="fa fa-bank"></i>
+                <i class="fas fa-university"></i>
                 <?php echo esc_html( $bank_iban ); ?>
             </li>
         <?php endif; ?>

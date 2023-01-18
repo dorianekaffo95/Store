@@ -101,6 +101,7 @@ class Module {
      */
     public function hooks() {
         //tinysort.min.js
+        add_action( 'init', [ $this, 'register_scripts' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'load_scripts' ] );
 
         add_action( 'dokan_loaded', [ $this, 'load_emails' ], 20 );
@@ -151,6 +152,18 @@ class Module {
     }
 
     /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_script( 'dokan-rma-script', DOKAN_RMA_ASSETS_DIR . '/js/scripts.js', array( 'jquery' ), $version, true );
+        wp_register_style( 'dokan-rma-style', DOKAN_RMA_ASSETS_DIR . '/css/style.css', false, $version, 'all' );
+    }
+
+    /**
      * Load scripts
      *
      * @since 1.0.0
@@ -170,35 +183,44 @@ class Module {
             $post_id = intval( $_GET['product_id'] );
         }
 
-
         if ( ( isset( $wp->query_vars['settings'] ) && 'rma' === (string) $wp->query_vars['settings'] )
             || ( isset( $_GET['action'] ) && $_GET['action'] == 'edit' && ! empty( $_GET['product_id'] ) ) ) { //phpcs:ignore
-            wp_enqueue_script( 'dokan-rma-script', DOKAN_RMA_ASSETS_DIR . '/js/scripts.js', array( 'jquery' ), DOKAN_PLUGIN_VERSION, true );
-            wp_enqueue_style( 'dokan-rma-style', DOKAN_RMA_ASSETS_DIR . '/css/style.css', false, DOKAN_PLUGIN_VERSION, 'all' );
+            wp_enqueue_script( 'dokan-rma-script' );
+            wp_enqueue_style( 'dokan-rma-style' );
         }
 
         if ( is_account_page() && ( isset( $wp->query_vars['request-warranty'] ) || isset( $wp->query_vars['view-rma-requests'] ) ) ) {
-            wp_enqueue_style( 'dokan-rma-style', DOKAN_RMA_ASSETS_DIR . '/css/style.css', false, DOKAN_PLUGIN_VERSION, 'all' );
+            wp_enqueue_style( 'dokan-rma-style' );
         }
 
         if ( isset( $wp->query_vars['return-request'] ) ) {
-            wp_enqueue_style( 'dokan-rma-style', DOKAN_RMA_ASSETS_DIR . '/css/style.css', false, DOKAN_PLUGIN_VERSION, 'all' );
-            wp_enqueue_script( 'dokan-rma-script', DOKAN_RMA_ASSETS_DIR . '/js/scripts.js', array( 'jquery' ), DOKAN_PLUGIN_VERSION, true );
+            wp_enqueue_style( 'dokan-rma-style' );
+            wp_enqueue_script( 'dokan-rma-script' );
 
             wp_localize_script(
                 'dokan-rma-script', 'DokanRMA', [
-					'ajaxurl' => admin_url( 'admin-ajax.php' ),
-					'nonce'   => wp_create_nonce( 'dokan_rma_nonce' ),
-				]
+                    'ajaxurl' => admin_url( 'admin-ajax.php' ),
+                    'nonce'   => wp_create_nonce( 'dokan_rma_nonce' ),
+                ]
             );
+
+            wp_enqueue_style( 'dokan-magnific-popup' );
+            wp_enqueue_script( 'dokan-popup' );
         }
 
         if ( is_account_page() ) {
             $custom_css = '
             body.woocommerce-account ul li.woocommerce-MyAccount-navigation-link--rma-requests a:before{
+                font-family: "Font Awesome\ 5 Free";
+                font-weight: 900;
                 content: "\f0e2"
             }';
             wp_add_inline_style( 'woocommerce-layout', $custom_css );
+        }
+
+        if ( isset( $wp->query_vars['settings'] ) && 'rma' === $wp->query_vars['settings'] ) {
+            wp_enqueue_script( 'dokan-tooltip' );
+            wp_enqueue_script( 'dokan-form-validate' );
         }
     }
 

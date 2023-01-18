@@ -55,7 +55,7 @@ if ( ! class_exists( 'Dokan_Reply_To_User_Support_Ticket' ) ) :
          * @return string
          */
         public function get_default_subject() {
-            return __( '[{site_title}] A New Reply on Your Ticket', 'dokan' );
+            return __( '[{site_title}] A New Reply on Your Ticket #{ticket_id}', 'dokan' );
         }
 
         /**
@@ -65,7 +65,7 @@ if ( ! class_exists( 'Dokan_Reply_To_User_Support_Ticket' ) ) :
          * @return string
          */
         public function get_default_heading() {
-            return __( 'A New Reply on Your Ticket', 'dokan' );
+            return __( 'A New Reply on Your Ticket #{ticket_id}', 'dokan' );
         }
 
         /**
@@ -78,8 +78,10 @@ if ( ! class_exists( 'Dokan_Reply_To_User_Support_Ticket' ) ) :
             if ( ! $this->is_enabled() ) {
                 return;
             }
-            
-            $this->email_data = $email_data;
+
+            $this->email_data             = $email_data;
+            $this->find['ticket-id']      = '{ticket_id}';
+            $this->replace['seller-name'] = $email_data['ticket_id'];
 
             $this->setup_locale();
             $this->send( $email_data['to_email'], $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );

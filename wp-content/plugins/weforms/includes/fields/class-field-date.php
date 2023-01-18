@@ -12,7 +12,7 @@ class WeForms_Form_Field_Date_Free extends WeForms_Field_Contract {
     }
 
     /**
-     * Render the text field
+     * Render the date field
      *
      * @param array $field_settings
      * @param int   $form_id
@@ -20,12 +20,29 @@ class WeForms_Form_Field_Date_Free extends WeForms_Field_Contract {
      * @return void
      */
     public function render( $field_settings, $form_id ) {
-        $value = ''; ?>
+        $use_theme_css = isset( $form_settings['use_theme_css'] ) ? $form_settings['use_theme_css'] : 'wpuf-style';
+        $value         = '';
+        ?>
         <li <?php $this->print_list_attributes( $field_settings ); ?>>
             <?php $this->print_label( $field_settings ); ?>
 
             <div class="wpuf-fields">
-                <input id="wpuf-date-<?php echo esc_attr( $field_settings['name'] ); ?>" type="text" class="datepicker <?php echo ' wpuf_'.esc_attr( $field_settings['name'] ).'_'. esc_attr($form_id); ?>" data-required="<?php echo esc_attr($field_settings['required']) ?>" data-type="text" name="<?php echo esc_attr( $field_settings['name'] ); ?>" placeholder="<?php echo esc_attr( $field_settings['format'] ); ?>" value="<?php echo esc_attr( $value ) ?>" size="30" />
+                <input
+                    id="wpuf-date-<?php echo esc_attr( $field_settings['name'] ); ?>"
+                    type="text"
+                    <?php
+                        $field_settings['enforce_format'] = ! isset( $field_settings['enforce_format'] ) ? '' : $field_settings['enforce_format'];
+                        echo esc_attr( $field_settings['enforce_format'] !== 'yes' ) ? '' : 'readonly';
+                    ?>
+                    class="datepicker <?php echo ' wpuf_'.esc_attr( $field_settings['name'] ).'_'. esc_attr($form_id); ?>"
+                    data-required="<?php echo esc_attr($field_settings['required']) ?>"
+                    data-type="text"
+                    data-style="<?php echo esc_attr( $use_theme_css ); ?>"
+                    name="<?php echo esc_attr( $field_settings['name'] ); ?>"
+                    placeholder="<?php echo esc_attr( $field_settings['format'] ); ?>"
+                    value="<?php echo esc_attr( $value ) ?>"
+                    size="30"
+                />
                 <?php $this->help_text( $field_settings ); ?>
             </div>
         </li>
@@ -58,11 +75,11 @@ class WeForms_Form_Field_Date_Free extends WeForms_Field_Contract {
         $settings = [
             [
                 'name'      => 'format',
-                'title'     => __( 'Date Format', 'weforms' ),
+                'title'     => esc_html__( 'Date Format', 'weforms' ),
                 'type'      => 'text',
                 'section'   => 'advanced',
                 'priority'  => 23,
-                'help_text' => __( 'The date format', 'weforms' ),
+                'help_text' => esc_html__( 'The date format', 'weforms' ),
             ],
             [
                 'name'          => 'time',
@@ -70,7 +87,7 @@ class WeForms_Form_Field_Date_Free extends WeForms_Field_Contract {
                 'type'          => 'checkbox',
                 'is_single_opt' => true,
                 'options'       => [
-                    'yes'   => __( 'Enable time input', 'weforms' ),
+                    'yes'   => esc_html__( 'Enable time input', 'weforms' ),
                 ],
                 'section'       => 'advanced',
                 'priority'      => 24,
@@ -82,11 +99,24 @@ class WeForms_Form_Field_Date_Free extends WeForms_Field_Contract {
                 'type'          => 'checkbox',
                 'is_single_opt' => true,
                 'options'       => [
-                    'yes'   => __( 'Set this as publish time input', 'weforms' ),
+                    'yes'   => esc_html__( 'Set this as publish time input', 'weforms' ),
                 ],
                 'section'       => 'advanced',
                 'priority'      => 24,
                 'help_text'     => '',
+            ],
+            [
+              'name'            => 'enforce_format',
+              'title'           => __( 'Toggle Keyboard input for Date', 'weforms' ),
+              'type'            => 'checkbox',
+              'section'         => 'advanced',
+              'is_single_opt'   => true,
+              'options'         => [
+                  'yes'   => esc_html__( 'Force Datepicker Input', 'weforms' ),
+              ],
+              'default'         => 'yes',
+              'priority'        => 24,
+              'help_text'       => esc_html__( 'Disables Keyboard Input and uses the Datepicker Format', 'weforms' ),
             ],
         ];
 
@@ -104,6 +134,7 @@ class WeForms_Form_Field_Date_Free extends WeForms_Field_Contract {
             'format'            => 'dd/mm/yy',
             'time'              => '',
             'is_publish_time'   => '',
+            'enforce_format'    => '',
         ];
 
         return array_merge( $defaults, $props );

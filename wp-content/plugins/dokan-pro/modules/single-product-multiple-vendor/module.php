@@ -2,6 +2,9 @@
 
 namespace WeDevs\DokanPro\Modules\SPMV;
 
+use WeDevs\DokanPro\Modules\SPMV\Search\Assets;
+use WeDevs\DokanPro\Modules\SPMV\Search\Dashboard;
+
 class Module {
 
     /**
@@ -17,9 +20,6 @@ class Module {
         $this->initiate();
 
         $this->hooks();
-
-        add_action( 'dokan_activated_module_spmv', array( self::class, 'activate' ) );
-        add_action( 'dokan_product_duplicate_after_save', [ $this, 'update_duplicate_product_spmv' ], 10, 2 );
     }
 
     /**
@@ -54,6 +54,9 @@ class Module {
 
         require_once DOKAN_SPMV_INC_DIR . '/products.php';
         require_once DOKAN_SPMV_INC_DIR . '/product-visibility.php';
+
+        require_once DOKAN_SPMV_INC_DIR . '/Search/Assets.php';
+        require_once DOKAN_SPMV_INC_DIR . '/Search/Dashboard.php';
     }
 
     /**
@@ -69,18 +72,10 @@ class Module {
         }
 
         new \Dokan_SPMV_Products();
-    }
+        new Assets();
+        new Dashboard();
 
-    /**
-     * Init all hooks
-     *
-     * @since 1.0.0
-     *
-     * @return void
-     */
-    public function hooks() {
         $enable_option = dokan_get_option( 'enable_pricing', 'dokan_spmv', 'off' );
-
         if ( 'off' === $enable_option ) {
             return;
         }
@@ -93,13 +88,27 @@ class Module {
     }
 
     /**
+     * Init all hooks
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
+    public function hooks() {
+        add_action( 'dokan_activated_module_spmv', [ $this, 'activate' ] );
+        add_filter( 'dokan_query_var_filter', [ $this, 'add_search_endpoints' ] );
+        add_action( 'woocommerce_flush_rewrite_rules', [ $this, 'flush_rewrite_rules' ] );
+        add_action( 'dokan_product_duplicate_after_save', [ $this, 'update_duplicate_product_spmv' ], 10, 2 );
+    }
+
+    /**
      * Create Mapping table for product and vendor
      *
      * @since 1.0.0
      *
      * @return void
      */
-    public static function activate() {
+    public function activate() {
         global $wpdb;
 
         $sql = "CREATE TABLE IF NOT EXISTS `{$wpdb->prefix}dokan_product_map` (
@@ -114,6 +123,8 @@ class Module {
 
         include_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta( $sql );
+
+        $this->flush_rewrite_rules();
     }
 
     /**
@@ -136,5 +147,32 @@ class Module {
         if ( $map_id ) {
             update_post_meta( $clone_product->get_id(), '_has_multi_vendor', '' );
         }
+    }
+
+    /**
+     * Add search endpoint to vendor dashboard.
+     *
+     * @sience 3.5.2
+     *
+     * @param array $query_var
+     *
+     * @return array
+     */
+    public function add_search_endpoints( $query_var ) {
+        $query_var[] = 'products-search';
+
+        return $query_var;
+    }
+
+    /**
+     * Flush rewrite rules
+     *
+     * @since 3.5.2
+     *
+     * @return void
+     */
+    public function flush_rewrite_rules() {
+        dokan()->rewrite->register_rule();
+        flush_rewrite_rules( true );
     }
 }

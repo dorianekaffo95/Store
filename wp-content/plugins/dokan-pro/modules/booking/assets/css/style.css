@@ -153,12 +153,11 @@ select#booking_order_status{
 }
 
 .select2-container{
-    z-index: 99999;
+    z-index: 1050;
 }
 
 div.dokan-booking-wrapper ul.dokan_tabs .active{
     font-size:1.1em;
-    border-top : 2px solid #f05025;
 }
 
 div.dokan-booking-wrapper input.dokan-btn{
@@ -171,6 +170,15 @@ div.dokan-booking-wrapper input.dokan-btn{
 
 .dokan-booking-wrapper label.checkbox-item.form-label.show_if_variable{
     display:none
+}
+
+.dokan-booking-wrapper tbody tr td a {
+    color: #6d6d6d;
+    transition: .2s linear;
+}
+
+.dokan-booking-wrapper tbody tr td a:hover {
+    color: #000;
 }
 
 .dokan-booking-day-restriction {
@@ -207,4 +215,8 @@ div.dokan-booking-wrapper input.dokan-btn{
 
 .wc_bookings_calendar_form .calendar_days .hours[class] {
     position: relative;
+}
+
+#wc-bookings-booking-form div.form-field.form-field-wide > div {
+    flex-wrap: wrap;
 }

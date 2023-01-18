@@ -103,19 +103,19 @@ class WebhookHandler {
      * @return array
      */
     public function get_request_headers() {
-        if ( ! function_exists( 'getallheaders' ) ) {
-            $headers = array();
-
-            foreach ( $_SERVER as $name => $value ) {
-                if ( 'HTTP_' === substr( $name, 0, 5 ) ) {
-                    $headers[ str_replace( ' ', '-', ucwords( strtolower( str_replace( '_', ' ', substr( $name, 5 ) ) ) ) ) ] = $value;
-                }
-            }
-
-            return $headers;
-        } else {
+        if ( function_exists( 'getallheaders' ) ) {
             return getallheaders();
         }
+
+        $headers = array();
+
+        foreach ( $_SERVER as $name => $value ) {
+            if ( 'HTTP_' === substr( $name, 0, 5 ) ) {
+                $headers[ str_replace( ' ', '-', ucwords( strtolower( str_replace( '_', ' ', substr( $name, 5 ) ) ) ) ) ] = $value;
+            }
+        }
+
+        return $headers;
     }
 
     /**
@@ -156,7 +156,6 @@ class WebhookHandler {
             }
         }
 
-
         return $events_available;
     }
 
@@ -177,6 +176,20 @@ class WebhookHandler {
         $site_url  = str_replace( [ 'http://', 'https://' ], '', home_url( '/' ) );
 
         if ( is_wp_error( $response ) ) {
+            // display error message
+            if ( is_admin() && current_user_can( 'activate_plugins' ) ) {
+                add_action( 'admin_notices', function () use ( $response ) { ?>
+                    <div class="error notice is-dismissible">
+                        <p>
+                        <?php
+                            // translators: %s is the error message
+                            printf( __( '<strong>PayPal Marketplace API Error:</strong> %s', 'dokan' ), Helper::get_error_message( $response ) );
+                        ?>
+                        </p>
+                    </div>
+                    <?php
+                } );
+            }
             dokan_log( 'Dokan PayPal Marketplace listing webhook error: ' . Helper::get_error_message( $response ) );
             return false;
         }

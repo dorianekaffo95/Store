@@ -18,6 +18,7 @@ class Dokan_ShipStation_Settings {
         add_action( 'dokan_dashboard_settings_helper_text', array( $this, 'add_helper_text' ), 10, 2 );
         add_action( 'dokan_settings_content', array( $this, 'add_settings_content' ) );
         add_action( 'wp_ajax_dokan_shipstation_settings', array( $this, 'form_handler' ) );
+        add_action( 'init', array( $this, 'register_scripts' ) );
     }
 
     /**
@@ -32,7 +33,8 @@ class Dokan_ShipStation_Settings {
             'name'    => 'enable_shipstation_logging',
             'label'   => __( 'Log ShipStation API Request', 'dokan' ),
             'desc'    => __( 'Log all ShipStation API interactions.', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
+            'default' => 'off',
             'tooltip' => __( 'Keep track of ShipStation API requests made by vendors.', 'dokan' ),
         );
 
@@ -55,6 +57,17 @@ class Dokan_ShipStation_Settings {
     }
 
     /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_script( 'dokan-shipstation-settings', DOKAN_SHIPSTATION_ASSETS . '/js/dokan-shipstation-settings.js', array( 'jquery' ), $version, true );
+    }
+
+    /**
      * Enqueue ShipStation scripts in vendor settings page
      *
      * @since 1.0.0
@@ -68,7 +81,8 @@ class Dokan_ShipStation_Settings {
             return;
         }
 
-        wp_enqueue_script( 'dokan-shipstation-settings', DOKAN_SHIPSTATION_ASSETS . '/js/dokan-shipstation-settings.js', array( 'jquery' ), DOKAN_SHIPSTATION_VERSION, true );
+        wp_enqueue_script( 'dokan-shipstation-settings' );
+        wp_enqueue_script( 'dokan-tooltip' );
     }
 
     /**
@@ -81,7 +95,7 @@ class Dokan_ShipStation_Settings {
     public function add_settings_nav( $settings ) {
         $settings['shipstation'] = array(
             'title'      => __( 'ShipStation', 'dokan' ),
-            'icon'       => '<i class="fa fa-gear"></i>',
+            'icon'       => '<i class="fas fa-cog"></i>',
             'url'        => dokan_get_navigation_url( 'settings/shipstation' ),
             'pos'        => 71,
             'permission' => 'dokan_view_store_shipping_menu'

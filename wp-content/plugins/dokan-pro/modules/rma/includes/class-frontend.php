@@ -1,5 +1,7 @@
 <?php
 
+use WeDevs\Dokan\CatalogMode\Helper as CatalogModeHelper;
+
 /**
 * Frontend product and cart management
 */
@@ -27,6 +29,9 @@ class Dokan_RMA_Frontend {
 
         add_action( 'template_redirect', [ $this, 'handle_warranty_submit_request' ], 10 );
         add_action( 'template_redirect', [ $this, 'handle_warranty_conversation' ], 10 );
+
+        // Dokan Catalog Mode Integration
+        add_filter( 'dokan_rma_addons_add_to_cart_text', [ $this, 'change_rma_add_to_cart_text' ], 10, 2 );
     }
 
     /**
@@ -34,7 +39,7 @@ class Dokan_RMA_Frontend {
      *
      * @since 1.0.0
      */
-    function show_product_warranty() {
+    public function show_product_warranty() {
         global $post, $product;
 
         if ( $product->is_type( 'external' ) ) {
@@ -45,37 +50,37 @@ class Dokan_RMA_Frontend {
         $warranty       = $this->get_settings( $product_id );
         $warranty_label = $warranty['label'];
 
-        if ( $warranty['type'] == 'included_warranty' ) {
-            if ( $warranty['length'] == 'limited' ) {
+        if ( $warranty['type'] === 'included_warranty' ) {
+            if ( $warranty['length'] === 'limited' ) {
                 $value      = $warranty['length_value'];
                 $duration   = dokan_rma_get_duration_value( $warranty['length_duration'], $value );
 
-                echo '<p class="warranty_info"><b>'. $warranty_label .':</b> '. $value .' '. $duration .'</p>';
+                echo '<p class="warranty_info"><b>' . $warranty_label . ':</b> ' . $value . ' ' . $duration . '</p>';
             } else {
-                echo '<p class="warranty_info"><b>'. $warranty_label .':</b> '. __('Lifetime', 'dokan') .'</p>';
+                echo '<p class="warranty_info"><b>' . $warranty_label . ':</b> ' . __( 'Lifetime', 'dokan' ) . '</p>';
             }
-        } elseif ( $warranty['type'] == 'addon_warranty' ) {
+        } elseif ( $warranty['type'] === 'addon_warranty' ) {
             $addons = $warranty['addon_settings'];
 
-            if ( is_array( $addons ) && !empty( $addons ) ) {
-                echo '<p class="warranty_info"><b>'. $warranty_label .'</b> <select name="dokan_warranty">';
-                echo '<option value="-1">'. __( 'No warranty', 'dokan' ) .'</option>';
+            if ( is_array( $addons ) && ! empty( $addons ) ) {
+                echo '<p class="warranty_info"><b>' . $warranty_label . '</b> <select name="dokan_warranty">';
+                echo '<option value="-1">' . __( 'No warranty', 'dokan' ) . '</option>';
 
                 foreach ( $addons as $x => $addon ) {
                     $amount     = $addon['price'];
                     $value      = $addon['length'];
                     $duration   = dokan_rma_get_duration_value( $addon['duration'], $value );
 
-                    if ( $value == 0 && $amount == 0 ) {
+                    if ( intval( $value ) === 0 && intval( $amount ) === 0 ) {
                         // no warranty option
-                        echo '<option value="-1">'. __( 'No warranty', 'dokan' ) .'</option>';
+                        echo '<option value="-1">' . __( 'No warranty', 'dokan' ) . '</option>';
                     } else {
-                        if ( $amount == 0 ) {
+                        if ( intval( $amount ) === 0 ) {
                             $amount = __( 'Free', 'dokan' );
                         } else {
                             $amount = wc_price( $amount );
                         }
-                        echo '<option value="'. $x .'">'. $value .' '. $duration . ' &mdash; '. $amount .'</option>';
+                        echo '<option value="' . $x . '">' . $value . ' ' . $duration . ' &mdash; ' . $amount . '</option>';
                     }
                 }
 
@@ -97,9 +102,9 @@ class Dokan_RMA_Frontend {
      *
      * @return array $item_data
      */
-    function add_cart_item_data( $item_data, $product_id ) {
-        if ( isset( $_POST['dokan_warranty']) && $_POST['dokan_warranty'] !== '' ) {
-            $item_data['dokan_warranty_index'] = $_POST['dokan_warranty'];
+    public function add_cart_item_data( $item_data, $product_id ) {
+        if ( isset( $_POST['dokan_warranty'] ) && $_POST['dokan_warranty'] !== '' ) { //phpcs:ignore
+            $item_data['dokan_warranty_index'] = sanitize_text_field( wp_unslash( $_POST['dokan_warranty'] ) ); //phpcs:ignore
         }
 
         return $item_data;
@@ -114,7 +119,7 @@ class Dokan_RMA_Frontend {
      *
      * @return array $item_data
      */
-    function add_cart_item( $item_data ) {
+    public function add_cart_item( $item_data ) {
         $_product       = $item_data['data'];
         $warranty_index = false;
 
@@ -126,13 +131,13 @@ class Dokan_RMA_Frontend {
         $warranty   = $this->get_settings( $product_id );
 
         if ( $warranty ) {
-            if ( $warranty['type'] == 'addon_warranty' && $warranty_index !== false ) {
+            if ( $warranty['type'] === 'addon_warranty' && $warranty_index !== false ) {
                 $addons                            = $warranty['addon_settings'];
                 $item_data['dokan_warranty_index'] = $warranty_index;
                 $add_cost                          = 0;
 
-                if ( isset( $addons[$warranty_index] ) && !empty( $addons[$warranty_index] ) ) {
-                    $addon = $addons[$warranty_index];
+                if ( isset( $addons[ $warranty_index ] ) && ! empty( $addons[ $warranty_index ] ) ) {
+                    $addon = $addons[ $warranty_index ];
                     if ( $addon['price'] > 0 ) {
                         $add_cost += $addon['price'];
 
@@ -152,19 +157,14 @@ class Dokan_RMA_Frontend {
      * @param int $product_id
      * @return bool $valid
      */
-    function add_cart_validation( $valid = '', $product_id = '' ) {
+    public function add_cart_validation( $valid = '', $product_id = '' ) {
         $warranty       = $this->get_settings( $product_id );
         $warranty_label = $warranty['label'];
 
-        if ( $warranty['type'] == 'addon_warranty' && ! isset( $_REQUEST['dokan_warranty'] ) ) {
+        if ( $warranty['type'] === 'addon_warranty' && ! isset( $_REQUEST['dokan_warranty'] ) ) {
+            // translators: %s: warranty label
             $error = sprintf( __( 'Please select your %s first.', 'dokan' ), $warranty_label );
-
-            if ( function_exists( 'wc_add_notice' ) ) {
-                wc_add_notice( $error, 'error' );
-            } else {
-                WC()->add_error( $error );
-            }
-
+            wc_add_notice( $error, 'error' );
             return false;
         }
 
@@ -181,8 +181,7 @@ class Dokan_RMA_Frontend {
      *
      * @return array $cart_item
      */
-    function get_cart_item_from_session( $cart_item, $values ) {
-
+    public function get_cart_item_from_session( $cart_item, $values ) {
         if ( isset( $values['dokan_warranty_index'] ) ) {
             $cart_item['dokan_warranty_index'] = $values['dokan_warranty_index'];
             $cart_item = $this->add_cart_item( $cart_item );
@@ -201,7 +200,7 @@ class Dokan_RMA_Frontend {
      *
      * @return array $other_data
      */
-    function get_item_data( $other_data, $cart_item ) {
+    public function get_item_data( $other_data, $cart_item ) {
         $_product   = $cart_item['data'];
         $product_id = $_product->get_id();
 
@@ -209,12 +208,12 @@ class Dokan_RMA_Frontend {
         $warranty_label = $warranty['label'];
 
         if ( $warranty ) {
-            if ( $warranty['type'] == 'addon_warranty' && isset( $cart_item['dokan_warranty_index'] ) ) {
+            if ( $warranty['type'] === 'addon_warranty' && isset( $cart_item['dokan_warranty_index'] ) ) {
                 $addons         = $warranty['addon_settings'];
                 $warranty_index = $cart_item['dokan_warranty_index'];
 
-                if ( isset( $addons[$warranty_index] ) && ! empty( $addons[$warranty_index] ) ) {
-                    $addon         = $addons[$warranty_index];
+                if ( isset( $addons[ $warranty_index ] ) && ! empty( $addons[ $warranty_index ] ) ) {
+                    $addon         = $addons[ $warranty_index ];
                     $name          = $warranty_label;
                     $duration_unit = dokan_rma_get_duration_value( $addon['duration'], $addon['length'] );
                     $value         = $addon['length'] . ' ' . $duration_unit;
@@ -226,23 +225,23 @@ class Dokan_RMA_Frontend {
                     $other_data[] = array(
                         'name'      => $name,
                         'value'     => $value,
-                        'display'   => ''
+                        'display'   => '',
                     );
                 }
-            } elseif ( $warranty['type'] == 'included_warranty' ) {
-                if ( $warranty['length'] == 'lifetime' ) {
+            } elseif ( $warranty['type'] === 'included_warranty' ) {
+                if ( $warranty['length'] === 'lifetime' ) {
                     $other_data[] = array(
                         'name'      => $warranty_label,
                         'value'     => __( 'Lifetime', 'dokan' ),
-                        'display'   => ''
+                        'display'   => '',
                     );
-                } elseif ( $warranty['length'] == 'limited' ) {
+                } elseif ( $warranty['length'] === 'limited' ) {
                     $duration_unit = dokan_rma_get_duration_value( $warranty['length_duration'], $warranty['length_value'] );
                     $string = $warranty['length_value'] . ' ' . $duration_unit;
                     $other_data[] = array(
                         'name'      => $warranty_label,
                         'value'     => $string,
-                        'display'   => ''
+                        'display'   => '',
                     );
                 }
             }
@@ -265,9 +264,9 @@ class Dokan_RMA_Frontend {
      *
      * @return void
      */
-    function add_warranty_index( $cart_key, $product_id, $quantity, $variation_id = null, $variation = null, $cart_item_data = null ) {
+    public function add_warranty_index( $cart_key, $product_id, $quantity, $variation_id = null, $variation = null, $cart_item_data = null ) {
         if ( isset( $_POST['dokan_warranty'] ) && $_POST['dokan_warranty'] !== '' ) {
-            WC()->cart->cart_contents[$cart_key]['dokan_warranty_index'] = $_POST['dokan_warranty'];
+            WC()->cart->cart_contents[ $cart_key ]['dokan_warranty_index'] = sanitize_text_field( wp_unslash( $_POST['dokan_warranty'] ) );
         }
     }
 
@@ -290,7 +289,7 @@ class Dokan_RMA_Frontend {
         }
 
         if ( ! is_single( $product->get_id() ) && $this->check_required_warranty( $product->get_id() ) ) {
-            $text = apply_filters( 'dokan_rma_addons_add_to_cart_text', __( 'Select options', 'dokan' ) );
+            $text = apply_filters( 'dokan_rma_addons_add_to_cart_text', __( 'Select options', 'dokan' ), $product );
         }
 
         return $text;
@@ -304,11 +303,7 @@ class Dokan_RMA_Frontend {
      * @return void
      */
     public function handle_warranty_submit_request() {
-        if ( !isset( $_POST['warranty_submit_request'] ) ) {
-            return;
-        }
-
-        if ( ! wp_verify_nonce( $_POST['dokan_save_warranty_request_nonce'], 'dokan_save_warranty_request' ) ) {
+        if ( ! isset( $_POST['dokan_save_warranty_request_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['dokan_save_warranty_request_nonce'] ) ), 'dokan_save_warranty_request' ) ) {
             return;
         }
 
@@ -320,11 +315,11 @@ class Dokan_RMA_Frontend {
         $product_map = [];
 
         // Mapping all product with quantity
-        foreach ( $_POST['request_item'] as $key => $product_id ) {
+        foreach ( wc_clean( wp_unslash( $_POST['request_item'] ) ) as $key => $product_id ) {
             $product_map[] = [
                 'product_id' => $product_id,
-                'quantity'   => ! empty( $_POST['request_item_qty'][$key] ) ? $_POST['request_item_qty'][$key] : 1,
-                'item_id'    => ! empty( $_POST['request_item_id'][$key] ) ? $_POST['request_item_id'][$key] : 0
+                'quantity'   => ! empty( $_POST['request_item_qty'][ $key ] ) ? sanitize_text_field( wp_unslash( $_POST['request_item_qty'][ $key ] ) ) : 1,
+                'item_id'    => ! empty( $_POST['request_item_id'][ $key ] ) ? sanitize_text_field( wp_unslash( $_POST['request_item_id'][ $key ] ) ) : 0,
             ];
         }
 
@@ -342,48 +337,46 @@ class Dokan_RMA_Frontend {
 
         wc_add_notice( __( 'Request has been successfully submitted', 'dokan' ), 'success' );
 
-        wp_redirect( wc_get_account_endpoint_url( 'rma-requests' ) );
+        wp_safe_redirect( wc_get_account_endpoint_url( 'rma-requests' ) );
         exit();
     }
 
     /**
-     * undocumented function
+     * Handle Warranty Conversation.
      *
      * @since 1.0.0
      *
      * @return void
      */
     public function handle_warranty_conversation() {
-        if ( ! isset( $_POST['dokan_rma_send_message'] ) ) {
+        if ( ! isset( $_POST['dokan_rma_send_message_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['dokan_rma_send_message_nonce'] ) ), 'dokan_rma_send_message' ) ) {
             return;
         }
 
-        if ( ! wp_verify_nonce( $_POST['dokan_rma_send_message_nonce'], 'dokan_rma_send_message' ) ) {
-            return;
-        }
+        $redirect_url = isset( $_POST['_wp_http_referer'] ) ? esc_url_raw( wp_unslash( $_POST['_wp_http_referer'] ) ) : home_url();
 
-        if ( ! isset( $_POST['message'] ) || ( isset( $_POST['message'] ) && '' == trim( $_POST['message'] ) ) ) {
+        if ( ! isset( $_POST['message'] ) || '' === trim( sanitize_text_field( wp_unslash( $_POST['message'] ) ) ) ) {
             wc_add_notice( __( 'Please enter some text for messaging', 'dokan' ), 'error' );
-            wp_redirect( $_POST['_wp_http_referer'] );
+            wp_safe_redirect( $redirect_url );
             exit();
         }
 
         if ( empty( $_POST['request_id'] ) ) {
             wc_add_notice( __( 'No request found for conversation', 'dokan' ), 'error' );
-            wp_redirect( $_POST['_wp_http_referer'] );
+            wp_safe_redirect( $redirect_url );
             exit();
         }
 
         $data = [
             'request_id' => intval( $_POST['request_id'] ),
-            'from'       => intval( $_POST['from'] ),
-            'to'         => intval( $_POST['to'] ),
+            'from'       => isset( $_POST['from'] ) ? intval( $_POST['from'] ) : '',
+            'to'         => isset( $_POST['to'] ) ? intval( $_POST['to'] ) : '',
             'message'    => sanitize_textarea_field( wp_unslash( $_POST['message'] ) ),
-            'created_at' => current_time( 'mysql' )
+            'created_at' => dokan_current_datetime()->format( 'Y-m-d H:i:s' ),
         ];
 
         $conversation = new Dokan_RMA_Conversation();
-        $result       =  $conversation->insert( $data );
+        $result       = $conversation->insert( $data );
 
         if ( is_wp_error( $result ) ) {
             wc_add_notice( $result->get_error_message(), 'error' );
@@ -392,8 +385,40 @@ class Dokan_RMA_Frontend {
 
         wc_add_notice( __( 'Message send successfully', 'dokan' ), 'success' );
 
-        wp_redirect( $_POST['_wp_http_referer'] );
+        wp_safe_redirect( $redirect_url );
         exit();
     }
 
+    /**
+     * This method will change add to cart text from Select Options to Read More
+     *
+     * @sience 3.7.4
+     *
+     * @param $add_to_cart_text string
+     * @param $product          \WC_Product
+     *
+     * @return string
+     */
+    public function change_rma_add_to_cart_text( $add_to_cart_text, $product ) {
+        if ( ! class_exists( CatalogModeHelper::class ) ) {
+            return $add_to_cart_text;
+        }
+        // check if enabled by admin
+        if ( ! CatalogModeHelper::is_enabled_by_admin() ) {
+            return $add_to_cart_text;
+        }
+
+        // check if enabled by product
+        if ( CatalogModeHelper::is_enabled_for_product( $product ) ) {
+            return __( 'Read More', 'dokan' ); // per product settings to hide product price is enabled
+        }
+
+        // check if enabled by vendor global settings
+        $vendor_id = dokan_get_vendor_by_product( $product, true );
+        if ( CatalogModeHelper::hide_add_to_cart_button_option_is_enabled_by_vendor( $vendor_id ) ) {
+            return __( 'Read More', 'dokan' ); // vendor global settings to hide product price is enabled
+        }
+
+        return $add_to_cart_text;
+    }
 }

@@ -3,6 +3,7 @@
 namespace DokanPro\Modules\Subscription;
 
 use DokanPro\Modules\Subscription\Abstracts\VendorSubscription;
+use WeDevs\Dokan\ProductCategory\Categories;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -130,6 +131,24 @@ class SubscriptionPack extends VendorSubscription {
 
         if ( $this->get_id() ) {
             $categories = get_post_meta( $this->get_id(), '_vendor_allowed_categories', true );
+
+            if ( empty( $categories ) ) {
+                return $categories;
+            }
+
+            $category       = new Categories();
+            $all_category   = $category->get_all_categories( true );
+            $child_cate = [];
+
+            // We are looping through all allowed categories and including it's child categories.
+            foreach ( $categories as $cat_id ) {
+                if ( ! isset( $all_category[ $cat_id ] ) || 0 !== intval( $all_category[ $cat_id ]['parent_id'] ) ) {
+                    continue;
+                }
+                $child_cate = array_merge( $child_cate, $category->get_children( $cat_id ) );
+            }
+
+            $categories = array_unique( array_merge( $categories, $child_cate ) );
         }
 
         return $categories;

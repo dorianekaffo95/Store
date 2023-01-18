@@ -36,7 +36,7 @@
             <div class="dokan-form-group">
                 <div class="dokan-w8">
                     <input
-                        name="settings[paypal][email]"
+                        name="settings[dokan_paypal_marketplace][email]"
                         value="<?php echo esc_attr( $email ); ?>"
                         class="dokan-form-control"
                         id="vendor_paypal_email_address"

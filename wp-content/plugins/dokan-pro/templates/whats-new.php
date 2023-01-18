@@ -4,6 +4,922 @@
  */
 $changelog = [
     [
+        'version'  => 'Version 3.7.5',
+        'released' => '2022-08-25',
+        'changes'  => [
+            'New'         => [
+                [
+                    'title'       => '[Auction] Multistep product category implementation for Auction Module',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Multistep product category implementation for Booking Module',
+                    'description' => '',
+                ],
+            ],
+            'Improvement'         => [
+                [
+                    'title'       => 'No message after clicking the `save changes` button on the vendor dashboard Ship Station settings',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Display active and inactive module count under the Dokan module page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ColorSchemeCustomizer] Added extended supports for Color Scheme Customizer module on frontend',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[StripeConnect] Fixed a deprecated warning `Method WC_Subscriptions::redirect_ajax_add_to_cart is deprecated since version 4.0.0`',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscriptionProduct] fixed a deprecated warning `Function WC_Subscriptions::is_duplicate_site is deprecated since version 4.0.0!`',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[TableRateShipping] Fixed tooltip not working for table rate shipping under vendor dashboard',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Single Store Page templates were not loading on latest version of Elementor',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fixed some deprecated warnings on Dokan Elementor module',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.4',
+        'released' => '2022-08-10',
+        'changes'  => [
+            'New'         => [
+                [
+                    'title'       => 'Introduced a new filter hook named `dokan_progressbar_translated_string`',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Product Inline Edit Support Catalog Mode for Products',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Single store page Featured, Latest, Best-selling, Top-rated products widget for Elementor module',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Added Catalog Mode support for Booking Products',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RequestAQuote] Added Catalog Mode support',
+                    'description' => '',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => 'Implement new category UI in product Quick edit and bulk edit in vendor dashboard.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Load asset (css/js) files only on required pages',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'Skrill payment gateway shows disconnect button for new vendors even though it is not connected.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Delete coupon cache for marketplace coupon after seller account has been deleted.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[WireCard/Moip] Wirecard payment gateway showed under vendor withdraw options when the module is enabled regardless of the payment method enabled in WooCommerce',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'PHP warning for vendor shipment status email template',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Updated Pending Product - email was sent for already published products if the setting is enabled for a vendor: Publish Product Directly.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Changing withdraw method doesn\'t always show Withdraw Method Changed Modal window for withdraw disbursement feature under Dokan admin settings.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Refund] Translation issue on refund required parameters',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[MangoPay] KYC documents were being `Out of Date` in some cases.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Geolocation] Filter by the vendor wasn\'t working if the Show Filters Before Location Map setting is turned off from the Geolocation admin setting',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Express] Error on adding payment method from My Account -> Add Payment Method page when the gateway setup process wasn\'t completed.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StripeConnect] Fixed redirect URL mismatch with stripe oAuth redirect URL',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StripeConnect] Fixed invalid redirect url issue after vendor connect their account with stripe',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[OrderMinMax] Fixed fatal error while calling filter product API from Request a Quote module',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ProductAdvertisement] Fixed 3 warnings on the home page if the Product advertisement module is active',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fixed single store page products broken layout of Elementor widgets on Storefront theme',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription] Categories restriction wasn\'t working when restrict categories was enabled from vendor subscription product.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RMA] fixed fatal error while purchasing booking product if rma module is active',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Added translation support for Delivery Time Calendar',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RequestAQuote] change text permanent delete to Delete Permanently',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RequestAQuote] Search for the product wasn\'t working while creating new Quotes or new Quote rules',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorStaff] Removed unfiltered_html capabilities from vendor_staff role',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.3',
+        'released' => '2022-07-26',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => '[RequestForQuotation] Fixed category list wasn’t rendered properly and was missing most of the category items.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.2',
+        'released' => '2022-07-15',
+        'changes'  => [
+            'New'         => [
+                [
+                    'title'       => '[ColorSchemeCustomizar] Added dashboard navigation active menu color settings.',
+                    'description' => '',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => 'Removed default values from withdraw disbursement settings',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ColorSchemeCustomizar] Added dashboard navigation custom border color settings.',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[Stripe] Fixed fatal error on parsing gateway title and a warning after checkout is completed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed data clear pop not showing after checking the data clearing settings checkbox.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.1',
+        'released' => '2022-06-30',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => 'Added disconnect button to the Skrill payment method',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Redirect the user to the corresponding payment settings page instead of the payment list page after connecting the payment method.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Respect the Dokan withdraw enable/disable method during a show of non-connected seller notice.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Update Elementor Store Open/Close times widget & add hover feature to the Store Open/Close times widget.',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'Fixed some empty method names in Payment Methods section of Vendor Dashboard > Withdraw.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RequestAQuote] Fixed a console warning on WordPress admin panel',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'After completion of 100% again clicking update settings of store/payment/social profile will popup progress bar again',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Progress bar doesn’t update if a vendor is created by the admin',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Progress bar doesn’t update if a customer becomes a vendor',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'No progress bar update for PayPal marketplace, Mangopay, razor pay, custom payment method update',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.0',
+        'released' => '2022-06-14',
+        'changes'  => [
+            'New'         => [
+                [
+                    'title'       => '[ColorSchemeCustomizer] Updated admin color picker settings page and included 7 different color pallets for admin to choose from.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorStaff] An email is sent to the vendor staff if the vendor changes the password.',
+                    'description' => '',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => 'Updated Dokan Pro and all modules settings page design according to the new settings page.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'If ‘Selling Product Types’ is set to ‘I plan to sell only digital products’ then when creating new variations of a variable product the Downloadable and Virtual checkboxes will be checked automatically if the corresponding values are empty. otherwise, the saved values will be placed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ProductAdvertisement] delete advertisement product reference after the base product has been moved to the trash',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ProductAdvertisement] create advertisement base product after saving advertisement settings',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'WPML translated endpoint not working in payment settings page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Distance rate shipping doesn\'t show the proper shipping method title under Cart and Checkout page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Distance rate shipping method rules order not saved',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Coupon percentage discount type doesn\'t respect WooCommerce decimal/thousand settings for coupon amount',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'admin shipping method deletion doesn\'t delete vendor shipping methods',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.6.2',
+        'released' => '2022-06-03',
+        'changes'  => [
+            'Fix'         => [
+                [
+                    'title'       => '[Stripe express] Live mode API wasn\'t working',
+                    'description' => '',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => '[Stripe express] Updated some validation to restrict some unnecessary process',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe express] Billing, shipping, and tax data processing for payment request',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Express] Added filter `dokan_stripe_express_payment_method_title` to manipulate payment method title',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.6.1',
+        'released' => '2022-05-31',
+        'changes'  => [
+            'New Module'  => [
+                [
+                    'title'       => 'Stripe Express',
+                    'description' => 'Enable split payments, multi-seller payments, Apple Pay, Google Pay, iDEAL and other marketplace features available in Stripe Express Kindly refer to the <a href="https://wedevs.com/docs/dokan/modules/stripe-express-integration/">documentation</a> for more information.',
+                ],
+            ],
+            'New'         => [
+                [
+                    'title'       => '[ProductAdvertising] Added reverse withdrawal support',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPal Marketplace] Added reverse withdrawal payment purchase support ',
+                    'description' => '',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => '[MangoPay] Some UX for MangoPay payment settings in vendor dashboard.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Introduce a callback to withdraw methods to determine if a seller if connected to that withdraw method',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'Negative vendor earning entry while refunding a multivendor order fully.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Marketplace coupon bound to some vendors applies to other vendors\' products',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Vendor coupon applies to sale items even if its exclude sale item flag is true',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[MangoPay] Empty state error was being thrown for some addresses where state is not required',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Connect] Payment element\'s designs of other Stripe gateways were breaking.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.6.0',
+        'released' => '2022-05-18',
+        'changes'  => [
+            'New Module'  => [
+                [
+                    'title'       => 'Request for Quotation',
+                    'description' => 'Facilitate wholesale orders between merchants and customers with the option for quoted prices. Kindly refer to the <a href="https://wedevs.com/docs/dokan/modules/dokan-request-for-quotation-module/">documentation</a> for more information.',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => 'Now vendor can choose if a Free shipping rule should be applied before or after deducing the coupon discount amount.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreSupport] Added Store Support unread ticket status icon, and added email settings and new email templates to send support status email to admin.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Auction] Added filters to the auctions products under vendor dashboard',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Auction] Added email search in auctions activity page',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'With a manual booking, vendor is being charged instead of the customer',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed a translation issue for automatic withdraw page’s minimum withdraw amount',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Vendor shipping zone is not selected properly on the cart page due to caching issue',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Stop the nonce verification failed message after saving store settings',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Auction] Fixed pagination under auctions products list page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[SPMV] min/max price show product not working if cloned products price diff is less than 1.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.5.6',
+        'released' => '2022-04-26',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => 'Added withdraw method icon filter hook: dokan_withdraw_method_icon',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Added withdraw method heading filter hook: dokan_vendor_dashboard_payment_settings_heading',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Added icons in images directory inside corresponding assets directory of withdraw methods if the icon file is missing',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'The Shipping tax is not calculated on Flat Rate shipping if there is any other method under the Flat Rate shipping method',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[MangoPay] Fixed live API key not working issue',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Customer does not get the verification link in the email if \'Enable Subscription in registration form\' is enabled in Vendor Subscription',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.5.5',
+        'released' => '2022-04-11',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => '[VendorVerification] Added vendor proof of residence upload feature',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreReview] Added email notification for new store reviews',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'Fixed Availability Range of the bookable product can not be deleted when the product is checked to be Accommodation Booking type.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fixed some deprecated warnings and a fatal error while using the latest version of Elementor.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Fixed Booking not visible in Day view of the calendar if site language is other than English.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Geolocation] The product location of the pending review products are automatically changed to same as store on publish has been fixed.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription] Vendor are being able to create variations even after restricting using subscription packs has been fixed now.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPalMarketplace] Fixed invalid parameter value error while creating vendor subscription if price contain more that 2 digits after decimal points.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.5.4',
+        'released' => '2022-03-18',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => 'Set delivery time week start date similar to WordPress week start settings',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[MangoPay] Applied some logic to restrict unnecessary implementations for MangoPay',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPal Marketplace] Restart Payment flow in case of funding source error on PayPal ie: user doesn’t have enough balance',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPal Marketplace] Display user friendly error messages instead of generic message',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPal Marketplace] Set Shipping and Tax fee recipient to seller despite of admin settings, previously it was displaying error on checkout page if shipping fee recipient was set to admin',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPal Marketplace] Added purchasing capability for not logged in user',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[SPMV] Fatal error under Single Product Multiple Vendor module while trying to clone auction product',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed some translation issue under Vendor Subscription, Vendor Verification, Paypal Marketplace, Mangopay, RazorPay, and Product Advertising modules',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[OrderMinMax] Fixed a warning after clicking Order Again on a completed order',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Product Addons] Completion of successful add-on creation alert message has wrong css class',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed adding two products from different vendors and one of them is virtual, will receive a warning error on the cart page.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'JS console error while loading product category & product add new pages has been fixed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPal Marketplace] Update seller enable for receive payment status if not already updated due to failed web hook event',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription] Remove validation if no subscription is active under vendor registration form',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription] Remove validation if no subscription is active under vendor registration form',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RMA] Send refund button is not working under RMA refund request screen',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe] \'Your card number is incomplete\' issue on checkout pay order page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking/Auction] Fixed product geolocation is not working for Booking and Auction Products',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed follow button not working under \'My Account\' > \'Vendors\' section',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.5.3',
+        'released' => '2022-03-08',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => 'Stop loading unnecessary style and script files on every page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreSupport] Added localization support for date time picker library',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'Vendor info was set to null if vendor haven’t assigned to any store category',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Dokan was creating unnecessary rows in the termmeta table, now has been fixed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed fatal error while checking dokan_is_store_open(), if admin didn\'t run dokan migrator',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed fatal error on dokan migrator',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[EU Compliance Fields] Fixed a fatal error while saving Germanized trusted product variation fields data',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[EU Compliance Fields] fatal error on wcpdf invoice integration on php version 8.0+',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fixed a warning due to compatibility issue with latest version of Store Support Module',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fixed social profile Elementor icon widget wasn’t working properly due to conflict with latest version of font awesome library',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreReviewe] fixed a fatal error while clicking Sell This Item from spmv module',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Dokan Stripe] Fixed gateway fee was returning 0 in case of several partial refunds requested for same order',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Product Enquiry] Fixed loading icon always displaying after product enquiry email is sent',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.5.2',
+        'released' => '2022-02-28',
+        'changes'  => [
+            'New Feature' => [
+                [
+                    'title'       => '[SPMV] Added product search feature under Add New Product  page if Single Product Multi Vendor module is enabled.',
+                    'description' => 'Product search in the Add new product window is added when the SPMV module is activated, <a href="https://wedevs.com/docs/dokan/modules/single-product-multiple-vendor/">Documentation</a>. Currently, we are giving product search functionality under Booking and Auction module also. The Booking or Auction Product search results displays Booking or Auction products only.',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => 'Added seller verification badge under Store listing page, single store page,  and single product page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Option to close progress bar if profile completeness score is 100%',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[EU Compliance Fields] Added EU Compliance Customer Fields in Order details Billing and Billing section of Customer profile[EU Compliance Fields] Added EU Compliance Customer Fields in Order details Billing and Billing section of Customer profile',
+                    'description' => 'Module page design updates',
+                ],
+                [
+                    'title'       => 'Module page design updates',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[StoreSupport] Activating Store Support from Modules has no reflection on the single store page unless vendor update their settings',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Tools - Page Installation Pages button does not work appropriately',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Hide add new coupon button from coupon create page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Shipping continent is not being shown under the shipping tab on the single product page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Disable shipping option when virtual is enabled for bookable products',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Resource available quantity field is empty',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Added Dokan Upgrader to delivery time schema updates',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Styles are not being saved If the announcement is drafted or edited after scheduled',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Showing an extra comma in the Booking resource\'s Parent products when a connected product is deleted',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.5.1',
+        'released' => '2022-02-17',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => 'Multiple Store Open Close Widget',
+                    'description' => 'Multiple store open close time wasn\'t working for Store Open/Close time Widget',
+                ],
+                [
+                    'title'       => 'Elementor Single Store Page Template',
+                    'description' => 'Single Store Page template was missing from Elementor template selection dropdown.',
+                ],
+                [
+                    'title'       => 'Elementor Single Product Page Widgets ',
+                    'description' => 'Product Widgets disappeared from Elementor single Product Page template edit panel.',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.5.0',
+        'released' => '2022-02-03',
+        'changes'  => [
+            'New Module'  => [
+                [
+                    'title'       => 'Razorpay Payment Gateway',
+                    'description' => 'Accept credit card payments and allow your sellers to get automatic split payment in Dokan via Razorpay. Module is available under <strong>Professional+</strong> plans. Please visit <a href="https://wedevs.com/docs/dokan/modules/dokan-razorpay/" target="_blank">documentation</a> to learn more about this module.',
+                ],
+                [
+                    'title'       => 'MangoPay Payment Gateway',
+                    'description' => 'Enable split payments, multi-seller payments, and other marketplace features given by MangoPay. Module is available under <strong>Professional+</strong> plans. Please visit <a href="https://wedevs.com/docs/dokan/modules/dokan-mangopay/" target="_blank">documentation</a> to learn more about this module.',
+                ],
+                [
+                    'title'       => 'Min Max Order Quantities ',
+                    'description' => 'Set a minimum or maximum purchase quantity or amount for the products of your marketplace. Module is available under <strong>Professional+</strong> plans. Please visit <a href="https://wedevs.com/docs/dokan/modules/how-to-enable-minimum-maximum-order-amount-for-dokan/" target="_blank">documentation</a> to learn more about this module.',
+                ],
+                [
+                    'title'       => 'Product Advertising ',
+                    'description' => 'Admin can earn more by allowing vendors to advertise their products and give them the right exposure. Module is available under <strong>Business+</strong> plans. Please visit <a href="https://wedevs.com/docs/dokan/modules/how-to-enable-minimum-maximum-order-amount-for-dokan/" target="_blank">documentation</a> to learn more about this module.',
+                ],
+            ],
+            'New Feature' => [
+                [
+                    'title'       => '[Store Support] Added Store Support feature for site admin.',
+                    'description' => 'Now Admin will be able to participate in support ticket conversations made via customers right from the admin dashboard. Please visit <a href="https://wedevs.com/docs/dokan/modules/how-to-install-and-use-store-support/support-fot-admin/" target="_blank">documentation</a> to learn more about this feature.',
+                ],
+                [
+                    'title'       => 'Added support for Multiple store open close time for vendor store',
+                    'description' => 'Now seller will be able to add multiple open/close time for their store. Please visit <a href="https://wedevs.com/docs/dokan/vendor-guide/how-to-manage-opening-closing-hours-of-vendor-store/" target="_blank">documentation</a> to learn more about this feature.',
+                ],
+                [
+                    'title'       => 'Automatic withdrawal disbursement',
+                    'description' => 'Now seller will be able to setup schedule to withdraw their earnings. Please visit <a href="https://wedevs.com/docs/dokan/withdraw/automatic-withdraw-disbursement/" target="_blank">documentation</a> to learn more about this feature.',
+                ],
+                [
+                    'title'       => 'Added custom withdraw method support for admin',
+                    'description' => 'Now admin will be able to add custom withdraw method along with existing one. Kindly visit <strong>WordPress Dashboard --> Dokan --> Settings --> Withdraw</strong> page to enable this feature.',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => 'Updated UI for module page',
+                    'description' => 'Now you will be able to find your required modules easily with the help of improved UI for the Module page. We have categorized modules into a couple of groups, updated documentation links, included video documentation, and many more. Kindly visit <strong>WordPress Dashboard --> Dokan --> Modules</strong> page to explore the new design.Now you will be able to find your required modules easily with the help of improved UI for the Module page. We have categorized modules into a couple of groups, updated documentation links, included video documentation, and many more. Kindly visit <strong>WordPress Dashboard --> Dokan --> Modules</strong> page to explore the new design.',
+                ],
+                [
+                    'title'       => 'For Store open close time widget, first day of the week will start on according to the WordPress settings',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Ensured compatibility with latest release of Rank math SEO',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Added support for "=" symbol while creating range and setting up the cost while creating a bookable product. ',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Set the minimum allowed value for \'Minimum booking window ( into the future )\' to zero(0)',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Geolocation] Added a search button under geolocation shortcode  to search store/product via geolocation, also removed auto reload features for this form.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Updated Dokan Free Shipping minimum amount calculation based on WooCommerce (compatibility with latest version)',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Store Support] Design updated on vendor dashboard store support page and customer dashboard support page.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreSupport] Added date range filtering option for vendor support tickets listing ',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreSupport] Added support tickets count under My Account page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ProductEnquiry] reCAPTCHA support added to product enquiry form ',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Auction] Added Back Navigation button from auction activity list, also fixed a typo',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Updated some admin notices for better readability',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[PayPal Marketplace] Switching subscription plan doesn\'t work if Paypal Marketplace module is active, now has been fixed.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Vendor coupon was not expiring at exact expiry date, now has been fixed.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Delivery Time] Delivery date label wasn’t displaying on frontend checkout page, now has been fixed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed button width mismatch under vendor dashboard report page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Auction] Starting bidding price was not resetting for Re-listing auction products, now has been fixed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Shipping methods are not available when both digital and physical products are in the cart, now has been fixed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Product Subscription] Shipping functionality is not working when vendor create subscription product from vendor dashboard, now has been fixed.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.4.4',
+        'released' => '2021-12-23',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => 'SEO section is not appearing while the latest Yoast SEO plugin (17.8) is installed and activated.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Refund not working if order has sub order.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
         'version'  => 'Version 3.4.3',
         'released' => '2021-12-15',
         'changes'  => [
@@ -30,13 +946,13 @@ $changelog = [
                 ],
 
             ],
-            'Refactor' => [
+            'Refactor'    => [
                 [
                     'title'       => 'float typecast refactored to wc_format_decimal() #1448',
                     'description' => '',
                 ],
             ],
-            'Fix'    => [
+            'Fix'         => [
                 [
                     'title'       => '[Wholesale] prevent users to buy products at wholesale prices if they are not wholesale customers.',
                     'description' => '',
@@ -85,7 +1001,7 @@ $changelog = [
         'version'  => 'Version 3.4.2',
         'released' => '2021-11-30',
         'changes'  => [
-            'New'    => [
+            'New'         => [
                 [
                     'title'       => '[Booking] Added accommodation booking for Booking module',
                     'description' => '',
@@ -143,7 +1059,7 @@ $changelog = [
                 ],
 
             ],
-            'Fix'    => [
+            'Fix'         => [
                 [
                     'title'       => 'Disabled bulk action product edit/delete, inline product edit/delete if vendor is not enabled for selling',
                     'description' => '',

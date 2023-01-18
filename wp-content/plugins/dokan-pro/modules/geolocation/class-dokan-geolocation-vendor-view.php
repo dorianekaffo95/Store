@@ -30,7 +30,7 @@ class Dokan_Geolocation_Vendor_View {
 
         add_action( 'dokan_before_seller_listing_loop', array( self::class, 'before_seller_listing_loop' ) );
         add_action( 'dokan_after_seller_listing_loop', array( self::class, 'after_seller_listing_loop' ) );
-        add_action( 'dokan_seller_listing_footer_content', array( self::class, 'seller_listing_footer_content' ) );
+        add_action( 'dokan_seller_listing_footer_content', array( self::class, 'seller_listing_footer_content' ), 11, 1 );
         add_action( 'dokan_store_lists_filter_form', array( self::class, 'load_store_lists_filter' ) );
 
         add_filter( 'dokan_show_seller_search', '__return_false' );

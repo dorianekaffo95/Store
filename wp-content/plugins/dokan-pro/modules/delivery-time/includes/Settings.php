@@ -35,11 +35,15 @@ class Settings {
      * @return array
      */
     public function load_settings_section( $section ) {
-        $section[] = array(
-            'id'    => 'dokan_delivery_time',
-            'title' => __( 'Delivery Time', 'dokan' ),
-            'icon'  => 'dashicons-clock',
-        );
+        $section[] = [
+            'id'                   => 'dokan_delivery_time',
+            'title'                => __( 'Delivery Time', 'dokan' ),
+            'icon_url'             => DOKAN_DELIVERY_TIME_ASSETS_DIR . '/images/delivery-time.svg',
+            'description'          => __( 'Delivery Schedule Setup', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/modules/dokan-delivery-time/',
+            'settings_title'       => __( 'Delivery Time Settings', 'dokan' ),
+            'settings_description' => __( 'You can configure your site to allow customers to choose the time and date they want their products delivered.', 'dokan' ),
+        ];
 
         return $section;
     }
@@ -60,79 +64,80 @@ class Settings {
         $fields['dokan_delivery_time'] = [
             'allow_vendor_override_settings' => [
                 'name'    => 'allow_vendor_override_settings',
-                'label'   => __( 'Allow vendor settings', 'dokan' ),
+                'label'   => __( 'Allow Vendor Settings', 'dokan' ),
                 'desc'    => __( 'Allow vendor to override settings', 'dokan' ),
-                'type'    => 'checkbox',
+                'type'    => 'switcher',
                 'default' => 'off',
                 'tooltip' => __( 'Check this to allow vendors to override & customize the delivery settings. Otherwise, admin configured settings will be applied.', 'dokan' ),
             ],
-            'delivery_date_label' => [
+            'delivery_date_label'            => [
                 'name'    => 'delivery_date_label',
-                'label'   => __( 'Delivery date label', 'dokan' ),
+                'label'   => __( 'Delivery Date Label', 'dokan' ),
                 'desc'    => __( 'This label will show on checkout page', 'dokan' ),
                 'default' => __( 'Delivery Date', 'dokan' ),
                 'type'    => 'text',
             ],
-            'preorder_date' => [
+            'preorder_date'                  => [
                 'name'    => 'preorder_date',
-                'label'   => __( 'Delivery blocked buffer', 'dokan' ),
+                'label'   => __( 'Delivery Blocked Buffer', 'dokan' ),
                 'desc'    => __( 'How many days the delivery date is blocked from current date? 0 for no block buffer', 'dokan' ),
                 'default' => '0',
                 'type'    => 'number',
                 'min'     => '0',
             ],
-            'delivery_box_info' => [
+            'delivery_box_info'              => [
                 'name'    => 'delivery_box_info',
-                'label'   => __( 'Delivery box info', 'dokan' ),
+                'label'   => __( 'Delivery Box Info', 'dokan' ),
                 /* translators: %s: day */
-                'desc'    => sprintf( __( 'This info will show on checkout page delivery time box. %s will be replaced by Delivery blocked buffer', 'dokan' ), '%DAY%' ),
+                'desc'    => sprintf( __( 'This info will show on checkout page delivery time box. %s will be replaced by delivery blocked buffer', 'dokan' ), '%DAY%' ),
                 /* translators: %s: day */
                 'default' => sprintf( __( 'This store needs %s day(s) to process your delivery request', 'dokan' ), '%DAY%' ),
-                'type'    => 'text',
+                'type'    => 'textarea',
+                'rows'    => 3,
             ],
-            'select_required' => [
+            'select_required'                => [
                 'name'    => 'selection_required',
                 'label'   => __( 'Require Delivery Date and Time', 'dokan' ),
                 'desc'    => __( 'Make choosing a delivery date and time mandatory for customers.', 'dokan' ),
                 'default' => 'on',
-                'type'    => 'checkbox',
+                'type'    => 'switcher',
             ],
-            'delivery_day' => [
+            'delivery_day'                   => [
                 'name'    => 'delivery_day',
-                'label'   => __( 'Delivery day', 'dokan' ),
+                'label'   => __( 'Delivery Day', 'dokan' ),
                 'desc'    => __( 'Select days of the week you are open for delivery', 'dokan' ),
                 'type'    => 'multicheck',
                 'default' => $all_delivery_days,
                 'options' => $all_delivery_days,
             ],
-            'opening_time' => [
+            'opening_time'                   => [
                 'name'        => 'opening_time',
-                'label'       => __( 'Opening time', 'dokan' ),
+                'label'       => __( 'Opening Time', 'dokan' ),
                 'type'        => 'select',
                 'placeholder' => __( 'Select opening time', 'dokan' ),
                 'options'     => $all_time_slots,
                 'desc'        => __( 'What time does your delivery start?', 'dokan' ),
             ],
-            'closing_time' => [
+            'closing_time'                   => [
                 'name'        => 'closing_time',
-                'label'       => __( 'Closing time', 'dokan' ),
+                'label'       => __( 'Closing Time', 'dokan' ),
                 'type'        => 'select',
                 'placeholder' => __( 'Select closing time', 'dokan' ),
                 'options'     => $all_time_slots,
                 'desc'        => __( 'What time does your delivery end?', 'dokan' ),
             ],
-            'time_slot_minutes' => [
+            'time_slot_minutes'              => [
                 'name'    => 'time_slot_minutes',
-                'label'   => __( 'Time slot', 'dokan' ),
+                'label'   => __( 'Time Slot', 'dokan' ),
                 'desc'    => __( 'Time slot in minutes. Please keep opening and closing time divisible by slot minutes. E.g ( 30, 60, 120 )', 'dokan' ),
                 'default' => '0',
                 'type'    => 'number',
                 'step'    => '30',
                 'max'     => '360',
             ],
-            'order_per_slot' => [
+            'order_per_slot'                 => [
                 'name'    => 'order_per_slot',
-                'label'   => __( 'Order per slot', 'dokan' ),
+                'label'   => __( 'Order Per Slot', 'dokan' ),
                 'desc'    => __( 'How many orders you can process in a single slot? 0 for unlimited orders', 'dokan' ),
                 'default' => '0',
                 'type'    => 'number',
@@ -177,49 +182,49 @@ class Settings {
 
         if ( empty( $delivery_date_label ) ) {
             $errors[] = [
-                'name' => 'delivery_date_label',
+                'name'  => 'delivery_date_label',
                 'error' => __( 'Delivery date label can not be empty', 'dokan' ),
             ];
         }
 
         if ( ! is_array( $selected_delivery_days ) || empty( $selected_delivery_days ) ) {
             $errors[] = [
-                'name' => 'delivery_day',
+                'name'  => 'delivery_day',
                 'error' => __( 'Delivery Day can not be empty! Please choose at least one delivery day', 'dokan' ),
             ];
         }
 
         if ( '' === $delivery_blocked_buffer || intval( $delivery_blocked_buffer ) < 0 ) {
             $errors[] = [
-                'name' => 'preorder_date',
+                'name'  => 'preorder_date',
                 'error' => __( 'Delivery blocked buffer can not be empty or less than 0', 'dokan' ),
             ];
         }
 
         if ( empty( $delivery_box_info ) ) {
             $errors[] = [
-                'name' => 'delivery_box_info',
+                'name'  => 'delivery_box_info',
                 'error' => __( 'Delivery box information can not be empty', 'dokan' ),
             ];
         }
 
         if ( empty( $opening_time ) || empty( $closing_time ) || ( strtotime( $opening_time ) > strtotime( $closing_time ) ) ) {
             $errors[] = [
-                'name' => 'closing_time',
+                'name'  => 'closing_time',
                 'error' => __( 'Opening time must be greater than closing time', 'dokan' ),
             ];
         }
 
         if ( ! is_int( intval( $time_slot_minutes ) ) || intval( $time_slot_minutes ) < 10 || intval( $time_slot_minutes ) > 1440 ) {
             $errors[] = [
-                'name' => 'time_slot_minutes',
+                'name'  => 'time_slot_minutes',
                 'error' => __( 'Time slot minutes can not be empty, less than 10 minutes or greater than 1440 minutes', 'dokan' ),
             ];
         }
 
         if ( '' === $order_per_slot || intval( $order_per_slot ) < 0 ) {
             $errors[] = [
-                'name' => 'order_per_slot',
+                'name'  => 'order_per_slot',
                 'error' => __( 'Order per slot can not be empty or less than 0', 'dokan' ),
             ];
         }
@@ -232,7 +237,7 @@ class Settings {
                         'value' => $option_value,
                     ],
                     'message'  => __( 'Validation error', 'dokan' ),
-                    'errors' => $errors,
+                    'errors'   => $errors,
                 ],
                 400
             );
@@ -245,7 +250,7 @@ class Settings {
      * @since 3.3.0
      *
      * @param string $option_name
-     * @param array $option_value
+     * @param array  $option_value
      *
      * @return void
      */
@@ -264,11 +269,11 @@ class Settings {
         $option_value['order_per_slot']    = intval( $option_value['order_per_slot'] );
         $option_value['time_slot_minutes'] = intval( $option_value['time_slot_minutes'] );
 
-        $selected_delivery_days         = $option_value['delivery_day'];
-        $time_slot_minutes              = $option_value['time_slot_minutes'];
-        $opening_time                   = $option_value['opening_time'];
-        $closing_time                   = $option_value['closing_time'];
-        $order_per_slot                 = $option_value['order_per_slot'];
+        $selected_delivery_days = $option_value['delivery_day'];
+        $time_slot_minutes      = $option_value['time_slot_minutes'];
+        $opening_time           = $option_value['opening_time'];
+        $closing_time           = $option_value['closing_time'];
+        $order_per_slot         = $option_value['order_per_slot'];
 
         $time_slots = [];
 

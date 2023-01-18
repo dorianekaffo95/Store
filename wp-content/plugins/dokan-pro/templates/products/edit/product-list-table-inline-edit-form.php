@@ -1,8 +1,11 @@
+<?php
+    use WeDevs\Dokan\ProductCategory\Helper;
+?>
 <tr class="dokan-product-list-inline-edit-form dokan-hide">
     <td colspan="11">
         <fieldset>
             <div class="dokan-clearfix">
-                <div class="dokan-w3 dokan-inline-edit-column">
+                <div class="dokan-w6 dokan-inline-edit-column">
                     <strong class="dokan-inline-edit-section-title"><?php esc_html_e( 'Quick Edit', 'dokan' ); ?></strong>
 
                     <div class="inline-edit-col dokan-clearfix">
@@ -13,6 +16,16 @@
                             <input type="text" class="dokan-form-control" data-field-name="post_title" value="<?php echo esc_html( $post_title ); ?>">
                         </div>
                     </div>
+
+                    <label>
+                        <?php esc_html_e( 'Product categories', 'dokan' ); ?>
+                    </label>
+                    <?php
+                        $data = Helper::get_saved_products_category( $product_id );
+                        $data['hide_cat_title'] = 'yes';
+                        $data['from'] = 'quick_edit';
+                        dokan_get_template_part( 'products/dokan-category-header-ui', '', $data );
+                    ?>
                 </div>
                 <div class="dokan-w6 dokan-inline-edit-column">
                     <label>
@@ -40,7 +53,7 @@
                                 <?php esc_html_e( 'Pending Review', 'dokan' ); ?>
                                 <input type="hidden" data-field-name="post_status" value="<?php echo esc_attr( 'pending' ); ?>">
                             </span>
-                        <?php } elseif ( function_exists( 'dokan_seller_vacation_is_seller_on_vacation' ) &&  dokan_seller_vacation_is_seller_on_vacation( dokan_get_current_user_id() ) ) { ?>
+                        <?php } elseif ( function_exists( 'dokan_seller_vacation_is_seller_on_vacation' ) && dokan_seller_vacation_is_seller_on_vacation( dokan_get_current_user_id() ) ) { ?>
                             <span class="dokan-label dokan-label-info">
                                 <?php esc_html_e( 'In Vacation', 'dokan' ); ?>
                                 <input type="hidden" data-field-name="post_status" value="<?php echo esc_attr( 'vacation' ); ?>">
@@ -217,25 +230,18 @@
                             </div>
                         </div>
                     <?php } ?>
-                </div>
 
-                <div class="dokan-w3 dokan-inline-edit-column">
-                    <label>
-                        <?php esc_html_e( 'Product categories', 'dokan' ); ?>
-                    </label>
-
-                    <select data-field-name="product_cat" class="dokan-form-control"
                     <?php
-                    if ( ! $options['using_single_category_style'] ) {
-                        echo 'multiple'; }
+                    /**
+                     * Filter to add custom fields to product quick edit form
+                     *
+                     * @since 3.7.4
+                     *
+                     * @args $product_id int
+                     * @args $options array
+                     */
+                    do_action( 'dokan_quick_edit_before_column2_ends', $product_id, $options );
                     ?>
-                    >
-                        <?php foreach ( $options['categories'] as $category ) { ?>
-                            <option value="<?php echo esc_attr( $category->term_id ); ?>" <?php echo in_array( $category->term_id, $product_cat, true ) ? ' selected' : ''; ?>>
-                                <?php echo esc_html( $category->name ); ?>
-                            </option>
-                        <?php } ?>
-                    </select>
                 </div>
             </div>
 

@@ -66,7 +66,7 @@
             </div>
             <div class="dokan-form-group">
                 <label for="_wc_booking_qty" class="form-label"><?php _e( 'Available Quantity', 'dokan' ); ?></label>
-                <?php dokan_post_input_box( $resource_id, '_wc_booking_qty', array( 'value' => $available_quantity ), 'number' ); ?>
+                <?php dokan_post_input_box( $resource_id, '_wc_booking_qty', array( 'value' => empty( $available_quantity ) ? 1 : $available_quantity ), 'number' ); ?>
             </div>
            <div id="bookings_availability" class="bookings_availability availability_fields dokan-edit-row dokan-clearfix">
                         <div class="dokan-clearfix">
@@ -82,14 +82,14 @@
                                             <th>
                                             <?php _e( 'Bookable', 'dokan' ); ?>
                                                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'If not bookable, users won\'t be able to choose this block for their booking.', 'dokan' ); ?>">
-                                                    <i class="fa fa-question-circle"></i>
+                                                    <i class="fas fa-question-circle"></i>
                                                 </span>
                                             </th>
                                             <th>
 
                                             <?php _e( 'Priority', 'dokan' ); ?>
                                                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'The lower the priority number, the earlier this rule gets applied. By default, global rules take priority over product rules which take priority over resource rules. By using priority numbers you can execute rules in different orders.', 'dokan' ); ?>">
-                                                    <i class="fa fa-question-circle"></i>
+                                                    <i class="fas fa-question-circle"></i>
                                                 </span>
                                             </th>
                                             <th class="remove" width="1%">&nbsp;</th>

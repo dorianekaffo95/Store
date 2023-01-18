@@ -348,8 +348,9 @@ jQuery( function( $ ) {
 						var html = html.html;
 
 						html = html.replace( /{loop}/g, loop );
+                        html = html.replace( /wc-pao-remove-option/g, 'wc-pao-remove-option dokan-btn dokan-btn-danger dokan-btn-sm' );
 
-						var selectedType = $( this ).parents( '.wc-pao-addon' ).find( '.wc-pao-addon-display-select' ).val();
+                        var selectedType = $( this ).parents( '.wc-pao-addon' ).find( '.wc-pao-addon-display-select' ).val();
 
 						if ( 'images' === selectedType ) {
 							html = html.replace( /wc-pao-addon-content-image hide/g, 'wc-pao-addon-content-image show' );
@@ -390,7 +391,7 @@ jQuery( function( $ ) {
 				.on( 'click', '.wc-pao-remove-addon', async function() {
 					$( '.wc-pao-error-message' ).remove();
 
-					const answer = await dokan_sweetalert( wc_pao_params.i18n.confirm_remove_addon, { 
+					const answer = await dokan_sweetalert( wc_pao_params.i18n.confirm_remove_addon, {
 						action  : 'confirm',
 						icon    : 'warning'
 					} );
@@ -417,7 +418,7 @@ jQuery( function( $ ) {
 					return false;
 				} )
 				.on( 'click', '.wc-pao-remove-option', async function() {
-					const answer = await dokan_sweetalert( wc_pao_params.i18n.confirm_remove_option, { 
+					const answer = await dokan_sweetalert( wc_pao_params.i18n.confirm_remove_option, {
 						action  : 'confirm',
 						icon    : 'warning'
 					} );

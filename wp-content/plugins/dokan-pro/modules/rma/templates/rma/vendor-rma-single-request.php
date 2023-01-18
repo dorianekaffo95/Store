@@ -160,7 +160,7 @@
                                             <input type="hidden" name="vendor_id" value="<?php echo $request['vendor']['store_id']; ?>">
                                             <input type="submit" class="dokan-right dokan-btn dokan-btn-default" value="<?php _e( 'Update', 'dokan' ) ?>">
 
-                                            <?php if ( 'yes' === dokan_get_option( 'rma_enable_refund_request', 'dokan_rma', 'no' ) && 'refund' === $request['type'] && 'processing' === $request['status'] ) : ?>
+                                            <?php if ( 'on' === dokan_get_option( 'rma_enable_refund_request', 'dokan_rma', 'off' ) && 'refund' === $request['type'] && 'processing' === $request['status'] ) : ?>
                                                 <?php
                                                     $has_already_refund_request = dokan_pro()->refund->has_pending_request( $request['order_id'] );
                                                 ?>
@@ -171,7 +171,7 @@
                                                 <?php endif ?>
                                             <?php endif ?>
 
-                                            <?php if ( 'yes' === dokan_get_option( 'rma_enable_coupon_request', 'dokan_rma', 'no' ) && 'coupon' === $request['type'] && 'processing' == $request['status'] ) : ?>
+                                            <?php if ( 'on' === dokan_get_option( 'rma_enable_coupon_request', 'dokan_rma', 'off' ) && 'coupon' === $request['type'] && 'processing' === $request['status'] ) : ?>
                                                 <a href="#" class="dokan-btn dokan-btn-default dokan-send-coupon-request" data-request_id="<?php echo $request['id']; ?>"><?php _e( 'Send Coupon', 'dokan' ) ?></a>
                                             <?php endif ?>
                                                 <?php

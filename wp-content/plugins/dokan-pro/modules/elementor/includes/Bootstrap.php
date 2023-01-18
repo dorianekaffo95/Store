@@ -27,7 +27,7 @@ class Bootstrap extends ModuleBase {
         parent::boot();
 
         add_action( 'elementor/documents/register', [ $this, 'register_documents' ] );
-        add_action( 'elementor/dynamic_tags/register_tags', [ $this, 'register_tags' ] );
+        add_action( 'elementor/dynamic_tags/register', [ $this, 'register_tags' ] );
         add_action( 'elementor/controls/controls_registered', [ $this, 'register_controls' ] );
         add_action( 'elementor/editor/footer', [ $this, 'add_editor_templates' ], 9 );
         add_action( 'elementor/theme/register_conditions', [ $this, 'register_conditions' ] );
@@ -71,6 +71,10 @@ class Bootstrap extends ModuleBase {
             'StoreVacationMessage',
             'StoreCoupons',
             'StoreProductFilter',
+            'StoreFeaturedProducts',
+            'StoreLatestProducts',
+            'StoreBestSellingProducts',
+            'StoreTopRatedProducts',
             'ProductRMA',
             'ProductSPMV',
             'ProductSPMVList',
@@ -134,7 +138,9 @@ class Bootstrap extends ModuleBase {
         );
 
         foreach ( $tags as $tag ) {
-            $module->register_tag( "\\WeDevs\\DokanPro\\Modules\\Elementor\\Tags\\{$tag}" );
+            $class_name = __NAMESPACE__ . '\Tags\\' . $tag;
+            $instance = new $class_name();
+            $module->register( $instance );
         }
     }
 
@@ -155,7 +161,7 @@ class Bootstrap extends ModuleBase {
 
         foreach ( $controls as $control ) {
             $control_class = "\\WeDevs\\DokanPro\\Modules\\Elementor\\Controls\\{$control}";
-            $controls_manager->register_control( $control_class::CONTROL_TYPE, new $control_class() );
+            $controls_manager->register( new $control_class(), $control_class::CONTROL_TYPE );
         }
     }
 

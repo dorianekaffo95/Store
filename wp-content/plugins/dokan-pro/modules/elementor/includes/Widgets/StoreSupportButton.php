@@ -58,8 +58,8 @@ class StoreSupportButton extends DokanButton {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->update_control(
             'text',
@@ -128,10 +128,10 @@ class StoreSupportButton extends DokanButton {
                 return;
             }
 
-            $store_support  = dokan_pro()->module->store_support;
-            $support_button = $store_support->get_support_button( $id );
-
-            if ( ! $support_button['show'] ) {
+            // get store info
+            $store_info = dokan_get_store_info( $id );
+            // check if vendor disabled store support button
+            if ( isset( $store_info['show_support_btn'] ) && 'no' === $store_info['show_support_btn'] ) {
                 return;
             }
 

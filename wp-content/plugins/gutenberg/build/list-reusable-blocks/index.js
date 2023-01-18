@@ -1,48 +1,48 @@
-/******/ (function() { // webpackBootstrap
+/******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = function(module) {
+/******/ 		__webpack_require__.n = (module) => {
 /******/ 			var getter = module && module.__esModule ?
-/******/ 				function() { return module['default']; } :
-/******/ 				function() { return module; };
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
 /******/ 			__webpack_require__.d(getter, { a: getter });
 /******/ 			return getter;
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = function(exports, definition) {
+/******/ 		__webpack_require__.d = (exports, definition) => {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	!function() {
-/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
-/******/ 	}();
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
+/******/ 		__webpack_require__.r = (exports) => {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
@@ -50,13 +50,13 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 
 ;// CONCATENATED MODULE: external ["wp","element"]
-var external_wp_element_namespaceObject = window["wp"]["element"];
+const external_wp_element_namespaceObject = window["wp"]["element"];
 ;// CONCATENATED MODULE: external ["wp","i18n"]
-var external_wp_i18n_namespaceObject = window["wp"]["i18n"];
+const external_wp_i18n_namespaceObject = window["wp"]["i18n"];
 ;// CONCATENATED MODULE: external "lodash"
-var external_lodash_namespaceObject = window["lodash"];
+const external_lodash_namespaceObject = window["lodash"];
 ;// CONCATENATED MODULE: external ["wp","apiFetch"]
-var external_wp_apiFetch_namespaceObject = window["wp"]["apiFetch"];
+const external_wp_apiFetch_namespaceObject = window["wp"]["apiFetch"];
 var external_wp_apiFetch_default = /*#__PURE__*/__webpack_require__.n(external_wp_apiFetch_namespaceObject);
 ;// CONCATENATED MODULE: ./packages/list-reusable-blocks/build-module/utils/file.js
 /**
@@ -101,7 +101,7 @@ function readTextFile(file) {
     reader.readAsText(file);
   });
 }
-//# sourceMappingURL=file.js.map
+
 ;// CONCATENATED MODULE: ./packages/list-reusable-blocks/build-module/utils/export.js
 /**
  * External dependencies
@@ -141,21 +141,16 @@ async function exportReusableBlock(id) {
   download(fileName, fileContent, 'application/json');
 }
 
-/* harmony default export */ var utils_export = (exportReusableBlock);
-//# sourceMappingURL=export.js.map
-;// CONCATENATED MODULE: external ["wp","components"]
-var external_wp_components_namespaceObject = window["wp"]["components"];
-;// CONCATENATED MODULE: external ["wp","compose"]
-var external_wp_compose_namespaceObject = window["wp"]["compose"];
-;// CONCATENATED MODULE: ./packages/list-reusable-blocks/build-module/utils/import.js
-/**
- * External dependencies
- */
+/* harmony default export */ const utils_export = (exportReusableBlock);
 
+;// CONCATENATED MODULE: external ["wp","components"]
+const external_wp_components_namespaceObject = window["wp"]["components"];
+;// CONCATENATED MODULE: external ["wp","compose"]
+const external_wp_compose_namespaceObject = window["wp"]["compose"];
+;// CONCATENATED MODULE: ./packages/list-reusable-blocks/build-module/utils/import.js
 /**
  * WordPress dependencies
  */
-
 
 /**
  * Internal dependencies
@@ -179,7 +174,7 @@ async function importReusableBlock(file) {
     throw new Error('Invalid JSON file');
   }
 
-  if (parsedContent.__file !== 'wp_block' || !parsedContent.title || !parsedContent.content || !(0,external_lodash_namespaceObject.isString)(parsedContent.title) || !(0,external_lodash_namespaceObject.isString)(parsedContent.content)) {
+  if (parsedContent.__file !== 'wp_block' || !parsedContent.title || !parsedContent.content || typeof parsedContent.title !== 'string' || typeof parsedContent.content !== 'string') {
     throw new Error('Invalid Reusable block JSON file');
   }
 
@@ -198,8 +193,8 @@ async function importReusableBlock(file) {
   return reusableBlock;
 }
 
-/* harmony default export */ var utils_import = (importReusableBlock);
-//# sourceMappingURL=import.js.map
+/* harmony default export */ const utils_import = (importReusableBlock);
+
 ;// CONCATENATED MODULE: ./packages/list-reusable-blocks/build-module/components/import-form/index.js
 
 
@@ -216,63 +211,47 @@ async function importReusableBlock(file) {
 
 
 
-class ImportForm extends external_wp_element_namespaceObject.Component {
-  constructor() {
-    super(...arguments);
-    this.state = {
-      isLoading: false,
-      error: null,
-      file: null
-    };
-    this.isStillMounted = true;
-    this.onChangeFile = this.onChangeFile.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-  }
+function ImportForm(_ref) {
+  let {
+    instanceId,
+    onUpload
+  } = _ref;
+  const inputId = 'list-reusable-blocks-import-form-' + instanceId;
+  const formRef = (0,external_wp_element_namespaceObject.useRef)();
+  const [isLoading, setIsLoading] = (0,external_wp_element_namespaceObject.useState)(false);
+  const [error, setError] = (0,external_wp_element_namespaceObject.useState)(null);
+  const [file, setFile] = (0,external_wp_element_namespaceObject.useState)(null);
 
-  componentWillUnmount() {
-    this.isStillMounted = false;
-  }
+  const onChangeFile = event => {
+    setFile(event.target.files[0]);
+    setError(null);
+  };
 
-  onChangeFile(event) {
-    this.setState({
-      file: event.target.files[0],
-      error: null
-    });
-  }
-
-  onSubmit(event) {
+  const onSubmit = event => {
     event.preventDefault();
-    const {
-      file
-    } = this.state;
-    const {
-      onUpload
-    } = this.props;
 
     if (!file) {
       return;
     }
 
-    this.setState({
+    setIsLoading({
       isLoading: true
     });
     utils_import(file).then(reusableBlock => {
-      if (!this.isStillMounted) {
+      if (!formRef) {
         return;
       }
 
-      this.setState({
-        isLoading: false
-      });
+      setIsLoading(false);
       onUpload(reusableBlock);
-    }).catch(error => {
-      if (!this.isStillMounted) {
+    }).catch(errors => {
+      if (!formRef) {
         return;
       }
 
       let uiMessage;
 
-      switch (error.message) {
+      switch (errors.message) {
         case 'Invalid JSON file':
           uiMessage = (0,external_wp_i18n_namespaceObject.__)('Invalid JSON file');
           break;
@@ -285,55 +264,40 @@ class ImportForm extends external_wp_element_namespaceObject.Component {
           uiMessage = (0,external_wp_i18n_namespaceObject.__)('Unknown error');
       }
 
-      this.setState({
-        isLoading: false,
-        error: uiMessage
-      });
+      setIsLoading(false);
+      setError(uiMessage);
     });
-  }
+  };
 
-  onDismissError() {
-    this.setState({
-      error: null
-    });
-  }
+  const onDismissError = () => {
+    setError(null);
+  };
 
-  render() {
-    const {
-      instanceId
-    } = this.props;
-    const {
-      file,
-      isLoading,
-      error
-    } = this.state;
-    const inputId = 'list-reusable-blocks-import-form-' + instanceId;
-    return (0,external_wp_element_namespaceObject.createElement)("form", {
-      className: "list-reusable-blocks-import-form",
-      onSubmit: this.onSubmit
-    }, error && (0,external_wp_element_namespaceObject.createElement)(external_wp_components_namespaceObject.Notice, {
-      status: "error",
-      onRemove: () => this.onDismissError()
-    }, error), (0,external_wp_element_namespaceObject.createElement)("label", {
-      htmlFor: inputId,
-      className: "list-reusable-blocks-import-form__label"
-    }, (0,external_wp_i18n_namespaceObject.__)('File')), (0,external_wp_element_namespaceObject.createElement)("input", {
-      id: inputId,
-      type: "file",
-      onChange: this.onChangeFile
-    }), (0,external_wp_element_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
-      type: "submit",
-      isBusy: isLoading,
-      disabled: !file || isLoading,
-      variant: "secondary",
-      className: "list-reusable-blocks-import-form__button"
-    }, (0,external_wp_i18n_namespaceObject._x)('Import', 'button label')));
-  }
-
+  return (0,external_wp_element_namespaceObject.createElement)("form", {
+    className: "list-reusable-blocks-import-form",
+    onSubmit: onSubmit,
+    ref: formRef
+  }, error && (0,external_wp_element_namespaceObject.createElement)(external_wp_components_namespaceObject.Notice, {
+    status: "error",
+    onRemove: () => onDismissError()
+  }, error), (0,external_wp_element_namespaceObject.createElement)("label", {
+    htmlFor: inputId,
+    className: "list-reusable-blocks-import-form__label"
+  }, (0,external_wp_i18n_namespaceObject.__)('File')), (0,external_wp_element_namespaceObject.createElement)("input", {
+    id: inputId,
+    type: "file",
+    onChange: onChangeFile
+  }), (0,external_wp_element_namespaceObject.createElement)(external_wp_components_namespaceObject.Button, {
+    type: "submit",
+    isBusy: isLoading,
+    disabled: !file || isLoading,
+    variant: "secondary",
+    className: "list-reusable-blocks-import-form__button"
+  }, (0,external_wp_i18n_namespaceObject._x)('Import', 'button label')));
 }
 
-/* harmony default export */ var import_form = ((0,external_wp_compose_namespaceObject.withInstanceId)(ImportForm));
-//# sourceMappingURL=index.js.map
+/* harmony default export */ const import_form = ((0,external_wp_compose_namespaceObject.withInstanceId)(ImportForm));
+
 ;// CONCATENATED MODULE: ./packages/list-reusable-blocks/build-module/components/import-dropdown/index.js
 
 
@@ -382,8 +346,8 @@ function ImportDropdown(_ref) {
   });
 }
 
-/* harmony default export */ var import_dropdown = (ImportDropdown);
-//# sourceMappingURL=index.js.map
+/* harmony default export */ const import_dropdown = (ImportDropdown);
+
 ;// CONCATENATED MODULE: ./packages/list-reusable-blocks/build-module/index.js
 
 
@@ -397,7 +361,7 @@ function ImportDropdown(_ref) {
  */
 
 
- // Setup Export Links
+ // Setup Export Links.
 
 document.body.addEventListener('click', event => {
   if (!event.target.classList.contains('wp-list-reusable-blocks__export')) {
@@ -406,7 +370,7 @@ document.body.addEventListener('click', event => {
 
   event.preventDefault();
   utils_export(event.target.dataset.id);
-}); // Setup Import Form
+}); // Setup Import Form.
 
 document.addEventListener('DOMContentLoaded', () => {
   const button = document.querySelector('.page-title-action');
@@ -435,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onUpload: showNotice
   }), container);
 });
-//# sourceMappingURL=index.js.map
+
 (window.wp = window.wp || {}).listReusableBlocks = __webpack_exports__;
 /******/ })()
 ;

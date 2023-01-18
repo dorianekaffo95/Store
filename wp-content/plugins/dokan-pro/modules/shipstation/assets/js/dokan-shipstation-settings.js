@@ -6,7 +6,12 @@
             form_data = form.serialize() + '&action=dokan_shipstation_settings';
 
         $.post( dokan.ajaxurl, form_data, function( response ) {
-            if ( ! response.success ) {
+            if ( response.success ) {
+                dokan_sweetalert( response.data, { 
+                    icon: 'success',
+                } );
+                return;
+            } else {
                 dokan_sweetalert( response.data, { 
                     icon: 'error',
                 } );

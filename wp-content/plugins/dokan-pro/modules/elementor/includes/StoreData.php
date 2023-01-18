@@ -57,24 +57,25 @@ class StoreData {
          *
          * @param array $data
          */
-        $this->store_data = apply_filters( 'dokan_elementor_store_data_defaults', [
-            'id'              => 0,
-            'banner'          => [
-                'id'  => 0,
-                'url' => DOKAN_PLUGIN_ASSEST . '/images/default-store-banner.png',
-            ],
-            'name'            => '',
-            'profile_picture' => [
-                'id'  => 0,
-                'url' => get_avatar_url( 0 ),
-            ],
-            'address'         => '',
-            'phone'           => '',
-            'email'           => '',
-            'rating'          => '',
-            'open_close'      => '',
-        ] );
-
+        $this->store_data = apply_filters(
+            'dokan_elementor_store_data_defaults', [
+                'id'              => 0,
+                'banner'          => [
+                    'id'  => 0,
+                    'url' => DOKAN_PLUGIN_ASSEST . '/images/default-store-banner.png',
+                ],
+                'name'            => '',
+                'profile_picture' => [
+                    'id'  => 0,
+                    'url' => get_avatar_url( 0 ),
+                ],
+                'address'         => '',
+                'phone'           => '',
+                'email'           => '',
+                'rating'          => '',
+                'open_close'      => '',
+            ]
+        );
 
         $store = dokan()->vendor->get( get_query_var( 'author' ) );
 
@@ -127,7 +128,7 @@ class StoreData {
 
             $show_store_open_close = dokan_get_option( 'store_open_close', 'dokan_general', 'on' );
 
-            if ( $show_store_open_close == 'on' && $store->is_store_time_enabled() ) {
+            if ( $show_store_open_close === 'on' && $store->is_store_time_enabled() ) {
                 if ( dokan_is_store_open( $store->get_id() ) ) {
                     $this->store_data['open_close'] = $store->get_store_open_notice();
                 } else {
@@ -165,22 +166,24 @@ class StoreData {
          *
          * @param array $this->store_data_editing
          */
-        return apply_filters( 'dokan_elementor_store_data_defaults_for_editing', [
-            'id'              => 0,
-            'banner'          => [
-                'id'  => 0,
-                'url' => DOKAN_PLUGIN_ASSEST . '/images/default-store-banner.png',
-            ],
-            'name'            => 'Store Name',
-            'profile_picture' => [
-                'id'  => 0,
-                'url' => get_avatar_url( 0 ),
-            ],
-            'address'         => 'New York, United States (US)',
-            'phone'           => '123-456-7890',
-            'email'           => 'mail@store.com',
-            'rating'          => '5 rating from 100 reviews',
-            'open_close'      => 'Store is open',
-        ] );
+        return apply_filters(
+            'dokan_elementor_store_data_defaults_for_editing', [
+                'id'              => 0,
+                'banner'          => [
+                    'id'  => 0,
+                    'url' => DOKAN_PLUGIN_ASSEST . '/images/default-store-banner.png',
+                ],
+                'name'            => 'Store Name',
+                'profile_picture' => [
+                    'id'  => 0,
+                    'url' => get_avatar_url( 0 ),
+                ],
+                'address'         => 'New York, United States (US)',
+                'phone'           => '123-456-7890',
+                'email'           => 'mail@store.com',
+                'rating'          => '5 rating from 100 reviews',
+                'open_close'      => 'Store is open',
+            ]
+        );
     }
 }

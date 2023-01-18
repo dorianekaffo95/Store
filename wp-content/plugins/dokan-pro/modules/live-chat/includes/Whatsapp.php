@@ -35,6 +35,7 @@ class Whatsapp {
         add_action( 'woocommerce_after_add_to_cart_button', [ $this, 'render_live_chat_button_product_page' ] );
         add_action( 'dokan_product_seller_tab_end', [ $this, 'render_live_chat_button_product_tab' ], 10, 2 );
 
+        add_action( 'init', [ $this, 'register_scripts' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
     }
 
@@ -90,6 +91,17 @@ class Whatsapp {
     }
 
     /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan-dashboard-live-chat', DOKAN_LIVE_CHAT_ASSETS . '/css/dashboard-livechat.css', [], $version, 'all' );
+    }
+
+    /**
      * Enqueue styles
      *
      * @since 3.2.0
@@ -97,7 +109,7 @@ class Whatsapp {
      * @return void
      */
     public function enqueue_styles() {
-        wp_enqueue_style( 'dokan-dashboard-live-chat', DOKAN_LIVE_CHAT_ASSETS . '/css/dashboard-livechat.css', [], DOKAN_PRO_PLUGIN_VERSION, 'all' );
+        wp_enqueue_style( 'dokan-dashboard-live-chat' );
     }
 
     /**

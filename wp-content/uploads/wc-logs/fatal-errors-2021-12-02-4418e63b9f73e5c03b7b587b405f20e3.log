@@ -1,4 +1,0 @@
-2021-12-02T15:01:32+00:00 CRITICAL syntax error, unexpected '$tabs' (T_VARIABLE), expecting ']' dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 38
-
-2021-12-02T15:01:33+00:00 CRITICAL syntax error, unexpected '$tabs' (T_VARIABLE), expecting ']' dans /var/www/html/primusevent/store/wp-content/themes/jardiwinery_child/functions.php à la ligne 38
-

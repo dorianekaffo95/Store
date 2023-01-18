@@ -74,6 +74,9 @@ class Ajax {
         add_action( 'wp_ajax_dokan-delete-shipping-method', array( $this, 'delete_shipping_method' ) );
         add_action( 'wp_ajax_dokan-save-shipping-settings', array( $this, 'save_shipping_settings' ) );
         add_action( 'wp_ajax_dokan-get-shipping-settings', array( $this, 'get_shipping_settings' ) );
+
+        // Profile Progressbar
+        add_action( 'wp_ajax_dokan_user_closed_progressbar', array( $this, 'user_closed_progressbar' ) );
     }
 
     /**
@@ -1158,8 +1161,8 @@ class Ajax {
                 <td width="15%">
                     <label for=""></label>
                     <div>
-                        <a class="dps-add" href="#"><i class="fa fa-plus"></i></a>
-                        <a class="dps-remove" href="#"><i class="fa fa-minus"></i></a>
+                        <a class="dps-add" href="#"><i class="fas fa-plus"></i></a>
+                        <a class="dps-remove" href="#"><i class="fas fa-minus"></i></a>
                     </div>
                 </td>
             </tr>
@@ -1182,8 +1185,8 @@ class Ajax {
                 <td width="15%">
                     <label for=""></label>
                     <div>
-                        <a class="dps-add" href="#"><i class="fa fa-plus"></i></a>
-                        <a class="dps-remove" href="#"><i class="fa fa-minus"></i></a>
+                        <a class="dps-add" href="#"><i class="fas fa-plus"></i></a>
+                        <a class="dps-remove" href="#"><i class="fas fa-minus"></i></a>
                     </div>
                 </td>
             </tr>
@@ -1225,7 +1228,7 @@ class Ajax {
         ?>
         <div class="dokan-no-announcement">
             <div class="annoument-no-wrapper">
-                <i class="fa fa-bell dokan-announcement-icon"></i>
+                <i class="fas fa-bell dokan-announcement-icon"></i>
                 <p><?php _e( 'No Announcement found', 'dokan' ) ?></p>
             </div>
         </div>
@@ -1584,7 +1587,7 @@ class Ajax {
             </td>
             <td colspan="3"><input type="text" name="attribute_values[]" value="<?php echo implode( ',', $att_val ); ?>" data-preset_attr="<?php echo implode( ',', $att_val ); ?>" class="dokan-form-control dokan-<?php echo $single; ?>attribute-option-values"></td>
             <td><button title="<?php _e( 'Clear All' , 'dokan' ) ?>"class="dokan-btn dokan-btn-theme clear_attributes"><?php _e( 'Clear' , 'dokan' ) ?></button>
-                <button title="Delete" class="dokan-btn dokan-btn-theme remove_<?php echo $remove_btn; ?>attribute"><i class="fa fa-trash-o"></i></button>
+                <button title="Delete" class="dokan-btn dokan-btn-theme remove_<?php echo $remove_btn; ?>attribute"><i class="far fa-trash-alt"></i></button>
             </td>
         </tr>
         <?php
@@ -1932,5 +1935,29 @@ class Ajax {
         <?php
         $response = ob_get_clean();
         return wp_send_json_success( $response );
+    }
+
+    /**
+     * Save the action of user closed the progressbar
+     *
+     * @since 3.5.2
+     *
+     * @return void
+     */
+    public function user_closed_progressbar() {
+        if ( ! wp_verify_nonce( $_POST['nonce'], 'dokan_user_closed_progressbar' ) ) {
+            wp_send_json_error( __( 'Invalid nonce', 'dokan' ) );
+        }
+
+        $profile_settings = get_user_meta( get_current_user_id(), 'dokan_profile_settings', true );
+        $progress         = isset( $profile_settings['profile_completion']['progress'] ) ? $profile_settings['profile_completion']['progress'] : 0;
+
+        if ( $progress >= 100 ) {
+            $profile_settings['profile_completion']['closed_by_user'] = true;
+            update_user_meta( get_current_user_id(), 'dokan_profile_settings', $profile_settings );
+            wp_send_json_success( __( 'Successfully closed', 'dokan' ) );
+        } else {
+            wp_send_json_error( __( 'Profile is not 100% complete', 'dokan' ) );
+        }
     }
 }

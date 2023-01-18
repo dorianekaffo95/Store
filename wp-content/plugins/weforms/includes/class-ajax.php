@@ -110,6 +110,8 @@ class WeForms_Ajax {
 
         if ( isset( $post_data['settings'] ) ) {
             $settings = (array) json_decode( $post_data['settings'] );
+            $settings['message'] = sanitize_text_field( $settings['message'] );
+            error_log(print_r($settings, true));
         } else {
             $settings = isset( $form_data['wpuf_settings'] ) ? $form_data['wpuf_settings'] : [];
         }
@@ -135,7 +137,7 @@ class WeForms_Ajax {
         // Update Old Entry meta_key if changed
         $form_id = $form_data['wpuf_form_id'];
         $form    = weforms()->form->get( $form_id );
-        
+
         $form->maybe_update_entries( $form_fields );
 
         do_action( 'weforms_update_form', $form_data['wpuf_form_id'], $form_fields, $settings );
@@ -528,7 +530,7 @@ class WeForms_Ajax {
         $has_empty          = false;
         $answers            = [];
         $respondentPoints   = isset( $form_settings['total_points'] ) ? floatval( $form_settings['total_points'] ) : 0;
-
+        $fields_formatted   = array();
         foreach ( $fields as $key => $field ) {
             if ( $form_settings['quiz_form'] == 'yes' ) {
                 $selectedAnswers    = isset( $field['selected_answers'] ) ? $field['selected_answers'] : '';
@@ -539,7 +541,6 @@ class WeForms_Ajax {
 
                 if ( $template == 'radio_field' || $template == 'dropdown_field' ) {
                     $answers[$field['name']] = true;
-
                     if ( empty( $givenAnswer ) ) {
                         $answers[$field['name']] = false;
                         $respondentPoints -= $fieldPoints;
@@ -576,11 +577,13 @@ class WeForms_Ajax {
             } elseif ( empty( $field['value'] ) ) {
                 $has_empty      = true;
                 break;
+            } else {
+                $field = WeForms_Form_Entry_Manager::format_entry_value( $field );
+                array_push( $fields_formatted, $field );
             }
         }
-
         $response = [
-            'form_fields'       => $fields,
+            'form_fields'       => $fields_formatted,
             'form_settings'     => $form_settings,
             'meta_data'         => $metadata,
             'payment_data'      => $payment,
@@ -588,6 +591,7 @@ class WeForms_Ajax {
             'respondent_points' => $respondentPoints,
             'answers'           => $answers,
         ];
+
 
         wp_send_json_success( $response );
     }
@@ -761,24 +765,24 @@ class WeForms_Ajax {
 
         $entry_id = 1;
         $global_settings = weforms_get_settings();
-        if ( empty( $global_settings['after_submission'] ) ) {
+        if ( empty( $form_settings['after_submission'] ) ) {
             $entry_id = weforms_insert_entry( [
                 'form_id' => $form_id,
             ], $entry_fields );
-        if ( is_wp_error( $entry_id ) ) {
-            wp_send_json( [
-                'success' => false,
-                'error'   => $entry_id->get_error_message(),
+            if ( is_wp_error( $entry_id ) ) {
+                wp_send_json( [
+                    'success' => false,
+                    'error'   => $entry_id->get_error_message(),
+                ] );
+            }
+            // Fire a hook for integration
+            do_action( 'weforms_entry_submission', $entry_id, $form_id, $page_id, $form_settings );
+            $notification = new WeForms_Notification( [
+                'form_id'  => $form_id,
+                'page_id'  => $page_id,
+                'entry_id' => $entry_id,
             ] );
-        }
-        // Fire a hook for integration
-        do_action( 'weforms_entry_submission', $entry_id, $form_id, $page_id, $form_settings );
-        $notification = new WeForms_Notification( [
-            'form_id'  => $form_id,
-            'page_id'  => $page_id,
-            'entry_id' => $entry_id,
-        ] );
-        $notification->send_notifications(); 
+            $notification->send_notifications();
         }
         // redirect URL
         $show_message = false;

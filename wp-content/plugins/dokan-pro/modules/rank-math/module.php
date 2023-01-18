@@ -4,6 +4,8 @@ namespace WeDevs\DokanPro\Modules\RankMath;
 
 defined( 'ABSPATH' ) || exit;
 
+use RankMath\Rest\Rest_Helper;
+
 /**
  * Class for Rank math SEO integration module
  *
@@ -17,19 +19,12 @@ class Module {
      * @since 3.4.0
      */
     public function __construct() {
+        // Define constants
         $this->constants();
 
-        // Verify if `Rank Math SEO` plugin is activated
-        if ( ! class_exists( 'RankMath' ) ) {
-            if ( ! current_user_can( 'activate_plugins' ) ) {
-                return;
-            }
+        $dependency = new DependencyNotice();
 
-            add_filter( 'dokan_admin_notices', [ $this, 'rank_math_activation_notice' ] );
-            add_action( 'wp_ajax_dokan_install_rank_math_seo', array( $this, 'install_rank_math_seo' ) );
-            add_action( 'wp_ajax_dokan_activate_rank_math_seo', array( $this, 'activate_rank_math_seo' ) );
-
-            //return from here
+        if ( $dependency->is_missing_dependency() ) {
             return;
         }
 
@@ -38,137 +33,13 @@ class Module {
             return;
         }
 
+        // Check if rank math setup is completed
+        if ( rank_math()->registration->invalid ) {
+            return;
+        }
+
         // Initialize the module
         add_action( 'init', array( $this, 'hooks' ) );
-    }
-
-    /**
-     * Rank Math SEO plugin activation notice
-     *
-     * @since 3.4.0
-     *
-     * @param array $notices
-     *
-     * @return array
-     * */
-    public function rank_math_activation_notice( $notices ) {
-        $rank_math_plugin_file  = 'seo-by-rank-math/rank-math.php';
-        $is_rank_math_installed = $this->is_rank_math_installed();
-
-        if ( $is_rank_math_installed ) {
-            $notices[] = [
-                'type'        => 'success',
-                'title'       => __( 'Dokan Rank Math SEO module is almost ready!', 'dokan' ),
-                'description' => sprintf( __( 'You just need to activate the %s plugin to make it functional.', 'dokan' ), '<strong>Rank Math SEO</strong>' ),
-                'priority'    => 10,
-                'actions'     => [
-                    [
-                        'type'           => 'primary',
-                        'text'           => __( 'Activate this plugin', 'dokan' ),
-                        'loading_text'   => __( 'Activating...', 'dokan' ),
-                        'completed_text' => __( 'Activated', 'dokan' ),
-                        'reload'         => true,
-                        'ajax_data'      => [
-                            'action'   => 'dokan_activate_rank_math_seo',
-                            '_wpnonce' => wp_create_nonce( 'dokan-rank-math-activate-nonce' ),
-                        ],
-                    ],
-                ],
-            ];
-        } else {
-            $notices[] = [
-                'type'        => 'alert',
-                'title'       => __( 'Dokan Rank Math SEO module is almost ready!', 'dokan' ),
-                'description' => sprintf( __( 'You just need to install the %s plugin to make it functional.', 'dokan' ), '<a target="_blank" href="https://wordpress.org/plugins/seo-by-rank-math/">Rank Math SEO</a>' ),
-                'priority'    => 10,
-                'actions'     => [
-                    [
-                        'type'           => 'secondary',
-                        'text'           => __( 'Install Now', 'dokan' ),
-                        'loading_text'   => __( 'Installing...', 'dokan' ),
-                        'completed_text' => __( 'Installed', 'dokan' ),
-                        'reload'         => true,
-                        'ajax_data'      => [
-                            'action'   => 'dokan_install_rank_math_seo',
-                            '_wpnonce' => wp_create_nonce( 'dokan-rank-math-installer-nonce' ),
-                        ],
-                    ],
-                ],
-            ];
-        }
-
-        return $notices;
-    }
-
-    /**
-     * Activate Rank Math SEO plugin
-     *
-     * @since 3.4.3
-     *
-     * @return void
-     * */
-    public function activate_rank_math_seo() {
-        if (
-            ! isset( $_REQUEST['_wpnonce'] ) ||
-            ! wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'dokan-rank-math-activate-nonce' ) // phpcs:ignore
-        ) {
-            wp_send_json_error( __( 'Error: Nonce verification failed', 'dokan' ) );
-        }
-
-        if ( ! current_user_can( 'manage_woocommerce' ) ) {
-            wp_send_json_error( __( 'You have no permission to do that', 'dokan-lite' ) );
-        }
-
-        activate_plugin( 'seo-by-rank-math/rank-math.php' );
-
-        wp_send_json_success();
-    }
-
-    /**
-     * Installs Rank Math SEO plugin
-     *
-     * @since 3.4.0
-     *
-     * @return void
-     * */
-    public function install_rank_math_seo() {
-        if (
-            ! isset( $_REQUEST['_wpnonce'] ) ||
-            ! wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'dokan-rank-math-installer-nonce' ) // phpcs:ignore
-        ) {
-            wp_send_json_error( __( 'Error: Nonce verification failed', 'dokan' ) );
-        }
-
-        include_once ABSPATH . 'wp-admin/includes/plugin-install.php';
-        include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
-
-        $api = plugins_api(
-            'plugin_information', array(
-                'slug'   => 'seo-by-rank-math',
-                'fields' => array(
-                    'sections' => false,
-                ),
-            )
-        );
-
-        $upgrader = new \Plugin_Upgrader( new \WP_Ajax_Upgrader_Skin() );
-        $upgrader->install( $api->download_link );
-        activate_plugin( 'seo-by-rank-math/rank-math.php' );
-
-        wp_send_json_success();
-    }
-
-    /**
-     * Checks if Rank Math SEO plugin is installed
-     *
-     * @since 3.4.0
-     *
-     * @return bool
-     */
-    private function is_rank_math_installed() {
-        $plugins = array_keys( get_plugins() );
-
-        return in_array( 'seo-by-rank-math/rank-math.php', $plugins, true );
     }
 
     /**
@@ -192,11 +63,14 @@ class Module {
      * @return void
      */
     public function hooks() {
-        // Load SEO content after inventory variants widget on the edit product page
-        add_action( 'dokan_product_edit_after_inventory_variants', array( $this, 'load_product_seo_content' ), 6, 2 );
+        $this->register_scripts();
 
         // Map meta cap for `vendor_staff` to bypass some primitive capability requirements.
         add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_for_rank_math' ), 10, 4 );
+        // Load SEO content after inventory variants widget on the edit product page
+        add_action( 'dokan_product_edit_after_inventory_variants', array( $this, 'load_product_seo_content' ), 6, 2 );
+        // Initiates rest api
+        add_action( 'rest_api_init', array( $this, 'init_rest_api' ) );
     }
 
     /**
@@ -234,41 +108,49 @@ class Module {
      * @return array List of premitive capabilities to be satisfied
      */
     public function map_meta_cap_for_rank_math( $caps, $cap, $user_id, $args ) {
-        global $wp;
+        switch ( $cap ) {
+            case 'edit_others_products':
+                global $wp;
 
-        if (
-            empty( $wp->query_vars['rest_route'] ) ||
-            false === strpos( $wp->query_vars['rest_route'], \RankMath\Rest\Rest_Helper::BASE )
-        ) {
-            return $caps;
-        }
+                if (
+                    empty( $wp->query_vars['rest_route'] ) ||
+                    false === strpos( $wp->query_vars['rest_route'], Rest_Helper::BASE )
+                ) {
+                    return $caps;
+                }
 
-        if ( 'edit_others_products' === $cap ) {
-            /**
-             * Here the userdata is being retrieved
-             * to get all capabilities of the user
-             * in order to check specific capability
-             * like `vendor_staff`.
-             */
-            $user = get_userdata( $user_id );
+                /*
+                 * Here the userdata is being retrieved
+                 * to get all capabilities of the user
+                 * in order to check specific capability
+                 * like `vendor_staff`.
+                 */
+                $user = get_userdata( $user_id );
 
-            // Bypass the primitive caps only if the user is `vendor_staff`
-            if ( ! empty( $user->allcaps['vendor_staff'] ) ) {
-                return array();
-            }
-        } elseif ( 'rank_math_redirections' === $cap ) {
-            /**
-             * For Redirection user need to have the capability
-             * of `rank_math_redirections`. So here the users
-             * who can edit dokan products are given that
-             * capability so that they can edit redierct settings.
-             */
-            add_filter(
-                'user_has_cap', function( $all_caps ) {
-                    $all_caps['rank_math_redirections'] = true;
-                    return $all_caps;
-                }, 10, 1
-            );
+                // Bypass the primitive caps only if the user is `vendor_staff`
+                if ( ! empty( $user->allcaps['vendor_staff'] ) ) {
+                    return array();
+                }
+
+                break;
+
+            default:
+                if ( 0 !== strpos( $cap, 'rank_math_' ) ) {
+                    break;
+                }
+
+                /*
+                 * For Redirection user need to have the capability
+                 * of `rank_math_redirections`. So here the users
+                 * who can edit dokan products are given that
+                 * capability so that they can edit redierct settings.
+                 */
+                add_filter(
+                    'user_has_cap', function( $all_caps ) use ( $cap ) {
+                        $all_caps[ $cap ] = true;
+                        return $all_caps;
+                    }, 10, 1
+                );
         }
 
         return $caps;
@@ -286,7 +168,7 @@ class Module {
      */
     public function load_product_seo_content( $product, $product_id ) {
 
-        /**
+        /*
          * Process the required functionality
          * for frontend application including
          * all the styles and scripts
@@ -296,5 +178,98 @@ class Module {
 
         // Require the template for rank math seo content
         require_once DOKAN_RANK_MATH_TEMPLATE_PATH . 'product-seo-content.php';
+    }
+
+    /**
+     * Registers necessary rest routes.
+     *
+     * @since 3.5.0
+     *
+     * @return void
+     */
+    public function init_rest_api() {
+        $rest = new \RankMath\ContentAI\Rest();
+        $rest->register_routes();
+    }
+
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        wp_register_style(
+            'rank-math-common',
+            rank_math()->plugin_url() . 'assets/admin/css/common.css',
+            array(),
+            rank_math()->version
+        );
+
+        wp_register_style(
+            'rank-math-content-ai',
+            rank_math()->plugin_url() . 'includes/modules/content-ai/assets/css/content-ai.css',
+            [ 'rank-math-common' ],
+            rank_math()->version
+        );
+
+        wp_register_script(
+            'rank-math-content-ai',
+            rank_math()->plugin_url() . 'includes/modules/content-ai/assets/js/content-ai.js',
+            [ 'rank-math-editor' ],
+            rank_math()->version,
+            true
+        );
+
+        wp_register_style(
+            'rank-math-metabox',
+            rank_math()->plugin_url() . 'assets/admin/css/metabox.css',
+            array(
+                'rank-math-common',
+                'rank-math-cmb2',
+                'rank-math-editor',
+                'wp-components',
+            ),
+            rank_math()->version
+        );
+
+        wp_register_script(
+            'rank-math-editor',
+            rank_math()->plugin_url() . 'assets/admin/js/classic.js',
+            array(
+                'clipboard',
+                'wp-hooks',
+                'moment',
+                'wp-date',
+                'wp-data',
+                'wp-api-fetch',
+                'wp-components',
+                'wp-element',
+                'wp-i18n',
+                'wp-url',
+                'wp-media-utils',
+                'rank-math-common',
+                'rank-math-analyzer',
+                'rank-math-validate',
+                'wp-block-editor',
+                'rank-math-app',
+            ),
+            rank_math()->version,
+            true
+        );
+
+        wp_register_style(
+            'rank-math-schema',
+            rank_math()->plugin_url() . 'includes/modules/schema/assets/css/schema.css',
+            array( 'wp-components', 'rank-math-metabox' ),
+            rank_math()->version
+        );
+
+        wp_register_script(
+            'rank-math-schema',
+            rank_math()->plugin_url() . 'includes/modules/schema/assets/js/schema-gutenberg.js',
+            array( 'rank-math-editor' ),
+            rank_math()->version,
+            true
+        );
     }
 }

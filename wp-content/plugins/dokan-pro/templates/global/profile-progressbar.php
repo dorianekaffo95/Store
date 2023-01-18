@@ -15,6 +15,10 @@
             <?php echo $progress . __( '% Profile complete', 'dokan' ) ?>
         </div>
     </div>
-    <div class="dokan-alert dokan-alert-info dokan-panel-alert"><?php echo dokan_progressbar_translated_string( $next_todo, $value, $progress ); ?></div>
+    <div class="dokan-alert dokan-alert-info dokan-panel-alert"><?php echo esc_html( dokan_progressbar_translated_string( $next_todo, $value, $progress ) ); ?>
+        <?php if ( $progress >= 100 ) : ?>
+        <sapn class="fa fa-times dokan-right" id="dokan-profile-progressbar-closer" data-nonce="<?php echo wp_create_nonce( 'dokan_user_closed_progressbar' ); ?>"></sapn>
+        <?php endif; ?>
+    </div>
    </div>
 </div>

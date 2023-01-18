@@ -54,6 +54,7 @@ class Assets {
      */
     public function add_localized_data( $data ) {
         $data['dokan_pro_i18n'] = array( 'dokan' => dokan_get_jed_locale_data( 'dokan', DOKAN_PRO_DIR . '/languages/' ) );
+        $data['current_plan']   = dokan_pro()->get_plan();
         return $data;
     }
 
@@ -104,6 +105,11 @@ class Assets {
             );
 
             wp_localize_script( 'dokan-pro-vue-frontend-shipping', 'dokanShipping', $localize_array );
+        }
+
+        // Load dokan store times assets in store page.
+        if ( isset( $wp->query_vars['settings'] ) && $wp->query_vars['settings'] === 'store' ) {
+            wp_enqueue_style( 'dokan-pro-store-times' );
         }
     }
 
@@ -171,7 +177,7 @@ class Assets {
                 'in_footer' => true,
             ],
         ];
-     
+
         /**
          * To allow add/remove js that registers vue these filter
          *
@@ -197,6 +203,10 @@ class Assets {
                 'src'     => DOKAN_PRO_PLUGIN_ASSEST . '/css/vue-pro-frontend-shipping' . $this->suffix . '.css',
                 'version' => $this->script_version,
             ],
+            'dokan-pro-store-times' => [
+                'src'     => DOKAN_PRO_PLUGIN_ASSEST . '/css/dokan-pro-store-times.css',
+                'version' => $this->script_version,
+            ],
             'dokan-pro-wp-version-before-5-3' => [
                 'src'     => DOKAN_PRO_PLUGIN_ASSEST . '/css/wp-version-before-5-3.css',
                 'version' => $this->script_version,
@@ -205,7 +215,7 @@ class Assets {
 
         return $styles;
     }
-    
+
     /**
      * Register i18n Scripts
      *

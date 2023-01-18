@@ -169,6 +169,12 @@ class Product {
             $data_k     = 'variable' . ( substr( $k, 0, 1 ) === '_' ? '' : '_' ) . $k;
             $data[ $k ] = ( isset( $_POST[ $data_k ][ $i ] ) ? wc_clean( wp_unslash( $_POST[ $data_k ][ $i ] ) ) : null );
         }
+        // get the product
+        $product = wc_get_product( $variation_id );
+
+        if ( ! $product ) {
+            return;
+        }
 
         foreach ( $data as $key => $value ) {
             $product = wc_ts_set_crud_data( $product, $key, $value );

@@ -176,6 +176,7 @@ class Dokan_Moip_Connect extends WC_Payment_Gateway {
         add_filter( 'woocommerce_credit_card_form_fields', array( $this, 'add_cpf_field' ), 10, 2 );
         // include js
         add_action( 'wp_enqueue_scripts', array( $this, 'include_moip_js' ) );
+        add_action( 'init', array( $this, 'register_scripts' ) );
     }
 
     /**
@@ -272,6 +273,18 @@ class Dokan_Moip_Connect extends WC_Payment_Gateway {
     }
 
     /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_script( 'dokan-moip', MOIP_ASSETS . '/js/moip.js', array(), $version, false );
+        wp_register_script( 'dokan-moip-checkout', MOIP_ASSETS . '/js/moip-checkout.js', array( 'jquery' ), $version, false );
+    }
+
+    /**
      * Include all the scripts
      *
      * @return void
@@ -281,7 +294,7 @@ class Dokan_Moip_Connect extends WC_Payment_Gateway {
             return;
         }
 
-        wp_enqueue_script( 'dokan-moip', MOIP_ASSETS . '/js/moip.js', array(), false, false );
+        wp_enqueue_script( 'dokan-moip' );
 
         $moip_params = array(
             'public_key'   => $this->public_key,
@@ -290,7 +303,7 @@ class Dokan_Moip_Connect extends WC_Payment_Gateway {
             'cvc_error'    => __( 'Card CVC number is not valid', 'dokan' ),
         );
 
-        wp_enqueue_script( 'dokan-moip-checkout', MOIP_ASSETS . '/js/moip-checkout.js', array( 'jquery' ), false, false );
+        wp_enqueue_script( 'dokan-moip-checkout' );
         wp_localize_script( 'dokan-moip', 'moip_params', $moip_params );
     }
 

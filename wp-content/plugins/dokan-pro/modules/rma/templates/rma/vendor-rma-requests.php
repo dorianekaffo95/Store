@@ -103,7 +103,7 @@
                                         <?php echo date_i18n( get_option( 'date_format' ), strtotime( $request['created_at'] ) ); ?>
                                     </td>
                                     <td data-title="<?php _e( 'View', 'dokan' ); ?>">
-                                        <a class="dokan-btn dokan-btn-default dokan-btn-sm tips" href="<?php echo add_query_arg( [ 'request' => $request['id'] ], dokan_get_navigation_url( 'return-request' ) ); ?>" data-toggle="tooltip" title="<?php _e( 'View', 'dokan' ); ?>" data-placement="top" title="%s"><i class="fa fa-eye">&nbsp;</i></a>
+                                        <a class="dokan-btn dokan-btn-default dokan-btn-sm tips" href="<?php echo add_query_arg( [ 'request' => $request['id'] ], dokan_get_navigation_url( 'return-request' ) ); ?>" data-toggle="tooltip" title="<?php _e( 'View', 'dokan' ); ?>" data-placement="top" title="%s"><i class="far fa-eye">&nbsp;</i></a>
                                     </td>
                                 </tr>
                             <?php } ?>

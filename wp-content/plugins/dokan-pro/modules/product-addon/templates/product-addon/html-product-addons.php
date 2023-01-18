@@ -8,11 +8,11 @@ $product_addons = array_filter( (array) $product->get_meta( '_product_addons' ) 
 
 <div id="dokan-product-addons-options" class="dokan-product-addons-options dokan-edit-row dokan-clearfix hide_if_grouped hide_if_external">
     <div class="dokan-section-heading" data-togglehandler="dokan_product_addons_options">
-        <h2><i class="fa fa-wrench" aria-hidden="true"></i> <?php esc_html_e( 'Add-ons', 'dokan' ); ?><span class=""></h2>
+        <h2><i class="fas fa-wrench" aria-hidden="true"></i> <?php esc_html_e( 'Add-ons', 'dokan' ); ?><span class=""></h2>
         <p class=""><?php esc_html_e( 'Manage addon fields for this product.', 'dokan' ); ?></p>
 
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>

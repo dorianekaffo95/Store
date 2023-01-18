@@ -223,8 +223,9 @@ class LogsController extends DokanRESTAdminController {
              * net amount is excluding gateway fee, so we need to deduct it from admin commission
              * otherwise admin commission will be including gateway fees
              */
-            $processing_fee = (float) $order->get_meta( 'dokan_gateway_fee' );
-            $commission     = $is_subscription_product ? (float) $result->order_total : (float) $result->order_total - (float) $result->net_amount;
+            $is_subscription_product = apply_filters( 'dokan_log_exclude_commission', $is_subscription_product, $result );
+            $processing_fee          = (float) $order->get_meta( 'dokan_gateway_fee' );
+            $commission              = $is_subscription_product ? (float) $result->order_total : (float) $result->order_total - (float) $result->net_amount;
 
             if ( $processing_fee && $processing_fee > 0 ) {
                 $commission = $commission - $processing_fee;

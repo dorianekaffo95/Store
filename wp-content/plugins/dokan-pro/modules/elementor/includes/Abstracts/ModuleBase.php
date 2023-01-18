@@ -16,7 +16,7 @@ abstract class ModuleBase {
      * @return void
      */
     public function boot() {
-        add_action( 'elementor/widgets/widgets_registered', [ $this, 'init_widgets' ] );
+        add_action( 'elementor/widgets/register', [ $this, 'init_widgets' ] );
     }
 
     /**
@@ -53,7 +53,7 @@ abstract class ModuleBase {
             $class_name = "\\WeDevs\\DokanPro\\Modules\\Elementor\\Widgets\\{$widget}";
 
             if ( class_exists( $class_name ) ) {
-                $widget_manager->register_widget_type( new $class_name() );
+                $widget_manager->register( new $class_name() );
             }
         }
     }

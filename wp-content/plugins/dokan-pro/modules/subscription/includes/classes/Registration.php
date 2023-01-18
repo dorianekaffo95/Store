@@ -159,6 +159,16 @@ class Registration {
     * @return array $fields
     */
     public function add_subscription_to_dokan_customer_migration_required_fields( $fields ) {
+        // check if subscription is enabled on registration
+        if ( ! Helper::is_subscription_enabled_on_registration() ) {
+            return $fields;
+        }
+
+        // check if subscription pack is available
+        if ( ! Helper::is_subscription_pack_available() ) {
+            return $fields;
+        }
+
         $fields['dokan-subscription-pack'] = __( 'Select subscription a pack', 'dokan' );
 
         return $fields;

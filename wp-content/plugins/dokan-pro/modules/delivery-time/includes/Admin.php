@@ -30,7 +30,11 @@ class Admin {
      *
      * @return void
      */
-    public function enqueue_scripts() {
+    public function enqueue_scripts( $hook ) {
+        if ( 'toplevel_page_dokan' !== $hook ) {
+            return;
+        }
+
         wp_enqueue_script( 'dokan-delivery-time-admin-script' );
     }
 

@@ -78,6 +78,9 @@ jQuery( function( $ ) {
         },
 
         onSubmit: function( event ) {
+            if ( ! dokan_stripe_form.isStripeChosen() ) {
+                return true;
+            }
             // If a source is already in place, submit the form as usual.
             if ( dokan_stripe_form.isStripeSaveCardChosen() || dokan_stripe_form.hasSource() ) {
                 return true;
@@ -202,6 +205,21 @@ jQuery( function( $ ) {
             return 0 < $( 'input.stripe-source' ).length;
         },
 
+        /**
+         * Check to see if Stripe in general is being used for checkout.
+         *
+         * @return {boolean}
+         */
+        isStripeChosen: function() {
+            return $( '#payment_method_dokan-stripe-connect' ).is( ':checked' )
+                || ( $( '#payment_method_dokan-stripe-connect' ).is( ':checked' ) && 'new' === $( 'input[name="wc-dokan-stripe-connect-payment-token"]:checked' ).val() );
+        },
+
+        /**
+         * Check to see if Stripe in general is being used for checkout.
+         *
+         * @return {boolean}
+         */
         isStripeSaveCardChosen: function() {
             return (
                 $( '#payment_method_dokan-stripe-connect' ).is( ':checked' )

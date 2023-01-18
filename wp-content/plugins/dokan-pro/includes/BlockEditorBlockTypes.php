@@ -12,7 +12,12 @@ class BlockEditorBlockTypes {
      * @return void
      */
     public function __construct() {
-        add_filter( 'block_categories', [ $this, 'add_block_category' ] );
+        global $wp_version;
+        if ( version_compare( $wp_version, '5.8.0', '<' ) ) {
+            add_filter( 'block_categories', [ $this, 'add_block_category' ], 10, 2 );
+        } else {
+            add_filter( 'block_categories_all', [ $this, 'add_block_category' ], 10, 2 );
+        }
         add_action( 'admin_enqueue_scripts', [ $this, 'register_scripts' ], 9 );
         add_action( 'init', [ $this, 'register_block_types' ] );
     }
@@ -22,10 +27,19 @@ class BlockEditorBlockTypes {
      *
      * @since 2.9.16
      *
-     * @param array $categories
+     * @param array $block_categories
+     * @param mixed $block_editor_context
+     *
+     * @return array
      */
-    public function add_block_category( $categories ) {
-        return array_merge( $categories, [
+    public function add_block_category( $block_categories, $block_editor_context ) {
+        // Check the context of this filter, return default if not in the post/page block editor.
+        // Alternatively, use this check to add custom categories to only the customizer or widget screens.
+        if ( ! ( $block_editor_context instanceof \WP_Block_Editor_Context ) ) {
+            return $block_categories;
+        }
+
+        return array_merge( $block_categories, [
             [
                 'slug'  => 'dokan',
                 'title' => __( 'Dokan', 'dokan' ),

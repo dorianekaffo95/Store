@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd46b6fa8f54750d420412288f06228c7
+class ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -82,10 +82,12 @@ class ComposerStaticInitd46b6fa8f54750d420412288f06228c7
         'WeDevs\\WeMail\\Admin\\GutenbergBlock' => __DIR__ . '/../..' . '/includes/Admin/GutenbergBlock.php',
         'WeDevs\\WeMail\\Admin\\Menu' => __DIR__ . '/../..' . '/includes/Admin/Menu.php',
         'WeDevs\\WeMail\\Admin\\Notice' => __DIR__ . '/../..' . '/includes/Admin/Notice.php',
+        'WeDevs\\WeMail\\Admin\\ReviewNotice' => __DIR__ . '/../..' . '/includes/Admin/ReviewNotice.php',
         'WeDevs\\WeMail\\Admin\\Scripts' => __DIR__ . '/../..' . '/includes/Admin/Scripts.php',
         'WeDevs\\WeMail\\Admin\\Shortcode' => __DIR__ . '/../..' . '/includes/Admin/Shortcode.php',
         'WeDevs\\WeMail\\Core\\Api\\Api' => __DIR__ . '/../..' . '/includes/Core/Api/Api.php',
         'WeDevs\\WeMail\\Core\\Auth\\Auth' => __DIR__ . '/../..' . '/includes/Core/Auth/Auth.php',
+        'WeDevs\\WeMail\\Core\\Automation\\Menu' => __DIR__ . '/../..' . '/includes/Core/Automation/Menu.php',
         'WeDevs\\WeMail\\Core\\Billing\\Menu' => __DIR__ . '/../..' . '/includes/Core/Billing/Menu.php',
         'WeDevs\\WeMail\\Core\\Campaign\\Campaign' => __DIR__ . '/../..' . '/includes/Core/Campaign/Campaign.php',
         'WeDevs\\WeMail\\Core\\Campaign\\Editor' => __DIR__ . '/../..' . '/includes/Core/Campaign/Editor.php',
@@ -105,6 +107,7 @@ class ComposerStaticInitd46b6fa8f54750d420412288f06228c7
         'WeDevs\\WeMail\\Core\\Form\\Integrations\\AffiliateWp' => __DIR__ . '/../..' . '/includes/Core/Form/Integrations/AffiliateWp.php',
         'WeDevs\\WeMail\\Core\\Form\\Integrations\\CalderaForms' => __DIR__ . '/../..' . '/includes/Core/Form/Integrations/CalderaForms.php',
         'WeDevs\\WeMail\\Core\\Form\\Integrations\\ContactForm7' => __DIR__ . '/../..' . '/includes/Core/Form/Integrations/ContactForm7.php',
+        'WeDevs\\WeMail\\Core\\Form\\Integrations\\EverestForms' => __DIR__ . '/../..' . '/includes/Core/Form/Integrations/EverestForms.php',
         'WeDevs\\WeMail\\Core\\Form\\Integrations\\FluentForms' => __DIR__ . '/../..' . '/includes/Core/Form/Integrations/FluentForms.php',
         'WeDevs\\WeMail\\Core\\Form\\Integrations\\FormidableForms' => __DIR__ . '/../..' . '/includes/Core/Form/Integrations/FormidableForms.php',
         'WeDevs\\WeMail\\Core\\Form\\Integrations\\ForminatorForms' => __DIR__ . '/../..' . '/includes/Core/Form/Integrations/ForminatorForms.php',
@@ -176,9 +179,11 @@ class ComposerStaticInitd46b6fa8f54750d420412288f06228c7
         'WeDevs\\WeMail\\Rest\\MailPoet' => __DIR__ . '/../..' . '/includes/Rest/MailPoet.php',
         'WeDevs\\WeMail\\Rest\\Middleware\\WeMailMiddleware' => __DIR__ . '/../..' . '/includes/Rest/Middleware/WeMailMiddleware.php',
         'WeDevs\\WeMail\\Rest\\Pages' => __DIR__ . '/../..' . '/includes/Rest/Pages.php',
+        'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\CategoryResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/CategoryResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderItemResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/OrderItemResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/OrderResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\ProductResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/ProductResource.php',
+        'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\CategoryResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/WooCommerce/CategoryResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\OrderItemResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/WooCommerce/OrderItemResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\OrderResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/WooCommerce/OrderResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\ProductResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/WooCommerce/ProductResource.php',
@@ -201,9 +206,9 @@ class ComposerStaticInitd46b6fa8f54750d420412288f06228c7
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd46b6fa8f54750d420412288f06228c7::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd46b6fa8f54750d420412288f06228c7::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitd46b6fa8f54750d420412288f06228c7::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3::$classMap;
 
         }, null, ClassLoader::class);
     }

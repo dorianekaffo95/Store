@@ -145,7 +145,9 @@ class Dokan_VSP_Product {
 
             update_post_meta( $post_id, '_sale_price_dates_from', $date_from );
             update_post_meta( $post_id, '_sale_price_dates_to', $date_to );
-            update_post_meta( $post_id, '_virtual', 'yes' );
+
+            $is_virtual = isset( $_POST['_virtual'] ) ? 'yes' : 'no';
+            update_post_meta( $post_id, '_virtual', $is_virtual );
 
             // Update price if on sale
             if ( '' !== $sale_price && ( ( empty( $date_to ) && empty( $date_from ) ) || ( $date_from < $now && ( empty( $date_to ) || $date_to > $now ) ) ) ) {
@@ -227,7 +229,7 @@ class Dokan_VSP_Product {
 
         $subscription_product_type = array( 'subscription', 'variable-subscription' );
 
-        if ( ! in_array( $_POST['product_type'], $subscription_product_type ) ) {
+        if ( ! isset( $_POST['product_type'] ) || ! in_array( $_POST['product_type'], $subscription_product_type ) ) {
             return;
         }
 
@@ -291,7 +293,6 @@ class Dokan_VSP_Product {
             $_POST[ 'variable' . WC_Subscriptions_Synchroniser::$post_meta_key ][ $index ] = 0;
         }
 
-        update_post_meta( $variation_id, '_virtual', 'yes' );
         update_post_meta( $variation_id, WC_Subscriptions_Synchroniser::$post_meta_key, $_POST[ 'variable' . WC_Subscriptions_Synchroniser::$post_meta_key ][ $index ] );
     }
 

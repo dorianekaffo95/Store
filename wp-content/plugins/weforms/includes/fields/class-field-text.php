@@ -20,7 +20,10 @@ class WeForms_Form_Field_Text extends WeForms_Field_Contract {
      * @return void
      */
     public function render( $field_settings, $form_id ) {
-        $value = $field_settings['default']; ?>
+        $value         = $field_settings['default'];
+        $form_settings = weforms()->form->get( $form_id )->get_settings();
+        $use_theme_css = isset( $form_settings['use_theme_css'] ) ? $form_settings['use_theme_css'] : 'wpuf-style';
+        ?>
         <li <?php $this->print_list_attributes( $field_settings ); ?>>
             <?php $this->print_label( $field_settings, $form_id ); ?>
 
@@ -35,6 +38,7 @@ class WeForms_Form_Field_Text extends WeForms_Field_Contract {
                     placeholder="<?php echo esc_attr( $field_settings['placeholder'] ); ?>"
                     value="<?php echo esc_attr( $value ); ?>"
                     size="<?php echo esc_attr( $field_settings['size'] ); ?>"
+                    data-style="<?php echo esc_attr( $use_theme_css ); ?>"
                 />
 
                 <span class="wpuf-wordlimit-message wpuf-help"></span>

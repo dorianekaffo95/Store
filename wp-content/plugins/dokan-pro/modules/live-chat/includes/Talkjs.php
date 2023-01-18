@@ -15,7 +15,7 @@ class Talkjs {
      *
      * @var string
      */
-    CONST API_END_POINT = 'https://api.talkjs.com/';
+    const API_END_POINT = 'https://api.talkjs.com/';
 
     /**
      * Hold the app_id
@@ -75,6 +75,7 @@ class Talkjs {
 
         // create shortcode
         add_action( 'init', array( $this, 'dokan_live_chat_shortcode' ) );
+        add_action( 'init', array( $this, 'register_scripts' ) );
 
         // init chat sessions
         add_action( 'wp_head', array( $this, 'init_chat_sessions' ), 999 );
@@ -88,8 +89,22 @@ class Talkjs {
      * @return void
      */
     public function dokan_include_scripts() {
-        wp_enqueue_style( 'dokan-magnific-popup' );
-        wp_enqueue_script( 'dokan-popup' );
+        if ( dokan_is_store_page() ) {
+            wp_enqueue_style( 'dokan-magnific-popup' );
+            wp_enqueue_script( 'dokan-popup' );
+        }
+    }
+
+    /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan-live-chat-login', DOKAN_LIVE_CHAT_ASSETS . '/css/style.css', [], $version );
+        wp_register_script( 'dokan-live-chat-login', DOKAN_LIVE_CHAT_ASSETS . '/js/script.js', array( 'jquery' ), $version, true );
     }
 
     /**
@@ -102,22 +117,24 @@ class Talkjs {
      * @uses wp_enqueue_style
      */
     public function dokan_enqueue_scripts() {
-        if ( dokan_is_store_page() || is_product() || is_account_page() ) {
-            wp_enqueue_style( 'dokan-live-chat-login', DOKAN_LIVE_CHAT_ASSETS . '/css/style.css' );
-            wp_enqueue_script( 'dokan-live-chat-login', DOKAN_LIVE_CHAT_ASSETS . '/js/script.js', array( 'jquery' ), false, true );
+        if ( dokan_is_store_page() || is_product() || ( is_account_page() && false !== get_query_var( 'customer-inbox', false ) ) ) {
+            wp_enqueue_style( 'dokan-live-chat-login' );
+            wp_enqueue_script( 'dokan-live-chat-login' );
 
-            wp_localize_script( 'dokan-live-chat-login', 'dokan_live_chat', array(
-                'wait'       => __( 'wait...', 'dokan' ),
-                'my_account' => 'yes'
-            ) );
+            wp_localize_script(
+                'dokan-live-chat-login',
+                'dokan_live_chat',
+                array(
+                    'wait'       => __( 'wait...', 'dokan' ),
+                    'my_account' => 'yes',
+                )
+            );
         }
 
         if ( dokan_is_seller_dashboard() && ! $this->dokan_is_seller_settings_page() ) {
-            wp_enqueue_script( 'dokan-live-chat-login', DOKAN_LIVE_CHAT_ASSETS . '/js/script.js', array( 'jquery' ), false, true );
+            wp_enqueue_script( 'dokan-live-chat-login' );
 
-            wp_localize_script( 'dokan-live-chat-login', 'dokan_live_chat', array(
-                'seller_dashboard' => 'yes',
-            ) );
+            wp_localize_script( 'dokan-live-chat-login', 'dokan_live_chat', array( 'seller_dashboard' => 'yes' ) );
         }
     }
 
@@ -148,11 +165,11 @@ class Talkjs {
      * @return mixed true,false or error
      */
     public function dokan_is_seller_online() {
-        if ( get_transient( 'dokan_seller_is_online' ) == 'maybe' ) {
+        if ( 'maybe' === get_transient( 'dokan_seller_is_online' ) ) {
             return false;
         }
 
-        if ( get_transient( 'dokan_seller_is_online' ) == 'yes' ) {
+        if ( 'yes' === get_transient( 'dokan_seller_is_online' ) ) {
             return true;
         }
 
@@ -166,14 +183,17 @@ class Talkjs {
             return false;
         }
 
-        $url = self::API_END_POINT . 'v1/' . $this->app_id . '/users/' . $user_id . '/sessions' ;
+        $url = self::API_END_POINT . 'v1/' . $this->app_id . '/users/' . $user_id . '/sessions';
 
-        $response = wp_remote_get( $url, array(
-            'sslverify' => false,
-            'headers' => array(
-                'Authorization' => 'Bearer '. $this->app_secret
+        $response = wp_remote_get(
+            $url,
+            array(
+                'sslverify' => false,
+                'headers' => array(
+                    'Authorization' => 'Bearer ' . $this->app_secret,
+                ),
             )
-        ) );
+        );
 
         set_transient( 'dokan_seller_is_online', 'maybe', 10 );
 
@@ -238,7 +258,7 @@ class Talkjs {
         $seller = wp_get_current_user();
 
         // if user is not logged in;
-        if ( $seller->ID == 0 ) {
+        if ( 0 === absint( $seller->ID ) ) {
             return;
         }
 
@@ -298,10 +318,10 @@ class Talkjs {
         <script type="text/javascript">
         Talk.ready.then( function() {
             var customer = new Talk.User({
-                id: "<?php echo $seller->ID ?>",
-                name: "<?php echo $seller->display_name ?>",
-                email: "<?php echo $seller->user_email ?>",
-                photoUrl: "<?php echo esc_url( get_avatar_url( $seller->ID ) ) ?>",
+                id: "<?php echo $seller->ID; ?>",
+                name: "<?php echo $seller->display_name; ?>",
+                email: "<?php echo $seller->user_email; ?>",
+                photoUrl: "<?php echo esc_url( get_avatar_url( $seller->ID ) ); ?>",
             });
 
             window.talkSession = new Talk.Session( {
@@ -321,7 +341,7 @@ class Talkjs {
                 }
 
                 // if it's customer my account page return early (disable popup)
-                if ( typeof dokan_live_chat !== 'undefined' && dokan_live_chat.my_account == 'yes' ) {
+                if ( typeof dokan_live_chat !== 'undefined' && dokan_live_chat.my_account === 'yes' ) {
                     return;
                 }
 
@@ -332,7 +352,7 @@ class Talkjs {
                 }
 
                 // if popup is not empty and there is a unread message
-                if (popup != '') {
+                if ( popup !== '' ) {
                     if (unreadCount > 0) {
                         popup.mount();
                     }
@@ -485,7 +505,7 @@ class Talkjs {
             return;
         }
 
-        if ( ! AdminSettings::show_chat_above_product_tab()  ) {
+        if ( ! AdminSettings::show_chat_above_product_tab() ) {
             return;
         }
 
@@ -570,22 +590,22 @@ class Talkjs {
     public function login_to_chat() {
         ob_start();
         ?>
-        <h2><?php _e( 'Please Login to Chat', 'dokan' ); ?></h2>
+        <h2><?php esc_html_e( 'Please Login to Chat', 'dokan' ); ?></h2>
 
         <form class="dokan-form-container" id="dokan-chat-login">
             <div class="dokan-form-group">
-                <label class="dokan-form-label" for="login-name"><?php _e( 'Username :', 'dokan' ) ?></label>
+                <label class="dokan-form-label" for="login-name"><?php esc_html_e( 'Username :', 'dokan' ); ?></label>
                 <input required class="dokan-form-control" type="text" name='login-name' id='login-name'/>
             </div>
             <div class="dokan-form-group">
-                <label class="dokan-form-label" for="login-password"><?php _e( 'Password :', 'dokan' ) ?></label>
+                <label class="dokan-form-label" for="login-password"><?php esc_html_e( 'Password :', 'dokan' ); ?></label>
                 <input required class="dokan-form-control" type="password" name='login-password' id='login-password'/>
             </div>
             <?php wp_nonce_field( 'dokan-chat-login-action', 'dokan-chat-login-nonce' ); ?>
             <div class="dokan-form-group login-to-chat ">
-                <input id='dokan-chat-login-btn' type="submit" value="<?php _e( 'Login', 'dokan' ) ?>" class="dokan-w5 dokan-btn dokan-btn-theme"/>
+                <input id='dokan-chat-login-btn' type="submit" value="<?php esc_attr_e( 'Login', 'dokan' ); ?>" class="dokan-w5 dokan-btn dokan-btn-theme"/>
                 <a href="<?php echo get_permalink( wc_get_page_id( 'myaccount' ) ); ?>" class="dokan-w5 dokan-btn dokan-btn-theme">
-                    <?php _e( 'Register', 'dokan' ); ?>
+                    <?php esc_html_e( 'Register', 'dokan' ); ?>
                 </a>
             </div>
         </form>
@@ -596,7 +616,7 @@ class Talkjs {
     }
 
     /**
-     * handles login data and sign in user
+     * Handles login data and sign in user
      *
      * @since 1.0
      *
@@ -615,15 +635,19 @@ class Talkjs {
         $user_signon           = wp_signon( $info, false );
 
         if ( is_wp_error( $user_signon ) ) {
-            wp_send_json( array(
-                'success' => false,
-                'msg'     => __( 'Invalid Username or Password', 'dokan' ),
-            ) );
+            wp_send_json(
+                array(
+                    'success' => false,
+                    'msg'     => __( 'Invalid Username or Password', 'dokan' ),
+                )
+            );
         } else {
-            wp_send_json( array(
-                'success' => true,
-                'msg'     => __( 'Logged in', 'dokan' ),
-            ) );
+            wp_send_json(
+                array(
+                    'success' => true,
+                    'msg'     => __( 'Logged in', 'dokan' ),
+                )
+            );
         }
     }
 
@@ -636,7 +660,7 @@ class Talkjs {
      */
     public function dokan_live_chat_shortcode() {
         add_shortcode( 'dokan-live-chat', array( $this, 'create_short_code' ) );
-        add_shortcode( 'dokan-chat-inbox', array( $this, 'create_chat_inbox') );
+        add_shortcode( 'dokan-chat-inbox', array( $this, 'create_chat_inbox' ) );
     }
 
     /**
@@ -715,11 +739,11 @@ class Talkjs {
         <script type="text/javascript">
         Talk.ready.then( function() {
             var customer = new Talk.User( {
-                id: "<?php echo $customer->ID ?>",
-                name: "<?php echo $customer->display_name ?>",
+                id: "<?php echo $customer->ID; ?>",
+                name: "<?php echo $customer->display_name; ?>",
                 email: "<?php echo ! empty( $customer->user_email ) ? $customer->user_email : 'fake@email.com'; ?>",
                 configuration: "vendor",
-                photoUrl: "<?php echo esc_url( get_avatar_url( $customer->ID ) ) ?>",
+                photoUrl: "<?php echo esc_url( get_avatar_url( $customer->ID ) ); ?>",
             } );
 
             window.talkSession = new Talk.Session( {
@@ -733,8 +757,8 @@ class Talkjs {
                 name: "<?php echo ! empty( $store_user->get_shop_name() ) ? $store_user->get_shop_name() : 'fakename'; ?>",
                 email: "<?php echo ! empty( $store_user->get_email() ) ? $store_user->get_email() : 'fake@email.com'; ?>",
                 configuration: "vendor",
-                photoUrl: "<?php echo esc_url( get_avatar_url( $store_user->get_id() ) ) ?>",
-                welcomeMessage: "<?php _e( 'How may I help you?', 'dokan' ) ?>"
+                photoUrl: "<?php echo esc_url( get_avatar_url( $store_user->get_id() ) ); ?>",
+                welcomeMessage: "<?php esc_html_e( 'How may I help you?', 'dokan' ); ?>"
             } );
 
             // popup the chat box when there is a new message and close the popop if browser get refreashed

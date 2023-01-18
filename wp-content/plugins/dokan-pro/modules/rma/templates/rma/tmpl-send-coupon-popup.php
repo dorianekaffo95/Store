@@ -1,7 +1,7 @@
 <script type="text/html" id="tmpl-dokan-send-coupon">
     <div id="dokan-send-coupon-popup" class="dokan-rma-popup white-popup">
         <form method="post" id="dokan-send-coupon-popup-form">
-            <h2><i class="fa fa-gift" aria-hidden="true"></i>&nbsp;<?php esc_html_e( 'Send Coupon', 'dokan' ); ?></h2>
+            <h2><i class="fas fa-gift" aria-hidden="true"></i>&nbsp;<?php esc_html_e( 'Send Coupon', 'dokan' ); ?></h2>
 
             <div class="rma-popup-content coupon-content"></div>
 

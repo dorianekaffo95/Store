@@ -126,16 +126,19 @@ class ModulesController extends DokanRESTAdminController {
             }
 
             $data[] = [
-                'id'           => $module['id'],
-                'name'         => $module['name'],
-                'description'  => $module['description'],
-                'thumbnail'    => $module['thumbnail'],
-                'plan'         => $module['plan'],
-                'active'       => in_array( $module['id'], $activate_modules, true ),
-                'available'    => file_exists( $module['module_file'] ),
-                'doc_id'       => isset( $module['doc_id'] ) ? $module['doc_id'] : null,
-                'doc_link'     => isset( $module['doc_link'] ) ? $module['doc_link'] : null,
-                'mod_link'     => isset( $module['mod_link'] ) ? $module['mod_link'] : null,
+                'id'             => $module['id'],
+                'name'           => $module['name'],
+                'description'    => $module['description'],
+                'thumbnail'      => $module['thumbnail'],
+                'plan'           => $module['plan'],
+                'active'         => in_array( $module['id'], $activate_modules, true ),
+                'available'      => file_exists( $module['module_file'] ),
+                'doc_id'         => isset( $module['doc_id'] ) ? $module['doc_id'] : null,
+                'doc_link'       => isset( $module['doc_link'] ) ? $module['doc_link'] : null,
+                'mod_link'       => isset( $module['mod_link'] ) ? $module['mod_link'] : null,
+                'pre_requisites' => isset( $module['pre_requisites'] ) ? $module['pre_requisites'] : null,
+                'categories'     => isset( $module['categories'] ) ? $module['categories'] : null,
+                'video_id'       => isset( $module['video_id'] ) ? $module['video_id'] : null,
             ];
         }
 

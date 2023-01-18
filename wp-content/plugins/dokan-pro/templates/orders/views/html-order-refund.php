@@ -13,7 +13,7 @@ $who_refunded = new WP_User( $refund_post->post_author );
 <tr class="refund <?php echo ( ! empty( $class ) ) ? $class : ''; ?>" data-order_refund_id="<?php echo dokan_get_prop( $refund, 'id' ); ?>">
 	<!-- <td class="check-column"></td> -->
 
-	<td class="thumb"><div><i class="fa fa-money"></i></div></td>
+	<td class="thumb"><div><i class="far fa-money-bill-alt"></i></div></td>
 
 	<td class="name">
 		<?php

@@ -66,6 +66,6 @@
 
     <?php wp_nonce_field( 'dokan_comment_nonce_action', 'dokan_comment_nonce' ); ?>
 
-    <input type="submit" value="<?php _e( 'Submit', 'dokan' ); ?>" class="dokan-btn  dokan-danger dokan-btn-theme dokan-btn-sm" name="comt_stat_sub">
+    <input type="submit" value="<?php _e( 'Submit', 'dokan' ); ?>" class="dokan-btn dokan-btn-sm" name="comt_stat_sub">
 </form>
 <?php endif; ?>

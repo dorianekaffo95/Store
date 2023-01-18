@@ -1043,6 +1043,34 @@ class Helper {
         delete_user_meta( $vendor_id, '_dokan_subscription_is_on_trial' );
         delete_user_meta( $vendor_id, '_dokan_subscription_trial_until' );
     }
+
+    /**
+     * Get subscription order by user_id
+     *
+     * @param $user_id
+     *
+     * @return false|\WC_Order|\WC_Order_Refund
+     */
+    public static function get_subscription_order( $user_id ) {
+        $order_id = get_user_meta( $user_id, 'product_order_id', true );
+        return wc_get_order( $order_id );
+    }
+
+    /**
+     * Check if subscription packs are available
+     *
+     * @since 3.5.4
+     *
+     * @return bool
+     */
+    public static function is_subscription_pack_available() {
+        /**
+         * @var $subscription_packs \WP_Query
+         */
+        $subscription_packs = dokan()->subscription->all();
+
+        return $subscription_packs->have_posts();
+    }
 }
 
 Helper::instance();

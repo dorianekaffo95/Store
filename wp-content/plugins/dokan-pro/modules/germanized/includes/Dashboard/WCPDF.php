@@ -260,7 +260,7 @@ class WCPDF {
                 'reset_number_yearly'   => isset( $_POST['dokan_wcpdf_documents_settings_invoice']['reset_number_yearly'] ) ? absint( wp_unslash( $_POST['dokan_wcpdf_documents_settings_invoice']['reset_number_yearly'] ) ) : 0,
             ];
         } else {
-            $invoice_settings = get_user_meta( $store_id, 'dokan_wcpdf_documents_settings_invoice', true );
+            $invoice_settings = (array) get_user_meta( $store_id, 'dokan_wcpdf_documents_settings_invoice', true );
             $invoice_settings['override_invoice_num'] = $override_invoice_num;
         }
         // store settings

@@ -2,6 +2,7 @@
 
 namespace WeDevs\DokanPro\Modules\Elementor\Abstracts;
 
+use Elementor\Modules\DynamicTags\Module;
 use WeDevs\DokanPro\Modules\Elementor\Bootstrap;
 use Elementor\Core\DynamicTags\Tag;
 
@@ -26,6 +27,6 @@ abstract class TagBase extends Tag {
      * @return array
      */
     public function get_categories() {
-        return [ \Elementor\Modules\DynamicTags\Module::TEXT_CATEGORY ];
+        return [ Module::TEXT_CATEGORY ];
     }
 }

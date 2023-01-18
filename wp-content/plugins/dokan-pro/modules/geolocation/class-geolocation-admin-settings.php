@@ -29,11 +29,15 @@ class Dokan_Geolocation_Admin_Settings {
      * @return array
      */
     public function add_settings_section( $sections ) {
-        $sections['dokan_geolocation'] = array(
-            'id'    => 'dokan_geolocation',
-            'title' => __( 'Geolocation', 'dokan' ),
-            'icon'  => 'dashicons-location',
-        );
+        $sections['dokan_geolocation'] = [
+            'id'                   => 'dokan_geolocation',
+            'title'                => __( 'Geolocation', 'dokan' ),
+            'icon_url'             => DOKAN_GEOLOCATION_ASSETS . '/images/geolocation.svg',
+            'description'          => __( 'Store Location Setup', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/modules/dokan-geolocation/',
+            'settings_title'       => __( 'Geolocation Settings', 'dokan' ),
+            'settings_description' => __( 'You can configure your store location settings and access configuration for vendor store from this settings menu.', 'dokan' ),
+        ];
 
         return $sections;
     }
@@ -48,63 +52,58 @@ class Dokan_Geolocation_Admin_Settings {
      * @return array
      */
     public function add_settings_fields( $settings_fields ) {
-        $settings_fields['dokan_geolocation'] = array(
-            'show_locations_map' => array(
+        $settings_fields['dokan_geolocation'] = [
+            'show_locations_map' => [
                 'name'    => 'show_locations_map',
                 'label'   => __( 'Location Map Position', 'dokan' ),
-                'type'    => 'select',
+                'type'    => 'radio',
                 'default' => 'top',
-                'options' => array(
+                'tooltip' => __( 'Choose where to place the Location Map of your store.', 'dokan' ),
+                'options' => [
                     'top'   => __( 'Top', 'dokan' ),
                     'left'  => __( 'Left', 'dokan' ),
                     'right' => __( 'Right', 'dokan' ),
-                ),
-                'tooltip' => __( 'Choose where to place the Location Map of your store.', 'dokan' ),
-            ),
-
-            'show_location_map_pages' => array(
+                ],
+            ],
+            'show_location_map_pages' => [
                 'name'    => 'show_location_map_pages',
                 'label'   => __( 'Show Map', 'dokan' ),
                 'desc'    => __( 'Select where want to show the map only', 'dokan' ),
-                'type'    => 'select',
+                'type'    => 'radio',
                 'default' => 'all',
-                'options' => array(
+                'tooltip' => __( 'Select which pages to display the store map.', 'dokan' ),
+                'options' => [
                     'all'           => __( 'Both', 'dokan' ),
                     'store_listing' => __( 'Store Listing', 'dokan' ),
                     'shop'          => __( 'Shop Page', 'dokan' ),
-                ),
-                'tooltip' => __( 'Select which pages to display the store map.', 'dokan' ),
-            ),
-
-            'show_filters_before_locations_map' => array(
+                ],
+            ],
+            'show_filters_before_locations_map' => [
                 'name'    => 'show_filters_before_locations_map',
-                'label'   => __( 'Show filters before location map', 'dokan' ),
+                'label'   => __( 'Show Filters Before Location Map', 'dokan' ),
                 'desc'    => __( 'Yes', 'dokan' ),
-                'type'    => 'checkbox',
+                'type'    => 'switcher',
                 'default' => 'on',
-            ),
-
-            'show_product_location_in_wc_tab' => array(
+            ],
+            'show_product_location_in_wc_tab' => [
                 'name'    => 'show_product_location_in_wc_tab',
-                'label'   => __( 'Product Location tab', 'dokan' ),
-                'desc'    => __( 'Show Location tab in single product page', 'dokan' ),
-                'type'    => 'checkbox',
+                'label'   => __( 'Product Location Tab', 'dokan' ),
+                'desc'    => __( 'Show location tab in single product page', 'dokan' ),
+                'type'    => 'switcher',
                 'default' => 'on',
-            ),
-
-            'distance_unit' => array(
+            ],
+            'distance_unit' => [
                 'name'    => 'distance_unit',
                 'label'   => __( 'Radius Search - Unit', 'dokan' ),
-                'type'    => 'select',
+                'type'    => 'radio',
                 'default' => 'km',
-                'options' => array(
+                'tooltip' => __( 'Set the unit measurement for map radius.', 'dokan' ),
+                'options' => [
                     'km'    => __( 'Kilometers', 'dokan' ),
                     'miles' => __( 'Miles', 'dokan' ),
-                ),
-                'tooltip' => __( 'Set the unit measurement for map radius.', 'dokan' ),
-            ),
-
-            'distance_min' => array(
+                ],
+            ],
+            'distance_min' => [
                 'name'    => 'distance_min',
                 'label'   => __( 'Radius Search - Minimum Distance', 'dokan' ),
                 'desc'    => __( 'Set minimum distance for radius search.', 'dokan' ),
@@ -112,9 +111,8 @@ class Dokan_Geolocation_Admin_Settings {
                 'min'     => 0,
                 'default' => 0,
                 'tooltip' => __( 'Set the minimum unit distance of the radius.', 'dokan' ),
-            ),
-
-            'distance_max' => array(
+            ],
+            'distance_max' => [
                 'name'    => 'distance_max',
                 'label'   => __( 'Radius Search - Maximum Distance', 'dokan' ),
                 'desc'    => __( 'Set maximum distance for radius search.', 'dokan' ),
@@ -122,19 +120,17 @@ class Dokan_Geolocation_Admin_Settings {
                 'min'     => 1,
                 'default' => 10,
                 'tooltip' => __( 'Set the maximum unit distance of the radius.', 'dokan' ),
-            ),
-
-            'map_zoom'     => array(
-                'name'    => 'map_zoom',
-                'label'   => __( 'Map Zoom Level', 'dokan' ),
-                'desc'    => __( 'To zoom in increase the number, to zoom out decrease the number.', 'dokan' ),
-                'type'    => 'number',
-                'min'     => 1,
-                'max'     => 18,
-                'default' => 11,
-            ),
-
-            'location' => array(
+            ],
+            'map_zoom'     => [
+                'name'          => 'map_zoom',
+                'label'         => __( 'Map Zoom Level', 'dokan' ),
+                'desc'          => __( 'To zoom in increase the number, to zoom out decrease the number.', 'dokan' ),
+                'type'          => 'number',
+                'min'           => 1,
+                'max'           => 18,
+                'default'       => 11,
+            ],
+            'location' => [
                 'name'    => 'location',
                 'label'   => __( 'Default Location', 'dokan' ),
                 'desc'    => __( 'In case the searched store is not found, the default location will be set on the map.', 'dokan' ),
@@ -145,8 +141,8 @@ class Dokan_Geolocation_Admin_Settings {
                     'address'   => __( 'Dhaka', 'dokan' ),
                     'zoom'      => 10,
                 ],
-            ),
-        );
+            ],
+        ];
 
         return $settings_fields;
     }

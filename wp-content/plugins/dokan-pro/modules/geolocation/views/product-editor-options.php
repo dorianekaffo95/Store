@@ -1,9 +1,9 @@
 <div class="dokan-geolocation-options dokan-edit-row dokan-clearfix">
     <div class="dokan-section-heading" data-togglehandler="dokan_geolocation_options">
-        <h2><i class="fa fa-map-marker" aria-hidden="true"></i> <?php _e( 'Geolocation', 'dokan' ); ?></h2>
+        <h2><i class="fas fa-map-marker-alt" aria-hidden="true"></i> <?php _e( 'Geolocation', 'dokan' ); ?></h2>
 
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
         </a>
 
         <div class="dokan-clearfix"></div>

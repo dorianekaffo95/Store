@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "firebase/php-jwt",
-            "version": "dev-main",
-            "version_normalized": "dev-main",
+            "version": "v5.5.1",
+            "version_normalized": "5.5.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "fbe639489d3348ff6e6d91f80b15198b39dc9217"
+                "reference": "83b609028194aa042ea33b5af2d41a7427de80e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/fbe639489d3348ff6e6d91f80b15198b39dc9217",
-                "reference": "fbe639489d3348ff6e6d91f80b15198b39dc9217",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/83b609028194aa042ea33b5af2d41a7427de80e6",
+                "reference": "83b609028194aa042ea33b5af2d41a7427de80e6",
                 "shasum": ""
             },
             "require": {
@@ -24,8 +24,7 @@
             "suggest": {
                 "paragonie/sodium_compat": "Support EdDSA (Ed25519) signatures when libsodium is not present"
             },
-            "time": "2021-12-01T22:06:59+00:00",
-            "default-branch": true,
+            "time": "2021-11-08T20:18:51+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -57,23 +56,23 @@
             ],
             "support": {
                 "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/main"
+                "source": "https://github.com/firebase/php-jwt/tree/v5.5.1"
             },
             "install-path": "../firebase/php-jwt"
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "3.7.1",
-            "version_normalized": "3.7.1.0",
+            "version": "v3.8.2",
+            "version_normalized": "3.8.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "0ec1b8cb8b230aae739422c5e42bc5733b3a7316"
+                "reference": "0d6e31482c544e5ed2bdc83bd3c033054129c482"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/0ec1b8cb8b230aae739422c5e42bc5733b3a7316",
-                "reference": "0ec1b8cb8b230aae739422c5e42bc5733b3a7316",
+                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/0d6e31482c544e5ed2bdc83bd3c033054129c482",
+                "reference": "0d6e31482c544e5ed2bdc83bd3c033054129c482",
                 "shasum": ""
             },
             "require": {
@@ -87,7 +86,7 @@
                 "firebase/php-jwt": "Needed to support Apple provider",
                 "phpseclib/phpseclib": "Needed to support Apple provider"
             },
-            "time": "2021-03-13T17:35:33+00:00",
+            "time": "2022-08-18T19:48:17+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -122,14 +121,59 @@
             "support": {
                 "gitter": "https://gitter.im/hybridauth/hybridauth",
                 "issues": "https://github.com/hybridauth/hybridauth/issues",
-                "source": "https://github.com/hybridauth/hybridauth/tree/3.7.1"
+                "source": "https://github.com/hybridauth/hybridauth/tree/v3.8.2"
             },
             "install-path": "../hybridauth/hybridauth"
         },
         {
+            "name": "mangopay/php-sdk-v2",
+            "version": "3.12.0",
+            "version_normalized": "3.12.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Mangopay/mangopay2-php-sdk.git",
+                "reference": "52e4cd70f41d7e2c2015f1537c3404de6f30ac43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mangopay/mangopay2-php-sdk/zipball/52e4cd70f41d7e2c2015f1537c3404de6f30ac43",
+                "reference": "52e4cd70f41d7e2c2015f1537c3404de6f30ac43",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-openssl": "*",
+                "php": ">=5.6",
+                "psr/log": "^1.0|^2.0|^3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.18",
+                "phpunit/phpunit": ">=5.7.27 <10"
+            },
+            "time": "2022-03-31T17:02:44+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "MangoPay\\": "MangoPay"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP SDK for MANGOPAY",
+            "support": {
+                "issues": "https://github.com/Mangopay/mangopay2-php-sdk/issues",
+                "source": "https://github.com/Mangopay/mangopay2-php-sdk/tree/3.12.0"
+            },
+            "install-path": "../mangopay/php-sdk-v2"
+        },
+        {
             "name": "moip/moip-sdk-php",
-            "version": "dev-release/3.4.3",
-            "version_normalized": "dev-release/3.4.3",
+            "version": "dev-release/3.7.5",
+            "version_normalized": "dev-release/3.7.5",
             "dist": {
                 "type": "path",
                 "url": "modules/moip/moip-sdk",
@@ -310,18 +354,126 @@
             "install-path": "../paypal/sdk-core-php"
         },
         {
-            "name": "stripe/stripe-php",
-            "version": "v7.107.0",
-            "version_normalized": "7.107.0.0",
+            "name": "psr/log",
+            "version": "1.1.4",
+            "version_normalized": "1.1.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "a90f74037261ed376c0d37066f396c48809c8e99"
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/a90f74037261ed376c0d37066f396c48809c8e99",
-                "reference": "a90f74037261ed376c0d37066f396c48809c8e99",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "time": "2021-05-03T11:20:27+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/log/tree/1.1.4"
+            },
+            "install-path": "../psr/log"
+        },
+        {
+            "name": "razorpay/razorpay",
+            "version": "dev-develop",
+            "version_normalized": "dev-develop",
+            "dist": {
+                "type": "path",
+                "url": "modules/razorpay/razorpay-sdk",
+                "reference": "cb05f9e79398d914b93b7886a6023db9cd4bfcb1"
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Razorpay\\Api\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Abhay Rana",
+                    "email": "nemo@razorpay.com",
+                    "homepage": "https://captnemo.in",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Shashank Kumar",
+                    "email": "shashank@razorpay.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Razorpay PHP Client Library",
+            "homepage": "https://docs.razorpay.com",
+            "keywords": [
+                "api",
+                "client",
+                "php",
+                "razorpay"
+            ],
+            "support": {
+                "email": "contact@razorpay.com",
+                "issues": "https://github.com/Razorpay/razorpay-php/issues",
+                "source": "https://github.com/Razorpay/razorpay-php"
+            },
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            },
+            "install-path": "../razorpay/razorpay"
+        },
+        {
+            "name": "stripe/stripe-php",
+            "version": "v7.128.0",
+            "version_normalized": "7.128.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "c704949c49b72985c76cc61063aa26fefbd2724e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/c704949c49b72985c76cc61063aa26fefbd2724e",
+                "reference": "c704949c49b72985c76cc61063aa26fefbd2724e",
                 "shasum": ""
             },
             "require": {
@@ -331,12 +483,12 @@
                 "php": ">=5.6.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "3.2.1",
+                "friendsofphp/php-cs-fixer": "3.5.0",
                 "phpstan/phpstan": "^1.2",
                 "phpunit/phpunit": "^5.7 || ^9.0",
                 "squizlabs/php_codesniffer": "^3.3"
             },
-            "time": "2021-12-09T20:40:29+00:00",
+            "time": "2022-05-05T17:18:02+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -368,7 +520,7 @@
             ],
             "support": {
                 "issues": "https://github.com/stripe/stripe-php/issues",
-                "source": "https://github.com/stripe/stripe-php/tree/v7.107.0"
+                "source": "https://github.com/stripe/stripe-php/tree/v7.128.0"
             },
             "install-path": "../stripe/stripe-php"
         },

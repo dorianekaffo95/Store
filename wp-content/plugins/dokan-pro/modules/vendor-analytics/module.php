@@ -29,6 +29,9 @@ class Module {
         add_filter( 'dokan_set_template_path', [ $this, 'load_view_templates' ], 10, 3 );
         // flush rewrite rules
         add_action( 'woocommerce_flush_rewrite_rules', [ $this, 'flush_rewrite_rules' ] );
+
+        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+        add_action( 'init', [ $this, 'register_scripts' ] );
     }
 
     /**
@@ -194,7 +197,7 @@ class Module {
         if ( dokan_is_seller_enabled( get_current_user_id() ) && current_user_can( 'dokandar' ) ) {
             $urls['analytics'] = array(
                 'title' => __( 'Analytics', 'dokan' ),
-                'icon'  => '<i class="fa fa-area-chart"></i>',
+                'icon'  => '<i class="fas fa-chart-area"></i>',
                 'url'   => dokan_get_navigation_url( 'analytics' ),
                 'pos'   => 181,
             );
@@ -226,5 +229,31 @@ class Module {
         add_filter( 'dokan_query_var_filter', array( $this, 'add_endpoint' ) );
         dokan()->rewrite->register_rule();
         flush_rewrite_rules( true );
+    }
+
+    /**
+     * Enqueue styles and scripts
+     *
+     * @since 3.5.3
+     *
+     * @retun void
+     */
+    public function enqueue_scripts() {
+        if ( dokan_is_seller_dashboard() && false !== get_query_var( 'analytics', false ) ) {
+            wp_enqueue_script( 'dokan-flot' );
+        }
+    }
+
+    /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_script( 'echarts-js', DOKAN_VENDOR_ANALYTICS_ASSETS . '/js/echarts.min.js', array(), $version, true );
+        wp_register_script( 'echarts-js-map-world', DOKAN_VENDOR_ANALYTICS_ASSETS . '/js/world.js', array( 'echarts-js' ), $version, true );
+        wp_register_script( 'dokan-vendor-analytics-locations', DOKAN_VENDOR_ANALYTICS_ASSETS . '/js/dokan-vendor-analytics-locations.js', array( 'echarts-js', 'echarts-js-map-world' ), $version, true );
     }
 }

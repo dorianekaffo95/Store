@@ -60,6 +60,7 @@ class VendorShipping extends WC_Shipping_Method {
         // additional hooks for post-calculations settings
         add_filter( 'woocommerce_shipping_chosen_method', array( $this, 'select_default_rate' ), 10, 2 );
         add_action( 'woocommerce_update_options_shipping_' . $this->id, array( $this, 'process_admin_options' ) );
+        add_action( 'woocommerce_shipping_zone_method_deleted', array( $this, 'delete_vendor_shipping_methods' ), 10, 3 );
     }
 
     /**
@@ -345,7 +346,7 @@ class VendorShipping extends WC_Shipping_Method {
                         'cost'      => $rate['cost'],
                         'meta_data' => array( 'description' => $rate['description'] ),
                         'package'   => $package,
-                        'taxes'     => $tax_rate,
+                        'taxes'     => $rate['taxes'],
                     )
                 );
 
@@ -364,8 +365,9 @@ class VendorShipping extends WC_Shipping_Method {
      * @return bool
      */
     public function free_shipping_is_available( $package, $method ) {
-        $has_met_min_amount = false;
-        $min_amount         = ! empty( $method['settings']['min_amount'] ) ? $method['settings']['min_amount'] : 0;
+        $has_met_min_amount    = false;
+        $min_amount            = ! empty( $method['settings']['min_amount'] ) ? $method['settings']['min_amount'] : 0;
+        $apply_before_discount = ! empty( $method['settings']['apply_before_coupon_discount'] ) && 'true' === $method['settings']['apply_before_coupon_discount'];
 
         $line_subtotal      = wp_list_pluck( $package['contents'], 'line_subtotal', null );
         $line_total         = wp_list_pluck( $package['contents'], 'line_total', null );
@@ -373,13 +375,20 @@ class VendorShipping extends WC_Shipping_Method {
         $line_subtotal_tax  = wp_list_pluck( $package['contents'], 'line_subtotal_tax', null );
         $line_total_tax     = wp_list_pluck( $package['contents'], 'line_tax', null );
         $discount_tax_total = array_sum( $line_subtotal_tax ) - array_sum( $line_total_tax );
+        $total              = array_sum( $line_subtotal );
 
-        $total = array_sum( $line_subtotal ) + array_sum( $line_subtotal_tax );
+        if ( version_compare( WC_VERSION, '3.7.2', '<' ) ) {
+            $total += array_sum( $line_subtotal_tax );
+        }
 
         if ( WC()->cart->display_prices_including_tax() ) {
             $total = round( $total - ( $discount_total + $discount_tax_total ), wc_get_price_decimals() );
         } else {
             $total = round( $total - $discount_total, wc_get_price_decimals() );
+        }
+
+        if ( $apply_before_discount ) {
+            $total += $this->get_coupon_discount_amount( $package );
         }
 
         if ( $total >= $min_amount ) {
@@ -524,5 +533,179 @@ class VendorShipping extends WC_Shipping_Method {
      */
     public function get_method_rate_id( $method ) {
         return apply_filters( 'dokan_get_vendor_shipping_method_id', $method['id'] . ':' . $method['instance_id'] );
+    }
+
+    /**
+     * Get Coupon discount amount for a shipping package
+     *
+     * @since 3.6.0
+     *
+     * @param array $package Current shipping package
+     *
+     * @return float
+     */
+    private function get_coupon_discount_amount( $package ) {
+        $coupon_discount = 0.0;
+        $coupons         = [];
+
+        foreach ( $package['applied_coupons'] as $coupon_code ) {
+            $coupon    = new \WC_Coupon( $coupon_code );
+            $coupons[] = $coupon;
+        }
+
+        if ( 'yes' === get_option( 'woocommerce_calc_discounts_sequentially', 'no' ) ) {
+            $coupons = $this->get_coupons_from_cart( $coupons );
+
+            $counted_fixed_cart_coupons = [];
+
+            foreach ( $package['contents'] as $product_line ) {
+                $sequential_subtotal = $product_line['line_subtotal'];
+
+                foreach ( $coupons as $coupon ) {
+                    if ( ! $coupon->is_valid_for_product( wc_get_product( $product_line['product_id'] ) ) ) { // all other checks(like max spend, validity, usage limit etc) not performed here because they are done when we press 'Apply coupon' in Cart page
+                        continue;
+                    }
+
+                    switch ( $coupon->get_discount_type() ) {
+                        case 'percent':
+                            $discount = wc_round_discount( $sequential_subtotal * $coupon->get_amount() / 100, wc_get_price_decimals() );
+                            $coupon_discount += $discount;
+                            break;
+
+                        case 'fixed_product':
+                            $discount = wc_round_discount( $coupon->get_amount() * $product_line['quantity'], wc_get_price_decimals() );
+                            $coupon_discount += $discount;
+                            break;
+
+                        case 'fixed_cart':
+                            if ( ! in_array( $coupon->get_code(), $counted_fixed_cart_coupons, true ) ) {
+                                $discount = wc_round_discount( $coupon->get_amount(), wc_get_price_decimals() );
+                                $coupon_discount += $discount;
+                                $counted_fixed_cart_coupons[] = $coupon->get_code();
+                            }
+                            break;
+
+                        default:
+                            $discount = 0;
+                    }
+
+                    $sequential_subtotal -= $discount;
+                }
+            }
+
+            return $coupon_discount;
+        }
+
+        foreach ( $coupons as $coupon ) {
+            foreach ( $package['contents'] as $product_line ) {
+                if ( ! $coupon->is_valid_for_product( wc_get_product( $product_line['product_id'] ) ) ) { // all other checks(like max spend, validity, usage limit etc) not performed here because they are done when we press 'Apply coupon' in Cart page
+                    continue;
+                }
+
+                $product_line_total = $product_line['line_subtotal'];
+
+                if ( 'percent' === $coupon->get_discount_type() ) {
+                    $coupon_discount += wc_round_discount( $product_line_total * $coupon->get_amount() / 100, wc_get_price_decimals() );
+                } elseif ( 'fixed_product' === $coupon->get_discount_type() ) {
+                    $coupon_discount += wc_round_discount( $coupon->get_amount() * $product_line['quantity'], wc_get_price_decimals() );
+                }
+            }
+
+            if ( 'fixed_cart' === $coupon->get_discount_type() ) {
+                $coupon_discount += wc_round_discount( $coupon->get_amount(), wc_get_price_decimals() );
+            }
+        }
+
+        return $coupon_discount;
+    }
+
+    /**
+     * Get ordered coupons for sequential application. This function follows the method `get_coupons_from_cart` from class-wc-cart-totals.php
+     *
+     * @since 3.6.0
+     *
+     * @param array $coupons
+     *
+     * @return array
+     */
+    private function get_coupons_from_cart( $coupons ) {
+        foreach ( $coupons as $coupon ) {
+            switch ( $coupon->get_discount_type() ) {
+                case 'fixed_product':
+                    $coupon->sort = 1;
+                    break;
+                case 'percent':
+                    $coupon->sort = 2;
+                    break;
+                case 'fixed_cart':
+                    $coupon->sort = 3;
+                    break;
+                default:
+                    $coupon->sort = 0;
+                    break;
+            }
+
+            // Allow plugins to override the default order.
+            $coupon->sort = apply_filters( 'woocommerce_coupon_sort', $coupon->sort, $coupon );
+        }
+
+        uasort( $coupons, array( $this, 'sort_coupons_callback' ) );
+
+        return $coupons;
+    }
+
+    /**
+     * Sort coupons so discounts apply consistently across installs. . This function follows the method `sort_coupons_callback` from class-wc-cart-totals.php
+     *
+     * @since 3.6.0
+     *
+     * In order of priority;
+     *  - sort param
+     *  - usage restriction
+     *  - coupon value
+     *  - ID
+     *
+     * @param \WC_Coupon $a Coupon object.
+     * @param \WC_Coupon $b Coupon object.
+     * @return int
+     */
+    protected function sort_coupons_callback( $a, $b ) {
+        if ( $a->sort !== $b->sort ) {
+            return ( $a->sort < $b->sort ) ? -1 : 1;
+        }
+
+        if ( $a->get_limit_usage_to_x_items() !== $b->get_limit_usage_to_x_items() ) {
+            return ( $a->get_limit_usage_to_x_items() < $b->get_limit_usage_to_x_items() ) ? -1 : 1;
+        }
+
+        if ( $a->get_amount() !== $b->get_amount() ) {
+            return ( $a->get_amount() < $b->get_amount() ) ? -1 : 1;
+        }
+
+        return $b->get_id() - $a->get_id();
+    }
+
+    /**
+     * Delete Vendor shipping methods if Admin delete 'Vendor Shipping' in WC > Settings > Shipping > Zone
+     *
+     * @since 3.7.0
+     *
+     * @param int $instance_id
+     * @param string $method_id
+     * @param int $zone_id
+     */
+    public function delete_vendor_shipping_methods( $instance_id, $method_id, $zone_id ) {
+        global $wpdb;
+
+        if ( 'dokan_vendor_shipping' !== $method_id ) {
+            return;
+        }
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->prefix}dokan_shipping_zone_methods WHERE zone_id = %d AND method_id IN ( 'flat_rate', 'free_shipping', 'local_pickup' )",
+                $zone_id
+            )
+        );
     }
 }

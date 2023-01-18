@@ -68,7 +68,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['verified_info'][
                     }
                     ?>
                     <div class="dokan-alert <?php echo $alert_class ?>" id="dokan_v_id_feedback">
-                        <?php echo sprintf( __( 'Your ID verification request is %s', 'dokan' ), $id_status ); ?>
+                        <?php echo sprintf( __( 'Your ID verification request is %s', 'dokan' ), \WeDevs\DokanPro\Modules\VendorVerification\Module::get_translated_status( $id_status ) ); ?>
                     </div>
                 <?php } ?>
 
@@ -115,7 +115,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['verified_info'][
                                     </div>
 
                                     <div class="gravatar-button-area<?php echo $gravatar ? ' dokan-hide' : ''; ?>">
-                                        <a href="#" class="dokan-gravatar-drag dokan-btn dokan-btn-default"><i class="fa fa-cloud-upload"></i> <?php _e( 'Upload Photo', 'dokan' ); ?></a>
+                                        <a href="#" class="dokan-gravatar-drag dokan-btn dokan-btn-default"><i class="fas fa-cloud-upload-alt"></i> <?php _e( 'Upload Photo', 'dokan' ); ?></a>
                                     </div>
 
 
@@ -255,7 +255,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['verified_info'][
 
 
                 <div class="dokan-alert <?php echo $alert_class ?>" id="d_v_address_feedback">
-                    <?php echo sprintf( __( 'Your Address verification request is %s', 'dokan' ), $address_status ); ?>
+                    <?php echo sprintf( __( 'Your Address verification request is %s', 'dokan' ), \WeDevs\DokanPro\Modules\VendorVerification\Module::get_translated_status( $address_status ) ); ?>
                 </div>
 
                 <?php

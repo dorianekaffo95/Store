@@ -90,7 +90,7 @@ class Dokan_RMA_Vendor {
         if ( dokan_is_seller_enabled( dokan_get_current_user_id() ) ) {
             $urls['return-request'] = array(
                 'title'      => __( 'Return Request', 'dokan' ),
-                'icon'       => '<i class="fa fa-undo" aria-hidden="true"></i>',
+                'icon'       => '<i class="fas fa-undo-alt" aria-hidden="true"></i>',
                 'url'        => dokan_get_navigation_url( 'return-request' ),
                 'pos'        => 170,
                 'permission' => 'dokan_view_store_rma_menu',
@@ -203,7 +203,7 @@ class Dokan_RMA_Vendor {
     public function load_settings_menu( $sub_settins ) {
         $sub_settins['rma'] = [
             'title'      => __( 'RMA', 'dokan' ),
-            'icon'       => '<i class="fa fa-undo" aria-hidden="true"></i>',
+            'icon'       => '<i class="fas fa-undo-alt" aria-hidden="true"></i>',
             'url'        => dokan_get_navigation_url( 'settings/rma' ),
             'pos'        => 93,
             'permission' => 'dokan_view_store_rma_menu',

@@ -988,5 +988,12 @@ th.column-booking_status {
 .wc_bookings_calendar_form .tablenav .views {
   margin-top: 20px;
 }
+.wc_bookings_calendar_form .tablenav .views a {
+  color: #6d6d6d;
+  transition: .2s linear;
+}
+.wc_bookings_calendar_form .tablenav .views a:hover {
+  color: #000;
+}
 
 /*# sourceMappingURL=admin.css.map*/

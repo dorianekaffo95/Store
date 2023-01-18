@@ -65,6 +65,7 @@ class Module {
         add_action( 'init', [ $this, 'do_product_export' ], 99 );
 
         // Loads frontend scripts and styles
+        add_action( 'init', [ $this, 'register_scripts' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
         add_filter( 'dokan_get_dashboard_nav', [ $this, 'add_importer_page' ], 13, 1 );
@@ -174,28 +175,40 @@ class Module {
     }
 
     /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     *
+     * @return void
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'woocommerce_admin_styles', WC()->plugin_url() . '/assets/css/admin.css', [], WC_VERSION );
+
+        /*
+         * All styles goes here
+         */
+        wp_register_style( 'dpi-styles', DOKAN_IE_ASSETS . '/css/style.css', false, $version );
+
+        wp_register_script( 'wc-product-import', WC()->plugin_url() . '/assets/js/admin/wc-product-import.js', [ 'jquery' ], WC_VERSION );
+        wp_register_script( 'wc-product-export', WC()->plugin_url() . '/assets/js/admin/wc-product-export.js', [ 'jquery' ], WC_VERSION );
+    }
+
+    /**
      * Enqueue admin scripts
      *
      * Allows plugin assets to be loaded.
      *
-     * @uses wp_enqueue_script()
-     * @uses wp_localize_script()
      * @uses wp_enqueue_style
      */
     public function enqueue_scripts() {
         global $wp;
 
         if ( dokan_is_seller_dashboard() && isset( $wp->query_vars['tools'] ) ) {
-            wp_enqueue_style( 'woocommerce_admin_styles', WC()->plugin_url() . '/assets/css/admin.css', [], WC_VERSION );
+            wp_enqueue_style( 'woocommerce_admin_styles' );
+            wp_enqueue_style( 'dpi-styles' );
         }
-
-        /*
-         * All styles goes here
-         */
-        wp_enqueue_style( 'dpi-styles', DOKAN_IE_ASSETS . '/css/style.css', false, date( 'Ymd' ) ); // phpcs:ignore
-
-        wp_register_script( 'wc-product-import', WC()->plugin_url() . '/assets/js/admin/wc-product-import.js', [ 'jquery' ], WC_VERSION );
-        wp_register_script( 'wc-product-export', WC()->plugin_url() . '/assets/js/admin/wc-product-export.js', [ 'jquery' ], WC_VERSION );
     }
 
     /**
@@ -227,14 +240,14 @@ class Module {
             if ( $installed_version >= '2.4' ) {
                 $urls['tools'] = [
                     'title' => __( 'Tools', 'dokan' ),
-                    'icon'  => '<i class="fa fa-wrench"></i>',
+                    'icon'  => '<i class="fas fa-wrench"></i>',
                     'url'   => dokan_get_navigation_url( 'tools' ),
                     'pos'   => 182,
                 ];
             } else {
                 $urls['tools'] = [
                     'title' => __( 'Tools', 'dokan' ),
-                    'icon'  => '<i class="fa fa-wrench"></i>',
+                    'icon'  => '<i class="fas fa-wrench"></i>',
                     'url'   => dokan_get_navigation_url( 'tools' ),
                 ];
             }
@@ -1431,12 +1444,12 @@ class Module {
         $product_query = dokan()->product->all( [ 'author' => dokan_get_current_user_id(), 'posts_per_page' => 1 ] );
         ?>
         <?php if ( current_user_can( 'dokan_import_product' ) ) { ?>
-            <a href="<?php echo dokan_get_navigation_url( 'tools/csv-import' ); ?>" class="dokan-btn">
+            <a href="<?php echo dokan_get_navigation_url( 'tools/csv-import' ); ?>" class="dokan-btn dokan-btn-theme">
                 <?php esc_html_e( 'Import', 'dokan' ); ?>
             </a>
         <?php } ?>
         <?php if ( current_user_can( 'dokan_export_product' ) && apply_filters( 'dokan_csv_export_enabled', true ) && $product_query->have_posts() ) { ?>
-            <a href="<?php echo dokan_get_navigation_url( 'tools/csv-export' ); ?>" class="dokan-btn">
+            <a href="<?php echo dokan_get_navigation_url( 'tools/csv-export' ); ?>" class="dokan-btn dokan-btn-theme">
                 <?php esc_html_e( 'Export', 'dokan' ); ?>
             </a>
         <?php } ?>

@@ -78,21 +78,21 @@ class Dokan_RMA_Ajax {
                 <table class="dokan-table dokan-refund-item-list-table">
                     <thead>
                         <tr>
-                            <th width="50%"><?php esc_html_e( 'Product', 'dokan' ); ?></th>
-                            <th width="20%"><?php esc_html_e( 'Qty', 'dokan' ); ?></th>
+                            <th width="30%"><?php esc_html_e( 'Product', 'dokan' ); ?></th>
+                            <th width="10%"><?php esc_html_e( 'Qty', 'dokan' ); ?></th>
 
                             <?php if ( $wc_tax_enabled ) : ?>
-                                <th width="20%"><?php esc_html_e( 'Tax', 'dokan' ); ?></th>
+                                <th width="10%"><?php esc_html_e( 'Tax', 'dokan' ); ?></th>
                             <?php endif; ?>
 
-                            <th width="30%"><?php esc_html_e( 'Subtotal', 'dokan' ); ?></th>
+                            <th width="15%"><?php esc_html_e( 'Subtotal', 'dokan' ); ?></th>
 
                             <?php if ( $wc_tax_enabled ) : ?>
-                                <th width="20%"><?php esc_html_e( 'Tax Refund', 'dokan' ); ?></th>
+                                <th width="15%"><?php esc_html_e( 'Tax Refund', 'dokan' ); ?></th>
                             <?php endif; ?>
 
-                            <th width="30%"><?php esc_html_e( 'Subtotal Refund', 'dokan' ); ?></th>
-                            <th width="15%"></th>
+                            <th width="20%"><?php esc_html_e( 'Subtotal Refund', 'dokan' ); ?></th>
+<!--                            <th width="15%"></th>-->
                         </tr>
                     </thead>
                     <tbody>
@@ -110,14 +110,14 @@ class Dokan_RMA_Ajax {
                                 <?php if ( $wc_tax_enabled ) : ?>
                                     <td>
                                         <div style="position: relative;">
-                                            <input type="text" data-max="<?php echo esc_attr( $item['tax'] * $item['quantity'] ); ?>" name="refund_tax[]" class="wc_input_price refund_item_amount" placeholder="<?php echo esc_attr( $price_placeholder ); ?>">
+                                            <input type="text" data-max="<?php echo esc_attr( $item['tax'] * $item['quantity'] ); ?>" name="refund_tax[]" class="wc_input_price refund_item_amount dokan-w12 dokan-text-right" placeholder="<?php echo esc_attr( $price_placeholder ); ?>">
                                         </div>
                                     </td>
                                 <?php endif; ?>
                                 <td>
                                     <input type="hidden" name="item_id[]" value="<?php echo $item['item_id']; ?>">
                                     <div style="position: relative;">
-                                        <input type="text" data-max="<?php echo esc_attr( $item['price'] * $item['quantity'] ); ?>" name="refund_amount[]" class="wc_input_price refund_item_amount" placeholder="<?php echo esc_attr( $price_placeholder ); ?>">
+                                        <input type="text" data-max="<?php echo esc_attr( $item['price'] * $item['quantity'] ); ?>" name="refund_amount[]" class="wc_input_price refund_item_amount dokan-w12 dokan-text-right" placeholder="<?php echo esc_attr( $price_placeholder ); ?>">
                                     </div>
                                     <input type="hidden" name="line_item_qtys[]" value="<?php echo esc_attr( $item['quantity'] ); ?>">
                                 </td>

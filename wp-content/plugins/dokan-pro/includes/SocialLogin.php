@@ -234,11 +234,16 @@ class SocialLogin {
      * @return array
      */
     public function dokan_social_api_settings( $sections ) {
-        $sections[] = array(
-            'id'    => 'dokan_social_api',
-            'title' => __( 'Social API', 'dokan' ),
-            'icon'  => 'dashicons-networking',
-        );
+        $sections[] = [
+            'id'                   => 'dokan_social_api',
+            'title'                => __( 'Social API', 'dokan' ),
+            'icon_url'             => DOKAN_PRO_PLUGIN_ASSEST . '/images/admin-settings-icons/social.svg',
+            'description'          => __( 'Configure Social Api', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/settings/dokan-social-login/',
+            'settings_title'       => __( 'Social Settings', 'dokan' ),
+            'settings_description' => __( 'Define settings to allow vendors to use their social profiles to register or log in to the marketplace.', 'dokan' ),
+        ];
+
         return $sections;
     }
 
@@ -250,182 +255,271 @@ class SocialLogin {
      * @return array
      */
     public function dokan_social_settings_fields( $settings_fields ) {
-        $settings_fields['dokan_social_api'] = array(
-            'sectio_title' => array(
-                'name'  => 'sectio_title',
-                'label' => __( 'Social API', 'dokan' ),
-                'type'  => 'sub_section',
-            ),
-            'enabled' => array(
+        $settings_fields['dokan_social_api'] = [
+            'section_title'    => [
+                'name'        => 'section_title',
+                'label'       => __( 'Social API', 'dokan' ),
+                'type'        => 'sub_section',
+                'description' => __( 'Configure your site social settings and control access to your site.', 'dokan' ),
+            ],
+            'enabled'          => [
                 'name'    => 'enabled',
                 'label'   => __( 'Enable Social Login', 'dokan' ),
-                'type'    => 'checkbox',
+                'type'    => 'switcher',
                 'desc'    => __( 'Enabling this will add Social Icons under registration form to allow users to login or register using Social Profiles.', 'dokan' ),
                 'tooltip' => __( 'Check this to allow social login/signup for customers and vendors.', 'dokan' ),
-            ),
-            'facebook_details' => array(
-                'name'  => 'facebook_details',
-                'label' => __( 'Facebook', 'dokan' ),
-                'type'  => 'sub_section',
-            ),
-            'facebook_app_label'  => array(
-                'name'  => 'fb_app_label',
-                'label' => __( 'Facebook App Settings', 'dokan' ),
-                'type'  => 'html',
-                'desc'  => '<a target="_blank" href="https://developers.facebook.com/apps/">' . __( 'Create an App', 'dokan' ) . '</a> if you don\'t have one and fill App ID and Secret below. <a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-facebook/" target="_blank">Get Help</a>',
-            ),
-            'facebook_app_url'    => array(
-                'name'    => 'fb_app_url',
-                'label'   => __( 'Site URL', 'dokan' ),
-                'type'    => 'html',
-                'desc'    => "<input class='regular-text' type='text' disabled value='{$this->callback}'>",
-                'tooltip' => __( 'Your store URL, which will be required in creating the App.', 'dokan' ),
-            ),
-            'facebook_app_id'     => array(
-                'name'    => 'fb_app_id',
-                'label'   => __( 'App ID', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Facebook Developer platform -> Login -> Select  "Add A New App" -> Collect App ID.', 'dokan' ),
-            ),
-            'facebook_app_secret' => array(
-                'name'    => 'fb_app_secret',
-                'label'   => __( 'App Secret', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Facebook Developer platform -> Login -> Select  "Add A New App" -> Collect App secret.', 'dokan' ),
-            ),
-            'twitter_details' => array(
-                'name'  => 'twitter_details',
-                'label' => __( 'Twitter', 'dokan' ),
-                'type'  => 'sub_section',
-            ),
-            'twitter_app_label'   => array(
-                'name'  => 'twitter_app_label',
-                'label' => __( 'Twitter App Settings', 'dokan' ),
-                'type'  => 'html',
-                'desc'  => '<a target="_blank" href="https://apps.twitter.com/">' . __( 'Create an App', 'dokan' ) . '</a> if you don\'t have one and fill Consumer key and Secret below. <a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-twitter/" target="_blank">Get Help</a>',
-            ),
-            'twitter_app_url'     => array(
-                'name'    => 'twitter_app_url',
-                'label'   => __( 'Callback URL', 'dokan' ),
-                'type'    => 'html',
-                'desc'    => "<input class='regular-text' type='text' disabled value='{$this->callback}'>",
-                'tooltip' => __( 'Your store URL, which will be required in creating the App.', 'dokan' ),
-            ),
-            'twitter_app_id'      => array(
-                'name'    => 'twitter_app_id',
-                'label'   => __( 'Consumer Key', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Twitter Developer platform -> Login -> Select  "Create an App" -> Input URL & integrate Twitter with Dokan. Go to "Keys and Tokens" -> View Keys -> Collect API key and use as Consumer Key.', 'dokan' ),
-            ),
-            'twitter_app_secret'  => array(
-                'name'    => 'twitter_app_secret',
-                'label'   => __( 'Consumer Secret', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Twitter Developer platform -> Login -> Select  "Create an App" -> Input URL & integrate Twitter with Dokan. Go to "Keys and Tokens" -> View Keys -> Collect API secret and use as Consumer secret.', 'dokan' ),
-            ),
-            'google_details' => array(
-                'name'  => 'google_details',
-                'label' => __( 'Google', 'dokan' ),
-                'type'  => 'sub_section',
-            ),
-            'google_app_label'    => array(
-                'name'  => 'google_app_label',
-                'label' => __( 'Google App Settings', 'dokan' ),
-                'type'  => 'html',
-                'desc'  => '<a target="_blank" href="https://console.developers.google.com/project">' . __( 'Create an App', 'dokan' ) . '</a> if you don\'t have one and fill Client ID and Secret below. <a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-google/" target="_blank">Get Help</a>',
-            ),
-            'google_app_url'      => array(
-                'name'    => 'google_app_url',
-                'label'   => __( 'Redirect URL', 'dokan' ),
-                'type'    => 'html',
-                'desc'    => "<input class='regular-text' type='text' disabled value='{$this->callback}'>",
-                'tooltip' => __( 'Your store URL, which will be required in syncing with Google API.', 'dokan' ),
-            ),
-            'google_app_id'       => array(
-                'name'    => 'google_app_id',
-                'label'   => __( 'Client ID', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Google Console Platform -> Google+API -> Enable -> Manage -> Credentials -> Create Credentials -> OAuth client ID -> Web Application -> Fill in the information & click Create. A pop up will show "Client ID".', 'dokan' ),
-            ),
-            'google_app_secret'   => array(
-                'name'    => 'google_app_secret',
-                'label'   => __( 'Client secret', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Google Console Platform -> Google+API -> Enable -> Manage -> Credentials -> Create Credentials -> OAuth client ID -> Web Application -> Fill in the information & click Create. A pop up will show "Client Credentials".', 'dokan' ),
-            ),
-            'linkedin_details' => array(
-                'name'  => 'linkedin_details',
-                'label' => __( 'Linkedin', 'dokan' ),
-                'type'  => 'sub_section',
-            ),
-            'linkedin_app_label'  => array(
-                'name'  => 'linkedin_app_label',
-                'label' => __( 'Linkedin App Settings', 'dokan' ),
-                'type'  => 'html',
-                'desc'  => '<a target="_blank" href="https://www.linkedin.com/developer/apps">' . __( 'Create an App', 'dokan' ) . '</a> if you don\'t have one and fill Client ID and Secret below. <a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-linkedin/" target="_blank">Get Help</a>',
-            ),
-            'linkedin_app_url'    => array(
-                'name'    => 'linkedin_app_url',
-                'label'   => __( 'Redirect URL', 'dokan' ),
-                'type'    => 'html',
-                'desc'    => "<input class='regular-text' type='text' disabled value='{$this->callback}'>",
-                'tooltip' => __( 'Your store URL, which will be required in creating the App.', 'dokan' ),
-            ),
-            'linkedin_app_id'     => array(
-                'name'    => 'linkedin_app_id',
-                'label'   => __( 'Client ID', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from LinkedIn Developers platform -> Create an App -> Fill necessary info -> Click "Create app" -> "Auth" section -> Collect Client ID.', 'dokan' ),
-            ),
-            'linkedin_app_secret' => array(
-                'name'    => 'linkedin_app_secret',
-                'label'   => __( 'Client Secret', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from LinkedIn Developers platform -> Create an App -> Fill necessary info -> Click "Create app" -> "Auth" section -> Collect Client Secret.', 'dokan' ),
-            ),
-            'apple_details' => array(
-                'name'  => 'apple_details',
-                'label' => __( 'Apple', 'dokan' ),
-                'type'  => 'sub_section',
-            ),
-            'apple_app_label'  => array(
-                'name'  => 'apple_app_label',
-                'label' => __( 'Apple App Settings', 'dokan' ),
-                'type'  => 'html',
-                'desc'  => '<a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-apple/" target="_blank">' . __( 'Get Help', 'dokan' ) . '</a>',
-            ),
-            'apple_redirect_url'    => array(
-                'name'    => 'apple_redirect_url',
-                'label'   => __( 'Redirect URL', 'dokan' ),
-                'type'    => 'html',
-                'desc'    => "<input class='regular-text' type='text' disabled value='{$this->callback}'>",
-                'tooltip' => __( 'Your store URL, which will be required in creating the app.', 'dokan' ),
-            ),
-            'apple_service_id'    => array(
-                'name'    => 'apple_service_id',
-                'label'   => __( 'Apple Service ID', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Apple Developer platform -> login -> Certificates, IDs & Profiles -> Indentifiers -> Service IDs (drop down) -> Register for Service ID -> Collect Service ID.', 'dokan' ),
-            ),
-            'apple_team_id'     => array(
-                'name'    => 'apple_team_id',
-                'label'   => __( 'Apple Team ID', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Apple Developer platform -> login -> Membership ->  Collect Team ID.', 'dokan' ),
-            ),
-            'apple_key_id' => array(
-                'name'    => 'apple_key_id',
-                'label'   => __( 'Apple Key ID', 'dokan' ),
-                'type'    => 'text',
-                'tooltip' => __( 'You can get it from Apple Developer platform -> login -> Certificates, IDs & Profiles -> Keys -> Click " + " -> Register for new Key -> Download "Apple Key Content" -> Collect Key ID.', 'dokan' ),
-            ),
-            'apple_key_content' => array(
-                'name'    => 'apple_key_content',
-                'label'   => __( 'Apple Key Content (including BEGIN and END lines)', 'dokan' ),
-                'type'    => 'textarea',
-                'tooltip' => __( 'You can get it from Apple Developer platform -> login -> Certificates, IDs & Profiles -> Keys -> Click " + " -> Register for new Key -> Download "Apple Key Content" -> Collect Key Content.', 'dokan' ),
-            ),
-        );
+            ],
+            'facebook_details' => [
+                'name'          => 'facebook_details',
+                'type'          => 'social',
+                'desc'          => sprintf(
+                    /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                    __( 'Configure your facebook API settings. %1$sGet Help%2$s', 'dokan' ),
+                    '<a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-facebook/" target="_blank">',
+                    '</a>'
+                ),
+                'label'         => __( 'Connect to Facebook', 'dokan' ),
+                'icon_url'      => DOKAN_PRO_PLUGIN_ASSEST . '/images/scl-icons/fb.svg',
+                'social_desc'   => __( 'You can successfully connect Facebook with your website.', 'dokan' ),
+                'fb_app_label'  => [
+                    'name'         => 'fb_app_label',
+                    'type'         => 'html',
+                    'desc'         => sprintf(
+                        /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                        __( 'If you don\'t have one and fill App ID and Secret below. %1$sCreate an App%2$s', 'dokan' ),
+                        '<a target="_blank" href="https://developers.facebook.com/apps/">',
+                        '</a>'
+                    ),
+                    'label'        => __( 'Facebook App Settings', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'fb_app_url'    => [
+                    'url'          => $this->callback,
+                    'name'         => 'fb_app_url',
+                    'type'         => 'html',
+                    'label'        => __( 'Site URL', 'dokan' ),
+                    'tooltip'      => __( 'Your store URL, which will be required in creating the App.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'fb_app_id'     => [
+                    'name'         => 'fb_app_id',
+                    'type'         => 'text',
+                    'label'        => __( 'App ID', 'dokan' ),
+                    'tooltip'      => __( 'You can get it from Facebook Developer platform -> Login -> Select  "Add A New App" -> Collect App ID.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'fb_app_secret' => [
+                    'name'         => 'fb_app_secret',
+                    'label'        => __( 'App Secret', 'dokan' ),
+                    'type'         => 'text',
+                    'tooltip'      => __( 'You can get it from Facebook Developer platform -> Login -> Select  "Add A New App" -> Collect App secret.', 'dokan' ),
+                    'social_field' => true,
+                ],
+            ],
+            'twitter_details'  => [
+                'name'               => 'twitter_details',
+                'type'               => 'social',
+                'desc'               => sprintf(
+                    /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                    __( 'Configure your twitter API settings. %1$sGet Help%2$s', 'dokan' ),
+                    '<a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-twitter/" target="_blank">',
+                    '</a>'
+                ),
+                'label'              => __( 'Connect to Twitter', 'dokan' ),
+                'icon_url'           => DOKAN_PRO_PLUGIN_ASSEST . '/images/scl-icons/twt.svg',
+                'social_desc'        => __( 'You can successfully connect Twitter with your website.', 'dokan' ),
+                'twitter_app_label'  => [
+                    'name'         => 'twitter_app_label',
+                    'type'         => 'html',
+                    'desc'         => sprintf(
+                        /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                        __( 'If you don\'t have one and fill Consumer key and Secret below. %1$sCreate an App%2$s', 'dokan' ),
+                        '<a target="_blank" href="https://apps.twitter.com/">',
+                        '</a>'
+                    ),
+                    'label'        => __( 'Twitter App Settings', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'twitter_app_url'    => [
+                    'url'          => $this->callback,
+                    'name'         => 'twitter_app_url',
+                    'type'         => 'html',
+                    'label'        => __( 'Callback URL', 'dokan' ),
+                    'tooltip'      => __( 'Your store URL, which will be required in creating the App.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'twitter_app_id'     => [
+                    'name'         => 'twitter_app_id',
+                    'type'         => 'text',
+                    'label'        => __( 'Consumer Key', 'dokan' ),
+                    'tooltip'      => __( 'You can get it from Twitter Developer platform -> Login -> Select  "Create an App" -> Input URL & integrate Twitter with Dokan. Go to "Keys and Tokens" -> View Keys -> Collect API key and use as Consumer Key.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'twitter_app_secret' => [
+                    'name'         => 'twitter_app_secret',
+                    'label'        => __( 'Consumer Secret', 'dokan' ),
+                    'type'         => 'text',
+                    'tooltip'      => __( 'You can get it from Twitter Developer platform -> Login -> Select  "Create an App" -> Input URL & integrate Twitter with Dokan. Go to "Keys and Tokens" -> View Keys -> Collect API secret and use as Consumer secret.', 'dokan' ),
+                    'social_field' => true,
+                ],
+            ],
+            'google_details'   => [
+                'name'              => 'google_details',
+                'type'              => 'social',
+                'desc'              => sprintf(
+                    /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                    __( 'Configure your google API settings. %1$sGet Help%2$s', 'dokan' ),
+                    '<a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-google/" target="_blank">',
+                    '</a>'
+                ),
+                'label'             => __( 'Connect to Google', 'dokan' ),
+                'icon_url'          => DOKAN_PRO_PLUGIN_ASSEST . '/images/scl-icons/google.svg',
+                'social_desc'       => __( 'You can successfully connect to your Google account with your website.', 'dokan' ),
+                'google_app_label'  => [
+                    'name'         => 'google_app_label',
+                    'type'         => 'html',
+                    'desc'         => sprintf(
+                        /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                        __( 'If you don\'t have one and fill Client ID and Secret below. %1$sCreate an App%2$s', 'dokan' ),
+                        '<a target="_blank" href="https://console.developers.google.com/project">',
+                        '</a>'
+                    ),
+                    'label'        => __( 'Google App Settings', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'google_app_url'    => [
+                    'url'          => $this->callback,
+                    'name'         => 'google_app_url',
+                    'type'         => 'html',
+                    'label'        => __( 'Redirect URL', 'dokan' ),
+                    'tooltip'      => __( 'Your store URL, which will be required in syncing with Google API.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'google_app_id'     => [
+                    'name'         => 'google_app_id',
+                    'type'         => 'text',
+                    'label'        => __( 'Client ID', 'dokan' ),
+                    'tooltip'      => __( 'You can get it from Google Console Platform -> Google+API -> Enable -> Manage -> Credentials -> Create Credentials -> OAuth client ID -> Web Application -> Fill in the information & click Create. A pop up will show "Client ID".', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'google_app_secret' => [
+                    'name'         => 'google_app_secret',
+                    'label'        => __( 'Client Secret', 'dokan' ),
+                    'type'         => 'text',
+                    'tooltip'      => __( 'You can get it from Google Console Platform -> Google+API -> Enable -> Manage -> Credentials -> Create Credentials -> OAuth client ID -> Web Application -> Fill in the information & click Create. A pop up will show "Client Credentials".', 'dokan' ),
+                    'social_field' => true,
+                ],
+            ],
+            'linkedin_details' => [
+                'name'                => 'linkedin_details',
+                'type'                => 'social',
+                'desc'                => sprintf(
+                    /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                    __( 'Configure your linkedin API settings. %1$sGet Help%2$s', 'dokan' ),
+                    '<a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-linkedin/" target="_blank">',
+                    '</a>'
+                ),
+                'label'               => __( 'Connect to Linkedin', 'dokan' ),
+                'icon_url'            => DOKAN_PRO_PLUGIN_ASSEST . '/images/scl-icons/linkedin.svg',
+                'social_desc'         => __( 'You can successfully connect LinkedIn with your website.', 'dokan' ),
+                'linkedin_app_label'  => [
+                    'name'         => 'linkedin_app_label',
+                    'type'         => 'html',
+                    'desc'         => sprintf(
+                        /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                        __( 'If you don\'t have one and fill Client ID and Secret below. %1$sCreate an App%2$s', 'dokan' ),
+                        '<a target="_blank" href="https://www.linkedin.com/developer/apps">',
+                        '</a>'
+                    ),
+                    'label'        => __( 'Linkedin App Settings', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'linkedin_app_url'    => [
+                    'url'          => $this->callback,
+                    'name'         => 'linkedin_app_url',
+                    'type'         => 'html',
+                    'label'        => __( 'Redirect URL', 'dokan' ),
+                    'tooltip'      => __( 'Your store URL, which will be required in creating the App.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'linkedin_app_id'     => [
+                    'name'         => 'linkedin_app_id',
+                    'type'         => 'text',
+                    'label'        => __( 'Client ID', 'dokan' ),
+                    'tooltip'      => __( 'You can get it from LinkedIn Developers platform -> Create an App -> Fill necessary info -> Click "Create app" -> "Auth" section -> Collect Client ID.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'linkedin_app_secret' => [
+                    'name'         => 'linkedin_app_secret',
+                    'label'        => __( 'Client Secret', 'dokan' ),
+                    'type'         => 'text',
+                    'tooltip'      => __( 'You can get it from LinkedIn Developers platform -> Create an App -> Fill necessary info -> Click "Create app" -> "Auth" section -> Collect Client Secret.', 'dokan' ),
+                    'social_field' => true,
+                ],
+            ],
+            'apple_details'    => [
+                'name'               => 'apple_details',
+                'desc'               => sprintf(
+                    /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                    __( 'Configure your apple API settings. %1$sGet Help%2$s', 'dokan' ),
+                    '<a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-apple/">',
+                    '</a>'
+                ),
+                'type'               => 'social',
+                'label'              => __( 'Connect to Apple', 'dokan' ),
+                'icon_url'           => DOKAN_PRO_PLUGIN_ASSEST . '/images/scl-icons/apple.svg',
+                'social_desc'        => __( 'You can successfully connect your Apple account with your website.', 'dokan' ),
+                'apple_app_label'    => [
+                    'name'         => 'apple_app_label',
+                    'type'         => 'html',
+                    'desc'         => '<a href="https://wedevs.com/docs/dokan/settings/dokan-social-login/configuring-apple/" target="_blank">' . __( 'Get Help', 'dokan' ) . '</a>',
+                    'desc'         => sprintf(
+                        /* translators: 1) Opening anchor tag, 2) Closing anchor tag */
+                        __( 'You can successfully connect to your Apple account and log in from here. %1$sCreate an App%2$s', 'dokan' ),
+                        '<a target="_blank" href="https://appleid.apple.com/">',
+                        '</a>'
+                    ),
+                    'label'        => __( 'Apple App Settings', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'apple_redirect_url' => [
+                    'url'          => $this->callback,
+                    'name'         => 'apple_redirect_url',
+                    'type'         => 'html',
+                    'label'        => __( 'Redirect URL', 'dokan' ),
+                    'tooltip'      => __( 'Your store URL, which will be required in creating the app.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'apple_service_id'   => [
+                    'name'         => 'apple_service_id',
+                    'type'         => 'text',
+                    'label'        => __( 'Apple Service ID', 'dokan' ),
+                    'tooltip'      => __( 'You can get it from Apple Developer platform -> login -> Certificates, IDs & Profiles -> Indentifiers -> Service IDs (drop down) -> Register for Service ID -> Collect Service ID.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'apple_team_id'      => [
+                    'name'         => 'apple_team_id',
+                    'type'         => 'text',
+                    'label'        => __( 'Apple Team ID', 'dokan' ),
+                    'tooltip'      => __( 'You can get it from Apple Developer platform -> login -> Membership ->  Collect Team ID.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'apple_key_id'       => [
+                    'name'         => 'apple_key_id',
+                    'type'         => 'text',
+                    'label'        => __( 'Apple Key ID', 'dokan' ),
+                    'tooltip'      => __( 'You can get it from Apple Developer platform -> login -> Certificates, IDs & Profiles -> Keys -> Click " + " -> Register for new Key -> Download "Apple Key Content" -> Collect Key ID.', 'dokan' ),
+                    'social_field' => true,
+                ],
+                'apple_key_content'  => [
+                    'name'         => 'apple_key_content',
+                    'label'        => __( 'Apple Key Content (including BEGIN and END lines)', 'dokan' ),
+                    'type'         => 'textarea',
+                    'tooltip'      => __( 'You can get it from Apple Developer platform -> login -> Certificates, IDs & Profiles -> Keys -> Click " + " -> Register for new Key -> Download "Apple Key Content" -> Collect Key Content.', 'dokan' ),
+                    'social_field' => true,
+                ],
+            ],
+        ];
 
         return $settings_fields;
     }

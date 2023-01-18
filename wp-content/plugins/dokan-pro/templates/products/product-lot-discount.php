@@ -1,10 +1,10 @@
 <?php if ( isset( $is_enable_op_discount['product-discount'] ) && $is_enable_op_discount['product-discount'] == 'product-discount' ) : ?>
     <div class="dokan-discount-options dokan-edit-row dokan-clearfix hide_if_external">
         <div class="dokan-section-heading" data-togglehandler="dokan_discount_options">
-            <h2><i class="fa fa-gift"></i> <?php _e( 'Discount Options', 'dokan' ); ?></h2>
+            <h2><i class="fas fa-gift"></i> <?php _e( 'Discount Options', 'dokan' ); ?></h2>
             <p><?php _e( 'Set your discount for this product', 'dokan' ) ?></p>
             <a href="#" class="dokan-section-toggle">
-                <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+                <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
             </a>
             <div class="dokan-clearfix"></div>
         </div>

@@ -47,7 +47,7 @@ class ProductRMA extends Widget_Base {
      * @return array
      */
     public function get_categories() {
-        return [ 'dokan-product-elements-single' ];
+        return [ 'woocommerce-elements-single' ];
     }
 
     /**
@@ -69,8 +69,8 @@ class ProductRMA extends Widget_Base {
      * @since 3.3.0
      * @access protected
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->start_controls_section(
             'section_title',
@@ -163,7 +163,7 @@ class ProductRMA extends Widget_Base {
      *
      * @since 1.0.0
      *
-     * @return void
+     * @return array
      */
     public function get_rma_settings( $product_id = 0 ) {
         $rma_settings   = [];

@@ -13,6 +13,7 @@ class Dokan_Seller_Vacation_Store_Settings {
         add_action( 'dokan_settings_form_bottom', array( $this, 'store_settings_form' ), 10, 2 );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'dokan_store_profile_saved', array( $this, 'save_settings' ), 18 );
+        add_action( 'init', array( $this, 'register_scripts' ) );
     }
 
 
@@ -50,6 +51,18 @@ class Dokan_Seller_Vacation_Store_Settings {
     }
 
     /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan-seller-vacation', DOKAN_SELLER_VACATION_ASSETS . '/css/dokan-seller-vacation.css', array(), $version );
+        wp_register_script( 'dokan-seller-vacation', DOKAN_SELLER_VACATION_ASSETS . '/js/dokan-seller-vacation.js', array( 'jquery', 'jquery-ui-datepicker', 'dokan-moment' ), $version, true );
+    }
+
+    /**
      * Enqueue admin scripts
      *
      * Allows plugin assets to be loaded.
@@ -61,9 +74,10 @@ class Dokan_Seller_Vacation_Store_Settings {
     public function enqueue_scripts() {
         global $wp;
 
-        if( isset( $wp->query_vars['settings'] ) ) {
-            wp_enqueue_style( 'dokan-seller-vacation', DOKAN_SELLER_VACATION_ASSETS . '/css/dokan-seller-vacation.css', array(), DOKAN_PRO_PLUGIN_VERSION );
-            wp_enqueue_script( 'dokan-seller-vacation', DOKAN_SELLER_VACATION_ASSETS. '/js/dokan-seller-vacation.js', array( 'jquery', 'jquery-ui-datepicker', 'dokan-moment' ), false, true );
+        if( isset( $wp->query_vars['settings'] ) && 'store' === $wp->query_vars['settings'] ) {
+            wp_enqueue_style( 'dokan-seller-vacation' );
+
+            wp_enqueue_script( 'dokan-seller-vacation' );
 
             wp_localize_script( 'dokan-seller-vacation', 'dokanSellerVacation', array(
                 'i18n' => array(

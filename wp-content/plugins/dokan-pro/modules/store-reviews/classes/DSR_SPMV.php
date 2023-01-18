@@ -96,13 +96,13 @@ class DSR_SPMV {
         } else {
             $seller_rating = dokan_get_seller_rating( $vendor_id );
 
-            if ( $seller_rating['rating'] > 0 ) {
+            if ( floatval( $seller_rating['rating'] ) > 0 ) {
                 $rating = $seller_rating['rating'];
             } else {
                 $rating = 0;
             }
         }
 
-        return $rating;
+        return floatval( $rating );
     }
 }

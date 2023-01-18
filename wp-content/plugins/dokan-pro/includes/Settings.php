@@ -24,9 +24,21 @@ class Settings extends DokanSettings {
      * @return void
      */
     public function __construct() {
-        $this->currentuser = dokan_get_current_user_id();
+        $this->currentuser  = dokan_get_current_user_id();
         $this->profile_info = dokan_get_store_info( dokan_get_current_user_id() );
 
+        // Settings hooks.
+        $this->hooks();
+    }
+
+    /**
+     * Settings related hooks.
+     *
+     * @since 3.5.0
+     *
+     * @return void
+     */
+    public function hooks() {
         add_filter( 'dokan_get_dashboard_settings_nav', array( $this, 'load_settings_menu' ), 10 );
         add_filter( 'dokan_dashboard_nav_active', array( $this, 'filter_nav_active' ), 10, 3 );
         add_filter( 'dokan_dashboard_settings_heading_title', array( $this, 'load_settings_header' ), 10, 2 );
@@ -38,11 +50,17 @@ class Settings extends DokanSettings {
         add_action( 'dokan_settings_content_area_header', array( $this, 'render_shipping_status_message' ), 25 );
         add_action( 'dokan_render_settings_content', array( $this, 'load_settings_content' ), 10 );
         add_action( 'dokan_settings_form_bottom', array( $this, 'add_discount_option' ), 10, 2 );
-        add_action( 'dokan_store_profile_saved', array( $this, 'save_store_data' ), 10, 2 );
+        add_action( 'dokan_store_profile_saved', array( $this, 'save_store_data' ), 1000000, 2 );
 
-        // add vendor biography
+        // Add vendor biography
         add_action( 'dokan_settings_form_bottom', array( $this, 'render_biography_form' ), 10, 2 );
         add_action( 'dokan_store_profile_saved', array( $this, 'save_biography_data' ) );
+
+        // Calculate store progress after vendor creation by admin
+        add_action( 'dokan_new_vendor', array( $this, 'save_store_data' ) );
+
+        //Calculate store progress after customer migrated to vendor
+        add_action( 'dokan_new_seller_created', array( $this, 'save_store_data' ), 10, 2 );
     }
 
     /**
@@ -78,7 +96,7 @@ class Settings extends DokanSettings {
         if ( $disable_woo_shipping != 'disabled' ) {
             $sub_settins['shipping'] = array(
                 'title'      => __( 'Shipping', 'dokan' ),
-                'icon'       => '<i class="fa fa-truck"></i>',
+                'icon'       => '<i class="fas fa-truck"></i>',
                 'url'        => dokan_get_navigation_url( 'settings/shipping' ),
                 'pos'        => 70,
                 'permission' => 'dokan_view_store_shipping_menu'
@@ -87,7 +105,7 @@ class Settings extends DokanSettings {
 
         $sub_settins['social'] = array(
             'title'      => __( 'Social Profile', 'dokan' ),
-            'icon'       => '<i class="fa fa-share-alt-square"></i>',
+            'icon'       => '<i class="fas fa-share-alt-square"></i>',
             'url'        => dokan_get_navigation_url( 'settings/social' ),
             'pos'        => 90,
             'permission' => 'dokan_view_store_social_menu'
@@ -96,7 +114,7 @@ class Settings extends DokanSettings {
         if ( dokan_get_option( 'store_seo', 'dokan_general', 'on' ) === 'on' ) {
             $sub_settins['seo'] = array(
                 'title'      => __( 'Store SEO', 'dokan' ),
-                'icon'       => '<i class="fa fa-globe"></i>',
+                'icon'       => '<i class="fas fa-globe"></i>',
                 'url'        => dokan_get_navigation_url( 'settings/seo' ),
                 'pos'        => 110,
                 'permission' => 'dokan_view_store_seo_menu'
@@ -150,7 +168,7 @@ class Settings extends DokanSettings {
 
         if ( $query_vars == 'shipping' ) {
             $settings_url = dokan_get_navigation_url( 'settings/shipping' ) . '#/settings';
-            $header = sprintf( '%s <span style="position:absolute; right:0px;"><a href="%s" class="dokan-btn dokan-btn-default"><i class="fa fa-gear"></i> %s</a></span>', __( 'Shipping Settings', 'dokan' ), $settings_url, __( 'Click here to add Shipping Policies', 'dokan' ) );
+            $header = sprintf( '%s <span style="position:absolute; right:0px;"><a href="%s" class="dokan-btn dokan-btn-default"><i class="fas fa-cog"></i> %s</a></span>', __( 'Shipping Settings', 'dokan' ), $settings_url, __( 'Click here to add Shipping Policies', 'dokan' ) );
         }
 
         if ( $query_vars == 'seo' ) {
@@ -281,9 +299,9 @@ class Settings extends DokanSettings {
 
                     /**
                      * To allow overriding dashboard/settings/shipping add these filter
-                     * 
+                     *
                      * @since 3.3.9
-                     * 
+                     *
                      * @param string Load Shipping Page Content
                      */
                     echo apply_filters( 'dokan_load_settings_content_shipping', $this->load_shipping_content() );
@@ -402,7 +420,7 @@ class Settings extends DokanSettings {
     *
     * @return void
     **/
-    public function save_store_data( $store_id, $dokan_settings ) {
+    public function save_store_data( $store_id, $dokan_settings = [] ) {
         if ( ! $store_id ) {
             return;
         }
@@ -452,6 +470,8 @@ class Settings extends DokanSettings {
                'linkedin' => 2,
            ],
         ];
+
+        $track_val['closed_by_user'] = isset( $dokan_settings['profile_completion']['closed_by_user'] ) ? $dokan_settings['profile_completion']['closed_by_user'] : false;
 
         if ( function_exists( 'dokan_has_map_api_key' ) && ! dokan_has_map_api_key() ) {
             unset( $progress_values['map_val'] );
@@ -530,9 +550,9 @@ class Settings extends DokanSettings {
         if ( isset( $dokan_settings['payment'] ) && isset( $dokan_settings['payment']['bank'] ) ) {
             $count_bank = true;
 
-            // if any of the values for bank details are blank, check_bank will be set as false
-            foreach ( $dokan_settings['payment']['bank'] as $value ) {
-                if ( strlen( trim( $value )) == 0)   {
+            $bank_required_fields = [ 'ac_name', 'ac_number', 'routing_number', 'ac_type' ];
+            foreach ( $bank_required_fields as $field ) {
+                if ( empty( $dokan_settings['payment']['bank'][ $field ] ) ) {
                     $count_bank = false;
                 }
             }
@@ -584,6 +604,24 @@ class Settings extends DokanSettings {
             }
         }
 
+        if ( $payment_method_val > 0 ) {
+            $track_val['current_payment_val'] = $payment_method_val;
+            $track_val['progress']            = $profile_val;
+
+            /**
+             * Check if other payment methods are added to seller's profile
+             *
+             * @since 3.7.1
+             *
+             * @param $track_val
+             */
+            $track_val = apply_filters( 'dokan_profile_completion_progress_for_payment_methods', $track_val );
+
+            $payment_method_val = $track_val['current_payment_val'];
+            unset( $track_val['current_payment_val'] );
+            $profile_val = $track_val['progress'];
+        }
+
         // set message if no payment method found
         if ( strlen( $next_add ) == 0 && $payment_method_val != 0 ) {
             $next_add = 'payment_method_val';
@@ -607,12 +645,11 @@ class Settings extends DokanSettings {
             }
         }
 
-
         $track_val['next_todo']     = $next_add;
         $track_val['progress']      = $profile_val;
         $track_val['progress_vals'] = $progress_values;
 
-        return apply_filters( 'dokan_profile_completion_progress_value', $track_val ) ;
+        return apply_filters( 'dokan_profile_completion_progress_value', $track_val );
     }
 
     /**

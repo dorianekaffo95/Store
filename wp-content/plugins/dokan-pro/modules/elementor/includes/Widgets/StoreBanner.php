@@ -72,8 +72,8 @@ class StoreBanner extends Widget_Image {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->update_control(
             'section_image',
@@ -90,7 +90,7 @@ class StoreBanner extends Widget_Image {
                 ],
                 'selectors' => [
                     '{{WRAPPER}} > .elementor-widget-container > .elementor-image > img' => 'width: 100%;',
-                ]
+                ],
             ],
             [
                 'recursive' => true,

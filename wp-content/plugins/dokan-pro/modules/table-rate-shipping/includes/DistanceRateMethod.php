@@ -81,6 +81,7 @@ class DistanceRateMethod extends WC_Shipping_Method {
         // additional hooks for post-calculations settings
         add_filter( 'woocommerce_shipping_chosen_method', [ $this, 'select_default_rate' ], 10, 2 );
         add_action( 'woocommerce_update_options_shipping_' . $this->id, [ $this, 'process_admin_options' ] );
+        add_action( 'woocommerce_shipping_zone_method_deleted', [ $this, 'delete_distance_rate_shipping_methods' ], 10, 3 );
     }
 
     /**
@@ -166,7 +167,7 @@ class DistanceRateMethod extends WC_Shipping_Method {
     public function query_rules( $instance_id ) {
         global $wpdb;
 
-        $rates = $wpdb->get_results( $wpdb->prepare( "SELECT * from {$wpdb->prefix}dokan_distance_rate_shipping WHERE instance_id = %d ORDER BY rate_id ASC", $instance_id ), ARRAY_A );
+        $rates = $wpdb->get_results( $wpdb->prepare( "SELECT * from {$wpdb->prefix}dokan_distance_rate_shipping WHERE instance_id = %d ORDER BY rate_order ASC", $instance_id ), ARRAY_A );
 
         return apply_filters( 'dokan_distance_rate_query_rules', $rates );
     }
@@ -391,7 +392,7 @@ class DistanceRateMethod extends WC_Shipping_Method {
         $this->available_rates = array(
             array(
                 'id'    => $this->get_rate_id(),
-                'label' => $this->title . $label_suffix,
+                'label' => $method['title'] . $label_suffix,
                 'cost'  => $shipping_total,
             )
         );
@@ -674,7 +675,7 @@ class DistanceRateMethod extends WC_Shipping_Method {
         if ( isset( $order_total ) && $order_total > 0 ) {
             $min_match = empty( $rule['rate_min'] ) || $order_total >= $rule['rate_min'];
             $max_match = empty( $rule['rate_max'] ) || $order_total <= $rule['rate_max'];
-            
+
             if ( $min_match && $max_match ) {
                 $rule_cost = 0;
 
@@ -863,5 +864,50 @@ class DistanceRateMethod extends WC_Shipping_Method {
         }
 
         return implode( ', ', apply_filters( 'dokan_distance_rate_shipping_' . $instance_id . '_get_shipping_address_string', $address ) );
+    }
+
+    /**
+     * Delete Distance Rate shipping methods, created by Vendor, if Admin delete 'Vendor Distance Rate' in WC > Settings > Shipping > Zone
+     *
+     * @since 3.7.0
+     *
+     * @param int $instance_id
+     * @param string $method_id
+     * @param int $zone_id
+     */
+    public function delete_distance_rate_shipping_methods( $instance_id, $method_id, $zone_id ) {
+        global $wpdb;
+
+        if ( 'dokan_distance_rate_shipping' !== $method_id ) {
+            return;
+        }
+
+        $distance_rate_shipping_method_ids = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT instance_id FROM {$wpdb->prefix}dokan_shipping_zone_methods WHERE zone_id = %d AND method_id = 'dokan_distance_rate_shipping'",
+                $zone_id
+            )
+        );
+
+        if ( empty( $distance_rate_shipping_method_ids ) ) {
+            return;
+        }
+
+        $distance_rate_shipping_method_ids = array_map( 'absint', $distance_rate_shipping_method_ids );
+        $distance_rate_shipping_method_ids = implode( ',', $distance_rate_shipping_method_ids );
+
+        //delete the distance rate rules first
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE from {$wpdb->prefix}dokan_distance_rate_shipping WHERE instance_id IN ($distance_rate_shipping_method_ids)"
+            )
+        );
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->prefix}dokan_shipping_zone_methods WHERE zone_id = %d AND method_id = 'dokan_distance_rate_shipping'",
+                $zone_id
+            )
+        );
     }
 }

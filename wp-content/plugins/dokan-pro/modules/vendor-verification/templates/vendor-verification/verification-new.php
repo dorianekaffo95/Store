@@ -59,7 +59,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['info']['phone_no
                     ?>
                     <div class="dokan-alert <?php echo $alert_class; ?>" id="dokan_v_id_feedback">
                         <?php /* translators: %s: id_status */ ?>
-                        <?php echo sprintf( __( 'Your ID verification request is %s', 'dokan' ), $id_status ); ?>
+                        <?php echo sprintf( __( 'Your ID verification request is %s', 'dokan' ), \WeDevs\DokanPro\Modules\VendorVerification\Module::get_translated_status( $id_status ) ); ?>
                     </div>
                 <?php } ?>
 
@@ -104,7 +104,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['info']['phone_no
                                         </div>
 
                                         <div class="gravatar-button-area<?php echo $gravatar ? ' dokan-hide' : ''; ?>">
-                                            <a href="#" class="dokan-gravatar-drag dokan-btn dokan-btn-default"><i class="fa fa-cloud-upload"></i> <?php esc_html_e( 'Upload Photo', 'dokan' ); ?></a>
+                                            <a href="#" class="dokan-gravatar-drag dokan-btn dokan-btn-default"><i class="fas fa-cloud-upload-alt"></i> <?php esc_html_e( 'Upload Photo', 'dokan' ); ?></a>
                                         </div>
 
                                         <?php do_action( 'dokan_before_id_verification_submit_button', $seller_profile ); ?>
@@ -260,7 +260,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['info']['phone_no
 
             <div class="dokan-alert <?php echo $alert_class; ?>" id="d_v_address_feedback">
                 <?php /* translators: %s: address status */ ?>
-                <?php echo sprintf( __( 'Your Address verification request is %s', 'dokan' ), $address_status ); ?>
+                <?php echo sprintf( __( 'Your Address verification request is %s', 'dokan' ), \WeDevs\DokanPro\Modules\VendorVerification\Module::get_translated_status( $address_status ) ); ?>
             </div>
 
             <?php
@@ -482,7 +482,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['info']['phone_no
                                         ?>
                                             <div class="dokan-vendor-company-file-item" id="<?php echo $customId; ?>">
                                                 <a href="<?php echo wp_get_attachment_url( $file ) ?>" target="_blank" ><?php echo get_the_title( $file ) ?></a>
-                                                <a href="#" onclick="companyVerificationRemoveList(event)" data-attachment_id="<?php echo $customId; ?>" class="dokan-btn dokan-btn-danger"><i class="fa fa-close" data-attachment_id="<?php echo $customId; ?>"></i></a>
+                                                <a href="#" onclick="companyVerificationRemoveList(event)" data-attachment_id="<?php echo $customId; ?>" class="dokan-btn disconnect dokan-btn-danger"><i class="fas fa-times" data-attachment_id="<?php echo $customId; ?>"></i></a>
                                                 <input type="hidden" name="vendor_verification_files_ids[]" value="<?php echo esc_attr( $file ); ?>" />
                                             </div>
                                         <?php
@@ -490,7 +490,7 @@ $phone_no       = isset( $seller_profile['dokan_verification']['info']['phone_no
                                             endif;
                                         ?>
                                     </div>
-                                    <a style="width: 100%;" href="#" class="dokan-files-drag dokan-btn dokan-btn-default"><i class="fa fa-cloud-upload"></i> <?php esc_html_e( 'Upload Files', 'dokan' ); ?></a>
+                                    <a style="width: 100%;" href="#" class="dokan-files-drag dokan-btn dokan-btn-default"><i class="fas fa-cloud-upload-alt"></i> <?php esc_html_e( 'Upload Files', 'dokan' ); ?></a>
                                 </div>
                             </div>
                         </div>

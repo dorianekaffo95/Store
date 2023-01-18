@@ -163,7 +163,6 @@ class Dokan_Staffs {
         $staff->add_cap( 'delete_posts' );
         $staff->add_cap( 'manage_categories' );
         $staff->add_cap( 'moderate_comments' );
-        $staff->add_cap( 'unfiltered_html' );
         $staff->add_cap( 'upload_files' );
         $staff->add_cap( 'edit_shop_orders' );
         $staff->add_cap( 'edit_product' );
@@ -255,6 +254,9 @@ class Dokan_Staffs {
 
         if ( ! $is_edit ) {
             wp_send_new_user_notifications( $user, 'user' );
+        } elseif ( ! empty( $user_password ) ) {
+            $email_instance = require_once DOKAN_VENDOR_STAFF_INC_DIR . '/class-staff-password-update-email.php';
+            $email_instance->trigger( $user );
         }
 
         $staff = new WP_User( $user );
@@ -269,7 +271,6 @@ class Dokan_Staffs {
         $staff->add_cap( 'delete_posts' );
         $staff->add_cap( 'manage_categories' );
         $staff->add_cap( 'moderate_comments' );
-        $staff->add_cap( 'unfiltered_html' );
         $staff->add_cap( 'upload_files' );
         $staff->add_cap( 'edit_shop_orders' );
         $staff->add_cap( 'edit_product' );

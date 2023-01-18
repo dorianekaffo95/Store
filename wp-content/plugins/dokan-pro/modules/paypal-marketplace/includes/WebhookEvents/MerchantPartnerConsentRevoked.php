@@ -2,7 +2,7 @@
 
 namespace WeDevs\DokanPro\Modules\PayPalMarketplace\WebhookEvents;
 
-use WeDevs\Dokan\Gateways\PayPal\Abstracts\WebhookEventHandler;
+use WeDevs\DokanPro\Modules\PayPalMarketplace\Abstracts\WebhookEventHandler;
 use WeDevs\DokanPro\Modules\PayPalMarketplace\Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {

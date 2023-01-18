@@ -2,6 +2,8 @@
 
 namespace WeDevs\DokanPro\Modules\StoreReviews;
 
+use WeDevs\DokanPro\Modules\StoreReviews\Emails\Manager;
+
 class Module {
 
     /**
@@ -29,9 +31,23 @@ class Module {
         $this->instances();
 
         // Loads frontend scripts and styles
+        add_action( 'init', array( $this, 'register_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_filter( 'dokan_rest_api_class_map', array( $this, 'rest_api_class_map' ) );
 
+    }
+
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dsr-styles', plugins_url( 'assets/css/style' . $suffix . '.css', __FILE__ ), false, $version );
+        wp_register_script( 'dsr-scripts', plugins_url( 'assets/js/script' . $suffix . '.js', __FILE__ ), array( 'jquery', 'dokan-popup' ), $version, true );
+        wp_register_style( 'dsr-scripts', plugins_url( 'assets/css/script' . $suffix . '.css', __FILE__ ), false, $version );
     }
 
     /**
@@ -44,20 +60,16 @@ class Module {
      * @uses wp_enqueue_style
      */
     public function enqueue_scripts() {
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
         //only load the scripts on store page for optimization
         if ( dokan_is_store_page() ) {
             wp_enqueue_style( 'dokan-magnific-popup' );
-            wp_enqueue_style( 'dsr-styles', plugins_url( 'assets/css/style' . $suffix . '.css', __FILE__ ), false, date( 'Ymd' ) );
-
-            wp_enqueue_script( 'dsr-scripts', plugins_url( 'assets/js/script' . $suffix . '.js', __FILE__ ), array( 'jquery', 'dokan-popup' ), false, true );
-            wp_enqueue_style( 'dsr-scripts', plugins_url( 'assets/css/script' . $suffix . '.css', __FILE__ ), false );
+            wp_enqueue_style( 'dsr-styles' );
+            wp_enqueue_script( 'dsr-scripts' );
+            wp_enqueue_style( 'dsr-scripts' );
         }
 
         if ( dokan_is_store_listing() ) {
-            wp_enqueue_style( 'dsr-styles', plugins_url( 'assets/css/style' . $suffix . '.css', __FILE__ ), false, date( 'Ymd' ) );
+            wp_enqueue_style( 'dsr-styles' );
         }
     }
 
@@ -70,6 +82,7 @@ class Module {
         if ( is_admin() ) {
             require_once DOKAN_SELLER_RATINGS_DIR.'/classes/admin.php';
         }
+        require_once DOKAN_SELLER_RATINGS_DIR . '/classes/Emails/Manager.php';
         require_once DOKAN_SELLER_RATINGS_DIR.'/classes/DSR_View.php';
         require_once DOKAN_SELLER_RATINGS_DIR.'/classes/DSR_SPMV.php';
         require_once DOKAN_SELLER_RATINGS_DIR . '/functions.php';
@@ -77,6 +90,7 @@ class Module {
 
     public function instances() {
         new \DSR_SPMV();
+        new Manager();
     }
 
     /**

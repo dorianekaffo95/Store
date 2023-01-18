@@ -187,20 +187,30 @@ class CurlClient implements ClientInterface
      */
     public function request($method, $absUrl, $params = [], $body = [])
     {
-        // init
+	// init
         $method = strtolower($method);
         $headers = $this->getDefaultHeaders();
         $options = $this->getDefaultOptions();
 
+	// convert to deepl format
+	foreach ($body["words"] as $index => $value){
+		if(!str_contains($value["w"], 'http')) {
+			$to_translates[] = $value["w"]; //$index . "<_>" . $value["w"];
+		} else {
+			$to_translates[] = ""; //"_\n"; $index . "<_>";
+		}
+        }
+        $to_translates = implode(" @\n", $to_translates);
+	$params = ["auth_key" => "1b2fac03-b600-a641-caad-8550b179dbff:fx", "source_lang" => $body["l_from"], "target_lang" => $body["l_to"]];
         // parameters
         if (\count($params) > 0) {
             $encoded = http_build_query($params);
-            $absUrl = $absUrl . '?' .$encoded;
+            $absUrl = "https://api-free.deepl.com/v2/translate" . '?' .$encoded;
+ 	    //$absUrl = "https://webhook.site/d1e3b4eb-9ddd-47e0-beef-1f82e41ee78c" . '?' .$encoded;
         }
-
         // generic processing
-        list($options, $headers) = $this->processMethod($method, $options, $headers, $body);
-        $options = $this->processHeadersAndOptions($headers, $options, $absUrl);
+        list($options, $headers) = $this->processMethod($method, $options, $headers, [], http_build_query( ["text" => $to_translates]));
+	$options = $this->processHeadersAndOptions($headers, $options, $absUrl);
 
         // Create a callback to capture HTTP headers for the response
         $rheaders = [];
@@ -214,11 +224,33 @@ class CurlClient implements ClientInterface
             return \strlen($header_line);
         };
         $options[CURLOPT_HEADERFUNCTION] = $headerCallback;
+	list($rbody, $rcode) = $this->executeRequestWithRetries($options, $absUrl);
+        // format translations from deepl
+	$translations = json_decode($rbody, true);
+	$translations = explode("@\n", $translations["translations"][0]["text"]);
 
-        list($rbody, $rcode) = $this->executeRequestWithRetries($options, $absUrl);
-
+        $body["to_words"] = [];
+	$body["from_words"] = [];
+        foreach ($body["words"] as $index => $value){
+		if(str_contains($body["words"][$index]["w"], 'http')) {
+                         $body["to_words"][] = $body["words"][$index]["w"];
+                 } else {
+                        $body["to_words"][] = $translations[$index];
+                 }
+		$body["from_words"][] = $body["words"][$index]["w"];
+        }
+	/*foreach ($body["to_words"] as $i => $val) {
+		echo $i . " : " . $body["from_words"][$i] ." ===> ". $body["to_words"][$i] . "\n";
+	}
+	var_dump($rbody);
+	$this->error_make(null);*/
+	unset($body["words"]);
+	$rbody = json_encode($body);
         return [$rbody, $rcode, $rheaders];
     }
+private function error_make(array $app){
+
+}
 
     /**
      * Setup behavior for each methods
@@ -229,21 +261,21 @@ class CurlClient implements ClientInterface
      * @return [$options, $headers]
      * @throws \Exception
      */
-    private function processMethod($method, array $options, array $headers, array $body = [])
+    private function processMethod($method, array $options, array $headers, array $body = [], string $to_translates = "")
     {
         if ($method === 'get') {
             if ($body !== []) {
                 throw new \Exception('Issuing a GET request with a body');
             }
             $options[CURLOPT_HTTPGET] = 1;
-        } elseif ($method === 'post') {
+        } elseif ($method === 'post')  {
             $data_string = json_encode($body);
 
             $options[CURLOPT_POST] = 1;
-            $options[CURLOPT_POSTFIELDS] = $data_string;
+            $options[CURLOPT_POSTFIELDS] = $to_translates;
 
-            array_push($headers, 'Content-Type: application/json');
-            array_push($headers, 'Content-Length: ' . strlen($data_string));
+            array_push($headers, 'Content-Type: application/x-www-form-urlencoded');
+            array_push($headers, 'Content-Length: ' .  strlen($to_translates));
         } else {
             throw new \Exception('Unrecognized method ' . strtoupper($method));
         }

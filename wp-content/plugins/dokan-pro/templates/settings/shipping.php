@@ -38,7 +38,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
         <label class="dokan-w4 dokan-control-label" for="dps_enable_shipping" style="margin-top:6px">
             <?php _e( 'Enable Shipping', 'dokan' ); ?>
             <span class="dokan-tooltips-help tips" title="<?php esc_attr_e( 'Check this if you want to enable shipping for your store', 'dokan' ); ?>">
-                <i class="fa fa-question-circle"></i>
+                <i class="fas fa-question-circle"></i>
             </span>
         </label>
 
@@ -58,7 +58,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             <label class="dokan-w4 dokan-control-label" for="shipping_type_price">
                 <?php _e( 'Default Shipping Price', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="<?php esc_attr_e( 'This is the base price and will be the starting shipping price for each product', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
 
@@ -71,7 +71,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             <label class="dokan-w4 dokan-control-label" for="dps_additional_product">
                 <?php _e( 'Per Product Additional Price', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="<?php esc_attr_e( 'If a customer buys more than one type product from your store, first product of the every second type will be charged with this price', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
 
@@ -84,7 +84,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             <label class="dokan-w4 dokan-control-label" for="dps_additional_qty">
                 <?php _e( 'Per Qty Additional Price', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="<?php esc_attr_e( 'Every second product of same type will be charged with this price', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
 
@@ -97,7 +97,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             <label class="dokan-w4 dokan-control-label" for="dps_pt">
                 <?php _e( 'Processing Time', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="<?php esc_attr_e( 'The time required before sending the product for delivery', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
 
@@ -115,7 +115,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             <label class="dokan-w4 dokan-control-label" for="_dps_ship_policy">
                 <?php _e( 'Shipping Policy', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="<?php _e( 'Write your terms, conditions and instructions about shipping', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
 
@@ -128,7 +128,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             <label class="dokan-w4 dokan-control-label" for="_dps_refund_policy">
                 <?php _e( 'Refund Policy', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="<?php _e( 'Write your terms, conditions and instructions about refund', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
 
@@ -141,7 +141,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             <label class="dokan-w4 dokan-control-label" for="dps_form_location">
                 <?php _e( 'Ships from:', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="<?php _e( 'Location from where the products are shipped for delivery. Usually it is same as the store.', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
 
@@ -172,7 +172,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                         <td width="40%">
                                             <label for=""><?php _e( 'Ship to', 'dokan' ); ?>
                                             <span class="dokan-tooltips-help tips" title="<?php _e( 'The country you ship to', 'dokan' ); ?>">
-                                            <i class="fa fa-question-circle"></i></span></label>
+                                            <i class="fas fa-question-circle"></i></span></label>
                                             <select name="dps_country_to[]" class="dokan-form-control dps_country_selection" id="dps_country_selection">
                                                 <?php dokan_country_dropdown( $countries, $country, true ); ?>
                                             </select>
@@ -180,7 +180,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                         <td class="dps_shipping_location_cost">
                                             <label for=""><?php _e( 'Cost', 'dokan' ); ?>
                                             <span class="dokan-tooltips-help tips" title="<?php _e( 'If the shipping price is same for all the states, use this field. If not, manually add the states below', 'dokan' ); ?>">
-                                            <i class="fa fa-question-circle"></i></span></label>
+                                            <i class="fas fa-question-circle"></i></span></label>
                                             <div class="dokan-input-group">
                                                 <span class="dokan-input-group-addon"><?php echo get_woocommerce_currency_symbol(); ?></span>
                                                 <input type="text" placeholder="0.00" class="dokan-form-control" name="dps_country_to_price[]" value="<?php echo esc_attr( $country_rate ); ?>">
@@ -202,7 +202,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                                                     <td>
                                                                         <label for=""><?php _e( 'State', 'dokan' ) ?>
                                                                         <span class="dokan-tooltips-help tips" title="<?php _e( 'The state you ship to', 'dokan' ); ?>">
-                                                                        <i class="fa fa-question-circle"></i></span></label>
+                                                                        <i class="fas fa-question-circle"></i></span></label>
                                                                         <select name="dps_state_to[<?php echo $country ?>][]" class="dokan-form-control dps_state_selection">
                                                                             <?php dokan_state_dropdown( $states[$country], $state, true ); ?>
                                                                         </select>
@@ -210,7 +210,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                                                     <td>
                                                                         <label for=""><?php _e( 'Cost', 'dokan' ); ?>
                                                                         <span class="dokan-tooltips-help tips" title="<?php _e( 'Shipping price for this state', 'dokan' ); ?>">
-                                                                        <i class="fa fa-question-circle"></i></span></label>
+                                                                        <i class="fas fa-question-circle"></i></span></label>
                                                                         <div class="dokan-input-group">
                                                                             <span class="dokan-input-group-addon"><?php echo get_woocommerce_currency_symbol(); ?></span>
                                                                             <input type="text" placeholder="0.00" value="<?php echo $state_rate; ?>" class="dokan-form-control" name="dps_state_to_price[<?php echo $country; ?>][]">
@@ -220,8 +220,8 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                                                     <td width="15%">
                                                                         <label for=""></label>
                                                                         <div>
-                                                                            <a class="dps-add" href="#"><i class="fa fa-plus"></i></a>
-                                                                            <a class="dps-remove" href="#"><i class="fa fa-minus"></i></a>
+                                                                            <a class="dps-add" href="#"><i class="fas fa-plus"></i></a>
+                                                                            <a class="dps-remove" href="#"><i class="fas fa-minus"></i></a>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -244,8 +244,8 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                                                     <td width="14%">
                                                                         <label for=""></label>
                                                                         <div>
-                                                                            <a class="dps-add" href="#"><i class="fa fa-plus"></i></a>
-                                                                            <a class="dps-remove" href="#"><i class="fa fa-minus"></i></a>
+                                                                            <a class="dps-add" href="#"><i class="fas fa-plus"></i></a>
+                                                                            <a class="dps-remove" href="#"><i class="fas fa-minus"></i></a>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -262,7 +262,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                     </tr>
                                 </tbody>
                             </table>
-                            <a href="#" class="dps-shipping-remove"><i class="fa fa-remove"></i></a>
+                            <a href="#" class="dps-shipping-remove"><i class="fas fa-times"></i></a>
                         </div>
 
                     <?php endforeach; ?>
@@ -276,7 +276,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                     <td>
                                         <label for=""><?php _e( 'Ship to', 'dokan' ); ?>
                                         <span class="dokan-tooltips-help tips" title="<?php _e( 'The country you ship to', 'dokan' ); ?>">
-                                        <i class="fa fa-question-circle"></i></span></label>
+                                        <i class="fas fa-question-circle"></i></span></label>
                                         <select name="dps_country_to[]" class="dokan-form-control dps_country_selection" id="dps_country_selection">
                                             <?php dokan_country_dropdown( $countries, '', true ); ?>
                                         </select>
@@ -284,7 +284,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                                     <td class="dps_shipping_location_cost">
                                         <label for=""><?php _e( 'Cost', 'dokan' ); ?>
                                         <span class="dokan-tooltips-help tips" title="<?php _e( 'If the shipping price is same for all the states, use this field. If not, manually add the states below', 'dokan' ); ?>">
-                                        <i class="fa fa-question-circle"></i></span></label>
+                                        <i class="fas fa-question-circle"></i></span></label>
                                         <div class="dokan-input-group">
                                             <span class="dokan-input-group-addon"><?php echo get_woocommerce_currency_symbol(); ?></span>
                                             <input type="text" placeholder="0.00" class="dokan-form-control" name="dps_country_to_price[]">
@@ -300,7 +300,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
 
                             </tbody>
                         </table>
-                        <a href="#" class="dps-shipping-remove"><i class="fa fa-remove"></i></a>
+                        <a href="#" class="dps-shipping-remove"><i class="fas fa-times"></i></a>
                     </div>
                 <?php endif; ?>
 
@@ -334,7 +334,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                 <td>
                     <label for=""><?php _e( 'Ship to', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" title="<?php _e( 'The country you ship to', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i></span></label>
+                    <i class="fas fa-question-circle"></i></span></label>
                     <select name="dps_country_to[]" class="dokan-form-control dps_country_selection" id="dps_country_selection">
                         <?php dokan_country_dropdown( $countries, '', true ); ?>
                     </select>
@@ -342,7 +342,7 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
                 <td class="dps_shipping_location_cost">
                     <label for=""><?php _e( 'Cost', 'dokan' ); ?>
                     <span class="dokan-tooltips-help tips" title="<?php _e( 'If the shipping price is same for all the states, use this field. If not, manually add the states below', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i></span></label>
+                    <i class="fas fa-question-circle"></i></span></label>
                     <div class="dokan-input-group">
                         <span class="dokan-input-group-addon"><?php echo get_woocommerce_currency_symbol(); ?></span>
                         <input type="text" placeholder="0.00" class="dokan-form-control" name="dps_country_to_price[]">
@@ -356,5 +356,5 @@ $dps_refund_policy       = get_user_meta( $user_id, '_dps_refund_policy', true )
             </tr>
         </tbody>
     </table>
-    <a href="#" class="dps-shipping-remove"><i class="fa fa-remove"></i></a>
+    <a href="#" class="dps-shipping-remove"><i class="fas fa-times"></i></a>
 </div>

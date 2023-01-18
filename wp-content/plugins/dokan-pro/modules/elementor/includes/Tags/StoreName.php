@@ -5,18 +5,6 @@ namespace WeDevs\DokanPro\Modules\Elementor\Tags;
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 
 class StoreName extends TagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 2.9.11
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *

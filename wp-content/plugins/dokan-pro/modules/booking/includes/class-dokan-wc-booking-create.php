@@ -25,24 +25,30 @@ class Dokan_WC_Bookings_Create {
         try {
             if ( ! empty( $_POST['create_booking'] ) ) {
                 if ( ! isset( $_POST['add_booking_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['add_booking_nonce'] ) ), 'create_booking_notification' ) ) {
-                    dokan_get_template_part( 'global/dokan-error', '', array( 'deleted' => false, 'message' => __( 'Nonce verification failed', 'dokan' ) ) );
+                    dokan_get_template_part(
+                        'global/dokan-error',
+                        '',
+                        array(
+                            'deleted' => false,
+                            'message' => __( 'Nonce verification failed', 'dokan' ),
+                        )
+                    );
                     return;
                 }
 
-                $customer_id         = isset( $_POST['customer_id'] ) ? absint( $_POST['customer_id'] ) : 0;
-                $bookable_product_id = absint( $_POST['bookable_product_id'] );
-                $booking_order       = wc_clean( $_POST['booking_order'] );
+                $customer_id         = isset( $_POST['customer_id'] ) ? absint( wp_unslash( $_POST['customer_id'] ) ) : 0;
+                $bookable_product_id = isset( $_POST['bookable_product_id'] ) ? absint( wp_unslash( $_POST['bookable_product_id'] ) ) : 0;
+                $booking_order       = isset( $_POST['booking_order'] ) ? wc_clean( wp_unslash( $_POST['booking_order'] ) ) : 0;
 
                 if ( ! $bookable_product_id ) {
                     throw new Exception( __( 'Please choose a bookable product', 'dokan' ) );
                 }
 
                 if ( 'existing' === $booking_order ) {
-
                     if ( class_exists( 'WC_Seq_Order_Number_Pro' ) ) {
-                        $order_id = WC_Seq_Order_Number_Pro::find_order_by_order_number( wc_clean( $_POST['booking_order_id'] ) );
+                        $order_id = WC_Seq_Order_Number_Pro::find_order_by_order_number( wc_clean( wp_unslash( $_POST['booking_order_id'] ) ) );
                     } else {
-                        $order_id = absint( $_POST['booking_order_id'] );
+                        $order_id = absint( wp_unslash( $_POST['booking_order_id'] ) );
                     }
 
                     $vendor_id = dokan_get_current_user_id();
@@ -68,15 +74,22 @@ class Dokan_WC_Bookings_Create {
 
             } elseif ( ! empty( $_POST['create_booking_2'] ) ) {
                 if ( ! isset( $_POST['add_booking_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['add_booking_nonce'] ) ), 'create_booking_notification' ) ) {
-                    dokan_get_template_part( 'global/dokan-error', '', array( 'deleted' => false, 'message' => __( 'Nonce verification failed', 'dokan' ) ) );
+                    dokan_get_template_part(
+                        'global/dokan-error',
+                        '',
+                        array(
+                            'deleted' => false,
+                            'message' => __( 'Nonce verification failed', 'dokan' ),
+                        )
+                    );
                     return;
                 }
 
                 WC()->cart->empty_cart();
 
-                $customer_id         = absint( $_POST['customer_id'] );
-                $bookable_product_id = absint( $_POST['bookable_product_id'] );
-                $booking_order       = wc_clean( $_POST['booking_order'] );
+                $customer_id         = absint( wp_unslash( $_POST['customer_id'] ) );
+                $bookable_product_id = absint( wp_unslash( $_POST['bookable_product_id'] ) );
+                $booking_order       = wc_clean( wp_unslash( $_POST['booking_order'] ) );
                 $product             = wc_get_product( $bookable_product_id );
                 $booking_data        = wc_bookings_get_posted_data( $_POST, $product );
                 $cost                = WC_Dokan_WC_Booking_Cost_Calculation::calculate_booking_cost( $booking_data, $product );
@@ -129,10 +142,13 @@ class Dokan_WC_Bookings_Create {
                 }
 
                 if ( $order_id ) {
-                    $item_id  = wc_add_order_item( $order_id, array(
-                        'order_item_name' => $product->get_title(),
-                        'order_item_type' => 'line_item',
-                    ) );
+                    $item_id = wc_add_order_item(
+                        $order_id,
+                        array(
+                            'order_item_name' => $product->get_title(),
+                            'order_item_type' => 'line_item',
+                        )
+                    );
 
                     if ( ! $item_id ) {
                         throw new Exception( __( 'Error: Could not create item', 'dokan' ) );
@@ -218,11 +234,11 @@ class Dokan_WC_Bookings_Create {
 
         switch ( $step ) {
             case 1:
-                include( DOKAN_WC_BOOKING_TEMPLATE_PATH . '/booking/add-booking/html-create-booking-page.php' );
+                include DOKAN_WC_BOOKING_TEMPLATE_PATH . '/booking/add-booking/html-create-booking-page.php';
                 break;
             case 2:
                 add_filter( 'wc_get_template', array( $this, 'use_default_form_template' ), 10, 5 );
-                include( DOKAN_WC_BOOKING_TEMPLATE_PATH . '/booking/add-booking/html-create-booking-page-2.php' );
+                include DOKAN_WC_BOOKING_TEMPLATE_PATH . '/booking/add-booking/html-create-booking-page-2.php';
                 remove_filter( 'wc_get_template', array( $this, 'use_default_form_template' ), 10 );
                 break;
         }

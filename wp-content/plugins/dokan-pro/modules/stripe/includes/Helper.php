@@ -229,7 +229,27 @@ class Helper {
     public static function get_gateway_title() {
         $settings = self::get_settings();
 
-        return ! empty( $settings['title'] ) ? $settings['title'] : __( 'Stripe Connect', 'dokan' );
+        $title = ! empty( $settings['title'] ) ? $settings['title'] : __( 'Stripe Connect', 'dokan' );
+
+        return wp_kses(
+            stripslashes( $title ),
+            [
+                'br'   => true,
+                'img'  => [
+                    'alt'   => true,
+                    'class' => true,
+                    'src'   => true,
+                    'title' => true,
+                ],
+                'p'    => [
+                    'class' => true,
+                ],
+                'span' => [
+                    'class' => true,
+                    'title' => true,
+                ],
+            ]
+        );
     }
 
 
@@ -353,6 +373,10 @@ class Helper {
      * @return void
      */
     public static function bootstrap_stripe() {
+        if ( ! self::is_ready() ) {
+            return;
+        }
+
         self::set_app_info();
         self::set_api_version();
 
@@ -745,5 +769,18 @@ class Helper {
     public static function has_vendor_subscription_module() {
         // don't confused with product_subscription, id for vendor subscription module is product_subscription
         return function_exists( 'dokan_pro' ) && dokan_pro()->module->is_active( 'product_subscription' );
+    }
+
+    /**
+     * Check if a seller is connected
+     *
+     * @since 3.6.1
+     *
+     * @param int $seller_id
+     *
+     * @return bool
+     */
+    public static function is_seller_connected( $seller_id ) {
+        return '' !== get_user_meta( $seller_id, 'dokan_connected_vendor_id', true );
     }
 }

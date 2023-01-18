@@ -20,14 +20,14 @@ unset($wcs_get_subscription_date_types['trial_end']); //Temp
 		<?php if ( $subscription->can_date_be_updated( 'next_payment' ) ) : ?>
 		<div class="billing-schedule-edit wcs-date-input">
 
-			<label for="_billing_interval" class="form-label"><?php esc_html_e( 'Payment', 'dokan-lite' ); ?> <i class="fa fa-question-circle tips" aria-hidden="true" data-title="<?php esc_html_e( 'Choose Variable if your product has multiple attributes - like sizes, colors, quality etc', 'dokan-lite' ); ?>"></i></label>
+			<label for="_billing_interval" class="form-label"><?php esc_html_e( 'Payment', 'dokan-lite' ); ?> <i class="fas fa-question-circle tips" aria-hidden="true" data-title="<?php esc_html_e( 'Choose Variable if your product has multiple attributes - like sizes, colors, quality etc', 'dokan-lite' ); ?>"></i></label>
 			<select name="_billing_interval" class="dokan-form-control" id="_billing_interval">
 					<?php foreach ( wcs_get_subscription_period_interval_strings() as $key => $value ) { ?>
 							<option value="<?php echo esc_attr( $key ) ?>" <?php selected( $subscription->get_billing_interval(), $key ) ?>><?php echo esc_html( $value ) ?></option>
 					<?php } ?>
 			</select>
 
-			<label for="_billing_period" class="form-label"><?php esc_html_e( 'Payment', 'dokan-lite' ); ?> <i class="fa fa-question-circle tips" aria-hidden="true" data-title="<?php esc_html_e( 'Choose Variable if your product has multiple attributes - like sizes, colors, quality etc', 'dokan-lite' ); ?>"></i></label>
+			<label for="_billing_period" class="form-label"><?php esc_html_e( 'Payment', 'dokan-lite' ); ?> <i class="fas fa-question-circle tips" aria-hidden="true" data-title="<?php esc_html_e( 'Choose Variable if your product has multiple attributes - like sizes, colors, quality etc', 'dokan-lite' ); ?>"></i></label>
 			<select name="_billing_period" class="dokan-form-control" id="_billing_period">
 					<?php foreach ( wcs_get_subscription_period_strings() as $key => $value ) { ?>
 							<option value="<?php echo esc_attr( $key ) ?>" <?php selected( $subscription->get_billing_period(), $key ) ?>><?php echo esc_html( $value ) ?></option>

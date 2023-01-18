@@ -128,7 +128,11 @@
 		"align": true,
 		"color": {
 			"__experimentalSkipSerialization": true,
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
@@ -145,9 +149,19 @@
 			"__experimentalSkipSerialization": true,
 			"color": true,
 			"style": true,
-			"width": true
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"style": true,
+				"width": true
+			}
 		},
-		"__experimentalSelector": ".wp-block-table > table"
+		"__experimentalSelector": ".wp-block-table > table",
+		"__experimentalStyle": {
+			"spacing": {
+				"margin": "0 0 1em 0"
+			}
+		}
 	},
 	"styles": [
 		{

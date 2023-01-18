@@ -43,8 +43,11 @@ class RegisterWithdrawMethods {
         add_filter( 'dokan_get_processing_fee', [ $this, 'get_order_processing_fee' ], 10, 2 );
         add_filter( 'dokan_get_processing_gateway_fee', [ $this, 'get_processing_gateway_fee' ], 10, 3 );
         add_filter( 'dokan_orders_vendor_net_amount', [ $this, 'dokan_orders_vendor_net_amount' ], 10, 5 );
+        add_filter( 'dokan_withdraw_method_settings_title', [ $this, 'get_heading' ], 10, 2 );
         add_action( 'template_redirect', [ $this, 'authorize_vendor' ] );
         add_action( 'template_redirect', [ $this, 'deauthorize_vendor' ] );
+        add_filter( 'dokan_withdraw_method_icon', [ $this, 'get_icon' ], 10, 2 );
+        add_filter( 'dokan_is_seller_connected_to_payment_method', [ $this, 'is_seller_connected' ], 10, 3 );
     }
 
     /**
@@ -86,9 +89,9 @@ class RegisterWithdrawMethods {
         }
 
         if ( ! is_ssl() && ! Helper::is_test_mode() ) {
-            /* translators: 1: Dokan Stripe Connect 2: SSL Mode */
             $notice = sprintf(
-                __( '%1s requires %2s', 'dokan' ),
+                /* translators: 1: Dokan Stripe Connect 2: SSL Mode */
+                __( '%1$s requires %2$s', 'dokan' ),
                 '<strong>Dokan Stripe Connect</strong>',
                 '<strong>SSL</strong>'
             );
@@ -114,7 +117,7 @@ class RegisterWithdrawMethods {
     public function register_methods( $methods ) {
         $methods['dokan-stripe-connect'] = [
             'title'    => __( 'Stripe', 'dokan' ),
-            'callback' => [ $this, 'stripe_authorize_button' ]
+            'callback' => [ $this, 'stripe_authorize_button' ],
         ];
 
         return $methods;
@@ -134,19 +137,24 @@ class RegisterWithdrawMethods {
         $auth_url            = '#';
         $disconnect_url      = '#';
 
+        Helper::bootstrap_stripe();
+
         if ( empty( $key ) && empty( $connected_vendor_id ) ) {
             $auth_url = Auth::get_vendor_authorize_url();
         } else {
             $disconnect_url = Auth::get_vendor_deauthorize_url();
         }
 
-        Helper::get_template( 'vendor-settings-payment', [
-            'vendor_id'           => $vendor_id,
-            'key'                 => $key,
-            'connected_vendor_id' => $connected_vendor_id,
-            'auth_url'            => $auth_url,
-            'disconnect_url'      => $disconnect_url,
-        ] );
+        Helper::get_template(
+            'vendor-settings-payment',
+            [
+                'vendor_id'           => $vendor_id,
+                'key'                 => $key,
+                'connected_vendor_id' => $connected_vendor_id,
+                'auth_url'            => $auth_url,
+                'disconnect_url'      => $disconnect_url,
+            ]
+        );
     }
 
     /**
@@ -157,25 +165,28 @@ class RegisterWithdrawMethods {
      * @return void
      */
     public function authorize_vendor() {
-        if ( ! isset( $_GET['state'] ) || false === strpos( $_GET['state'], 'dokan-stripe-connect' ) ) {
+        if ( empty( $_GET['state'] ) || empty( $_GET['code'] ) ) {
             return;
         }
 
-        if ( empty( $_GET['code'] ) ) {
+        $state = sanitize_text_field( wp_unslash( $_GET['state'] ) );
+        $code  = sanitize_text_field( wp_unslash( $_GET['code'] ) );
+
+        if ( false === strpos( $state, 'dokan-stripe-connect' ) ) {
             return;
         }
 
-        $get_data = wp_unslash( $_GET );
         $store_id = get_current_user_id();
 
-        $nonce = str_replace( 'dokan-stripe-connect:', '', $get_data['state'] );
+        $nonce = str_replace( 'dokan-stripe-connect:', '', $state );
 
         if ( ! wp_verify_nonce( $nonce, 'dokan-stripe-vendor-authorize' ) ) {
             return;
         }
 
         try {
-            $response = Auth::get_vendor_token( $get_data['code'] );
+            Helper::bootstrap_stripe();
+            $response = Auth::get_vendor_token( $code );
         } catch ( Exception $e ) {
             dokan_log(
                 sprintf(
@@ -208,7 +219,7 @@ class RegisterWithdrawMethods {
         // delete announcement transient
         delete_transient( 'dokan_check_stripe_access_key_valid_' . $store_id );
         delete_transient( 'non_connected_sellers_notice_intervals_' . $store_id );
-        wp_safe_redirect( dokan_get_navigation_url( 'settings/payment' ) );
+        wp_safe_redirect( dokan_get_navigation_url( 'settings/payment-manage-dokan-stripe-connect' ) );
         exit;
     }
 
@@ -224,7 +235,7 @@ class RegisterWithdrawMethods {
             return;
         }
 
-        if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( $_GET['_wpnonce'], 'dokan-stripe-vendor-deauthorize' ) ) {
+        if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'dokan-stripe-vendor-deauthorize' ) ) {
             return;
         }
 
@@ -235,10 +246,13 @@ class RegisterWithdrawMethods {
         }
 
         try {
-            Auth::deauthorize( [
-                'stripe_user_id' => get_user_meta( $vendor_id, 'dokan_connected_vendor_id', true ),
-            ] );
-        } catch( Exception $e ) {
+            Helper::bootstrap_stripe();
+            Auth::deauthorize(
+                [
+                    'stripe_user_id' => get_user_meta( $vendor_id, 'dokan_connected_vendor_id', true ),
+                ]
+            );
+        } catch ( Exception $e ) {
             dokan_log(
                 sprintf(
                     "[Stripe Connect] Unable to deauthorize vendor. \nException Message: %s\nError Trace:\n%s",
@@ -266,7 +280,7 @@ class RegisterWithdrawMethods {
         delete_transient( "dokan_check_stripe_access_key_valid_$vendor_id" );
         delete_transient( 'non_connected_sellers_notice_intervals_' . $vendor_id );
 
-        wp_safe_redirect( dokan_get_navigation_url( 'settings/payment' ) );
+        wp_safe_redirect( dokan_get_navigation_url( 'settings/payment-manage-dokan-stripe-connect' ) );
         exit;
     }
 
@@ -328,7 +342,7 @@ class RegisterWithdrawMethods {
      * @param \WC_Order $suborder
      * @param \WC_Order $order
      *
-     * @return void
+     * @return float
      */
     public function dokan_orders_vendor_net_amount( $net_amount, $vendor_earning, $gateway_fee, $suborder, $order ) {
         if (
@@ -339,5 +353,60 @@ class RegisterWithdrawMethods {
         }
 
         return $net_amount;
+    }
+
+    /**
+     * Get the Withdrawal method icon
+     *
+     * @since 3.5.6
+     *
+     * @param string $method_icon
+     * @param string $method_key
+     *
+     * @return string
+     */
+    public function get_icon( $method_icon, $method_key ) {
+        if ( in_array( $method_key, [ 'stripe', 'dokan-stripe-connect' ], true ) ) {
+            $method_icon = DOKAN_STRIPE_ASSETS . 'images/stripe-withdraw-method.svg';
+        }
+
+        return $method_icon;
+    }
+
+    /**
+     * Get the heading for this payment's settings page
+     *
+     * @since 3.5.6
+     *
+     * @param string $heading
+     * @param string $slug
+     *
+     * @return string
+     */
+    public function get_heading( $heading, $slug ) {
+        if ( false !== strpos( $slug, 'dokan-stripe-connect' ) ) {
+            $heading = __( 'Stripe Settings', 'dokan' );
+        }
+
+        return $heading;
+    }
+
+    /**
+     * Get if a seller is connected to this payment method
+     *
+     * @since 3.6.1
+     *
+     * @param bool $connected
+     * @param string $payment_method_id
+     * @param int $seller_id
+     *
+     * @return bool
+     */
+    public function is_seller_connected( $connected, $payment_method_id, $seller_id ) {
+        if ( Helper::get_gateway_id() === $payment_method_id && Helper::is_seller_connected( $seller_id ) ) {
+            $connected = true;
+        }
+
+        return $connected;
     }
 }

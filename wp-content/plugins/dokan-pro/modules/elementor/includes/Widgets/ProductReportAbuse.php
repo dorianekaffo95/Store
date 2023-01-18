@@ -47,7 +47,7 @@ class ProductReportAbuse extends Widget_Base {
      * @return array
      */
     public function get_categories() {
-        return [ 'dokan-product-elements-single' ];
+        return [ 'woocommerce-elements-single' ];
     }
 
     /**
@@ -69,8 +69,8 @@ class ProductReportAbuse extends Widget_Base {
      * @since 3.3.0
      * @access protected
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->start_controls_section(
             'section_title',
@@ -105,7 +105,7 @@ class ProductReportAbuse extends Widget_Base {
         ?>
         <div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
             <a href="#report-abuse" class="dokan-report-abuse-button">
-                <i class="fa fa-flag"></i> <?php echo $this->get_settings( 'text' ); ?>
+                <i class="fas fa-flag"></i> <?php echo $this->get_settings( 'text' ); ?>
             </a>
         </div>
         <?php

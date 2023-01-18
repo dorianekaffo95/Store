@@ -1,9 +1,9 @@
 <li class="product-attribute-list <?php echo esc_attr( implode( ' ', $metabox_class ) ); ?>" data-taxonomy="<?php echo esc_attr( $taxonomy ); ?>">
     <div class="dokan-product-attribute-heading">
-        <span><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;&nbsp;<strong><?php echo ! empty( $attribute_label ) ? esc_html( $attribute_label ) : esc_html__( 'Attribute Name', 'dokan' ); ?></strong></span>
+        <span><i class="fas fa-bars" aria-hidden="true"></i>&nbsp;&nbsp;<strong><?php echo ! empty( $attribute_label ) ? esc_html( $attribute_label ) : esc_html__( 'Attribute Name', 'dokan' ); ?></strong></span>
         <a href="#" class="dokan-product-remove-attribute"><?php esc_html_e( 'Remove', 'dokan' ); ?></a>
         <a href="#" class="dokan-product-toggle-attribute">
-            <i class="fa fa-sort-desc fa-flip-horizointal" aria-hidden="true"></i>
+            <i class="fas fa-sort-down fa-flip-horizointal" aria-hidden="true"></i>
         </a>
     </div>
 

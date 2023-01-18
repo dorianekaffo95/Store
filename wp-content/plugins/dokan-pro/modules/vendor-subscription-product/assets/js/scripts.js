@@ -174,6 +174,11 @@
         if ( 'variable-subscription' === product_type ) {
             $(sale_price_cont).width('100%');
         }
+
+        if ( is_virtual ) {
+            $( '.hide_if_virtual' ).hide();
+            $( '.show_if_virtual' ).show();
+        }
     }
 
     function setSubscriptionLengths(){

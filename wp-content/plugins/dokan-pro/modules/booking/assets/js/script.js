@@ -1,11 +1,11 @@
 // Remove a person type
 jQuery( '#bookings_persons' ).on( 'click', 'button.remove_booking_person', async function ( e ) {
     e.preventDefault();
-    const answer = await dokan_sweetalert( wc_bookings_writepanel_js_params.i18n_remove_person, { 
-        action : 'confirm', 
+    const answer = await dokan_sweetalert( wc_bookings_writepanel_js_params.i18n_remove_person, {
+        action : 'confirm',
         icon   : 'warning',
     } );
-    
+
     if ( 'undefined' !== answer && answer.isConfirmed ) {
 
         var el = jQuery( this ).parent().parent();
@@ -70,7 +70,7 @@ jQuery(function($) {
                 prev_li.find('label').replaceWith(response.data);
                 prev_li.find('a.dokan-edit-status').removeClass('dokan-hide');
             } else {
-                dokan_sweetalert( response.data, { 
+                dokan_sweetalert( response.data, {
                     icon: 'error',
                 } );
             }
@@ -121,7 +121,7 @@ jQuery(function($) {
 
         [...calendar_days].forEach((row) => {
             let hour_row = $(row);
-            let time     = hour_row.text().trim();
+            let time     = hour_row.data('hour').trim();
 
             if ( start_time === time || has_next ) {
                 if ( index === 1 ) {
@@ -135,4 +135,16 @@ jQuery(function($) {
             }
         });
     }
+
+    /**
+     * Submit interceptor to manipulate submission data
+     */
+    $('#wc-bookings-booking-form').on( 'submit', function (ev){
+        ev.preventDefault();
+
+        const form = $(this);
+        form.find('input[name="add-to-cart"]').val(''); // set add-to-cart to empty to prevent caught by 'add_to_cart_action' and then redirect
+        form.unbind('submit'); // unbind submit to prevent infinite callback invocation
+        form.submit(); // submit the form
+    });
 });

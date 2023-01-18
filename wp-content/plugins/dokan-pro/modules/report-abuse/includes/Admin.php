@@ -15,6 +15,7 @@ class Admin {
         add_action( 'dokan_admin_menu', [ self::class, 'add_admin_menu' ] );
         add_filter( 'dokan-admin-routes', [ self::class, 'add_admin_route' ] );
         add_action( 'dokan-vue-admin-scripts', [ self::class, 'enqueue_admin_script' ] );
+        add_action( 'init', [ self::class, 'register_scripts' ] );
     }
 
     /**
@@ -63,6 +64,24 @@ class Admin {
     }
 
     /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public static function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'woocommerce_select2', WC()->plugin_url() . '/assets/css/select2.css', [], WC_VERSION );
+        wp_register_script(
+            'dokan-report-abuse-admin-vue',
+            DOKAN_REPORT_ABUSE_ASSETS . '/js/dokan-report-abuse-admin' . $suffix . '.js',
+            [ 'jquery', 'dokan-vue-vendor', 'dokan-vue-bootstrap', 'selectWoo' ],
+            $version,
+            true
+        );
+    }
+
+    /**
      * Enqueue admin script
      *
      * @since 2.9.8
@@ -70,16 +89,7 @@ class Admin {
      * @return void
      */
     public static function enqueue_admin_script() {
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
-        wp_enqueue_style( 'woocommerce_select2', WC()->plugin_url() . '/assets/css/select2.css', [], WC_VERSION );
-        wp_enqueue_script(
-            'dokan-report-abuse-admin-vue',
-            DOKAN_REPORT_ABUSE_ASSETS . '/js/dokan-report-abuse-admin' . $suffix . '.js',
-            [ 'jquery', 'dokan-vue-vendor', 'dokan-vue-bootstrap', 'selectWoo' ],
-            DOKAN_PRO_PLUGIN_VERSION,
-            true
-        );
+        wp_enqueue_style( 'woocommerce_select2' );
+        wp_enqueue_script( 'dokan-report-abuse-admin-vue' );
     }
 }

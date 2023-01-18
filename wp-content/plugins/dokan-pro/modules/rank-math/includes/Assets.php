@@ -19,8 +19,21 @@ class Assets extends RankMathAssets {
      * @since 3.4.0
      */
     public function __construct() {
+        $this->run_hooks();
         $this->register();
         $this->enqueue();
+        $this->overwrite_wplink();
+    }
+
+    /**
+     * Initializes required hooks.
+     *
+     * @since 3.5.0
+     *
+     * @return void
+     */
+    private function run_hooks() {
+        do_action( 'rank_math/admin/before_editor_scripts' ); // phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
     }
 
     /**

@@ -45,7 +45,7 @@ class Dokan_Product_Addon_Frontend {
     public function add_settings_menu( $settings_tab ) {
         $settings_tab['product-addon'] = [
             'title' => __( 'Addons', 'dokan'),
-            'icon'  => '<i class="fa fa-puzzle-piece" aria-hidden="true"></i>',
+            'icon'  => '<i class="fas fa-puzzle-piece" aria-hidden="true"></i>',
             'url'   => dokan_get_navigation_url( 'settings/product-addon' ),
             'pos'   => 40
         ];
@@ -148,7 +148,7 @@ class Dokan_Product_Addon_Frontend {
                 ) );
             } else {
                 if ( ! empty( $_GET['deleted'] ) && $_GET['deleted'] ) {
-                    echo '<div class="dokan-alert dokan-alert-danger"><p>' . esc_html__( 'Add-on deleted successfully', 'dokan' ) . '</p></div>';
+                    echo '<div class="dokan-alert dokan-alert-success"><p>' . esc_html__( 'Add-on deleted successfully', 'dokan' ) . '</p></div>';
                 }
 
                 dokan_get_template_part( 'product-addon/html-global-admin', '', array(

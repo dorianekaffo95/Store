@@ -227,21 +227,24 @@ class Request implements ArrayAccess {
         if ( is_array( $this->required ) ) {
             $missing_required = [];
 
-            foreach ( $this->required as $param ) {
+            foreach ( $this->required as $param => $message ) {
                 if ( empty( $data[ $param ] ) ) {
-                    $missing_required[] = $param;
+                    $missing_required[] = $message;
                 }
             }
 
             if ( $missing_required ) {
-                $this->add_error( new WP_Error(
-                    'dokan_pro_missing_params',
-                    sprintf( __( 'Missing parameter(s): %s', 'dokan' ), implode( ', ', $missing_required ) ),
-                    [
-                        'status' => 400,
-                        'params' => $missing_required,
-                    ]
-                ) );
+                $this->add_error(
+                    new WP_Error(
+                        'dokan_pro_missing_params',
+                        // translators: %s is a list of required params
+                        sprintf( __( 'Missing parameter(s): %s', 'dokan' ), implode( ', ', $missing_required ) ),
+                        [
+                            'status' => 400,
+                            'params' => $missing_required,
+                        ]
+                    )
+                );
 
                 return;
             }

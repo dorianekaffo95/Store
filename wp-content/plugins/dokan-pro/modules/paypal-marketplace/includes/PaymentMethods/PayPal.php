@@ -194,6 +194,7 @@ class PayPal extends WC_Payment_Gateway {
                 __( 'Error while creating PayPal order: %1$s', 'dokan' ), Helper::get_error_message( $create_order_url )
             );
             wc_add_notice( $error_message, 'error' );
+            dokan_log( '[Dokan PayPal Marketplace] Create Order Data: ' . print_r( $create_order_data, true ) );
             Helper::log_paypal_error( $order->get_id(), $create_order_url, 'dpm_create_order' );
 
             return [
@@ -206,6 +207,8 @@ class PayPal extends WC_Payment_Gateway {
         $order->update_meta_data( '_dokan_paypal_create_order_debug_id', $create_order_url['paypal_debug_id'] );
         $order->update_meta_data( '_dokan_paypal_order_id', $create_order_url['id'] );
         $order->update_meta_data( '_dokan_paypal_redirect_url', $create_order_url['links'][1]['href'] );
+        $order->update_meta_data( 'shipping_fee_recipient', 'seller' );
+        $order->update_meta_data( 'tax_fee_recipient', 'seller' );
         $order->save_meta_data();
 
         return [

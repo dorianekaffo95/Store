@@ -5,6 +5,7 @@ namespace WeDevs\DokanPro;
 use WC_Tax;
 use WC_Product;
 use WC_Product_Variable;
+use WeDevs\Dokan\ProductCategory\Helper;
 use Automattic\WooCommerce\Utilities\NumberUtil;
 
 /**
@@ -197,10 +198,14 @@ class ProductBulkEdit {
         $bulk_products      = isset( $request_data['products_id'] ) ? array_map( 'sanitize_text_field', $request_data['products_id'] ) : [];
         $is_single_category = 'single' === dokan_get_option( 'product_category_style', 'dokan_selling', 'single' );
 
-        if ( $is_single_category ) {
-            $request_data['product_cat'] = isset( $request_data['product_cat'] ) ? (array) absint( $request_data['product_cat'] ) : '';
+        if ( ! empty( $request_data['chosen_product_cat_bulk'] ) ) {
+            $chosen_cat = $is_single_category ? [ reset( $request_data['chosen_product_cat_bulk'] ) ] : $request_data['chosen_product_cat_bulk'];
         } else {
-            $request_data['product_cat'] = isset( $request_data['product_cat'] ) ? array_map( 'absint', $request_data['product_cat'] ) : '';
+            $chosen_cat = [ absint( get_option( 'default_product_cat' ) ) ];
+        }
+
+        foreach ( $request_data['products_id'] as $key => $id ) {
+            Helper::set_object_terms_from_chosen_categories( $id, $chosen_cat );
         }
 
         if ( ! empty( $request_data['product_tags'] ) ) {

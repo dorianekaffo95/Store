@@ -29,6 +29,11 @@ table.dokan-rma-addon-warranty-table tbody tr td select {
 
 .dokan-rma-request-area ul.request-statuses-filter {
     font-size: 12px;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+.dokan-rma-request-area ul.request-statuses-filter li {
+    display: inline-block;
 }
 .dokan-rma-request-area ul.request-statuses-filter li.active a {
     color: #999;

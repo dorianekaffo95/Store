@@ -12,11 +12,11 @@
 
     <li class="product-attribute-list">
         <div class="dokan-product-attribute-heading">
-            <span><i class="fa fa-bars" aria-hidden="true"></i> <strong>Title</strong></span>
+            <span><i class="fas fa-bars" aria-hidden="true"></i> <strong>Title</strong></span>
             <input type="hidden" name="attribute_position[]" value="">
             <a href="#" class="dokan-product-remove-attribute"><?php _e( 'Remove', 'dokan' ); ?></a>
             <a href="#" class="dokan-product-toggle-attribute">
-                <i class="fa fa-sort-desc fa-flip-horizointal" aria-hidden="true"></i>
+                <i class="fas fa-sort-down fa-flip-horizointal" aria-hidden="true"></i>
             </a>
         </div>
         <div class="dokan-product-attribute-item dokan-clearfix dokan-hide">

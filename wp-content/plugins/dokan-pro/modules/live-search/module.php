@@ -21,6 +21,8 @@ class Module {
     public function __construct() {
         include_once 'classes/class-dokan-live-search.php';
 
+        $this->define_constants();
+
         // Widget initialization hook
         add_action( 'widgets_init', array( $this, 'initialize_widget_register' ) );
 
@@ -35,6 +37,8 @@ class Module {
 
         add_action( 'wp_ajax_dokan_suggestion_search_action', array( $this, 'dokan_suggestion_search_action' ) );
         add_action( 'wp_ajax_nopriv_dokan_suggestion_search_action', array( $this, 'dokan_suggestion_search_action' ) );
+
+        add_action( 'init', [ $this, 'register_scripts' ] );
     }
 
     /**
@@ -47,19 +51,6 @@ class Module {
      * @uses wp_enqueue_style()
      */
     public function enqueue_scripts() {
-        wp_enqueue_style( 'dokan-ls-custom-style', plugins_url( 'assets/css/style.css', __FILE__ ), false, DOKAN_PLUGIN_VERSION );
-        wp_enqueue_script( 'dokan-ls-custom-js', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), DOKAN_PLUGIN_VERSION, true );
-
-        wp_localize_script(
-            'dokan-ls-custom-js', 'dokanLiveSearch', array(
-                'ajaxurl'             => admin_url( 'admin-ajax.php' ),
-                'loading_img'         => plugins_url( 'assets/images/loading.gif', __FILE__ ),
-                'currentTheme'        => wp_get_theme()->stylesheet,
-                'themeTags'           => apply_filters( 'dokan_ls_theme_tags', array() ),
-                'dokan_search_action' => 'dokan_suggestion_search_action',
-                'dokan_search_nonce'  => wp_create_nonce( 'dokan_suggestion_search_nonce' ),
-            )
-        );
     }
 
     /**
@@ -204,11 +195,15 @@ class Module {
      * @return array
      */
     public function render_live_search_section( $sections ) {
-        $sections[] = array(
-            'id'    => 'dokan_live_search_setting',
-            'title' => __( 'Live Search', 'dokan' ),
-            'icon'  => 'dashicons-search',
-        );
+        $sections[] = [
+            'id'                   => 'dokan_live_search_setting',
+            'title'                => __( 'Live Search', 'dokan' ),
+            'icon_url'             => plugins_url( 'assets/images/search.svg', __FILE__ ),
+            'description'          => __( 'Ajax Live Search Control', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/modules/how-to-install-configure-use-dokan-live-search/',
+            'settings_title'       => __( 'Live Search Settings', 'dokan' ),
+            'settings_description' => __( 'You can configure your site settings for customers to utilize when navigating stores for specific products.', 'dokan' ),
+        ];
 
         return $sections;
     }
@@ -223,20 +218,20 @@ class Module {
      * @return array
      */
     public function render_live_search_settings( $settings_fields ) {
-        $settings_fields['dokan_live_search_setting'] = array(
-            'live_search_option' => array(
+        $settings_fields['dokan_live_search_setting'] = [
+            'live_search_option' => [
                 'name'    => 'live_search_option',
                 'label'   => __( 'Live Search Options', 'dokan' ),
-                'desc'    => __( 'Select one option wich one will apply on search box', 'dokan' ),
+                'desc'    => __( 'Select one option which one will apply on search box', 'dokan' ),
                 'type'    => 'select',
-                'default' => 'default',
-                'options' => array(
+                'default' => 'suggestion_box',
+                'options' => [
                     'suggestion_box'  => __( 'Search with Suggestion Box', 'dokan' ),
                     'old_live_search' => __( 'Autoload Replace Current Content', 'dokan' ),
-                ),
+                ],
                 'tooltip' => __( 'Select one option which one will apply on search box.', 'dokan' ),
-            ),
-        );
+            ],
+        ];
 
         return $settings_fields;
     }
@@ -248,5 +243,36 @@ class Module {
      */
     public function initialize_widget_register() {
         register_widget( 'Dokan_Live_Search_Widget' );
+    }
+
+    /**
+     * Define constants
+     *
+     * @since 3.7.4
+     */
+    public function define_constants() {
+        define( 'DOKAN_LIVE_SEARCH_FILE', __FILE__ );
+        define( 'DOKAN_LIVE_SEARCH_ASSETS', plugin_dir_url( DOKAN_LIVE_SEARCH_FILE ) . 'assets/' );
+    }
+
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        wp_register_style( 'dokan-ls-custom-style', DOKAN_LIVE_SEARCH_ASSETS . 'css/style.css', false, DOKAN_PLUGIN_VERSION );
+        wp_register_script( 'dokan-ls-custom-js', DOKAN_LIVE_SEARCH_ASSETS . 'js/script.js', array( 'jquery' ), DOKAN_PLUGIN_VERSION, true );
+
+        wp_localize_script(
+            'dokan-ls-custom-js', 'dokanLiveSearch', array(
+                'ajaxurl'             => admin_url( 'admin-ajax.php' ),
+                'loading_img'         => plugins_url( 'assets/images/loading.gif', __FILE__ ),
+                'currentTheme'        => wp_get_theme()->stylesheet,
+                'themeTags'           => apply_filters( 'dokan_ls_theme_tags', array() ),
+                'dokan_search_action' => 'dokan_suggestion_search_action',
+                'dokan_search_nonce'  => wp_create_nonce( 'dokan_suggestion_search_nonce' ),
+            )
+        );
     }
 }

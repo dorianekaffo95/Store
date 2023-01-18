@@ -39,9 +39,13 @@ class AdminSettings {
      */
     public function dokan_live_chat_sections( $sections ) {
         $sections[] = [
-            'id'    => 'dokan_live_chat',
-            'title' => __( 'Live Chat', 'dokan' ),
-            'icon'  => 'dashicons-format-chat',
+            'id'                   => 'dokan_live_chat',
+            'title'                => __( 'Live Chat', 'dokan' ),
+            'icon_url'             => DOKAN_LIVE_CHAT_ASSETS . '/images/chat.svg',
+            'description'          => __( 'Secure Live Chat Settings', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/modules/dokan-live-chat/',
+            'settings_title'       => __( 'Live Chat Settings', 'dokan' ),
+            'settings_description' => __( 'You can integrate and set up your site to let registered and customers chat in real-time with vendors.', 'dokan' ),
         ];
 
         return $sections;
@@ -60,20 +64,20 @@ class AdminSettings {
         $settings['dokan_live_chat'] = [
             'enable'                   => [
                 'name'    => 'enable',
-                'label'   => __( 'Enable Live Chat', 'dokan' ),
                 'desc'    => __( 'Enable live chat between vendor and customer', 'dokan' ),
-                'type'    => 'checkbox',
+                'type'    => 'switcher',
+                'label'   => __( 'Enable Live Chat', 'dokan' ),
                 'default' => 'on',
             ],
             'provider'                 => [
                 'name'               => 'provider',
                 'label'              => __( 'Chat Provider', 'dokan' ),
-                'desc'               => __( 'Which chat provider you want to setup in your site?', '' ),
+                'desc'               => __( 'Which chat provider you want to setup in your site?', 'dokan' ),
                 'refresh_after_save' => true,
                 'type'               => 'radio',
                 'default'            => 'talkjs',
                 'options'            => [
-                    'messenger' => __( 'Facebook Messenger', 'dokan' ),
+                    'messenger' => __( 'Messenger', 'dokan' ),
                     'talkjs'    => __( 'TalkJS', 'dokan' ),
                     'tawkto'    => __( 'Tawk.to', 'dokan' ),
                     'whatsapp'  => __( 'WhatsApp', 'dokan' ),
@@ -93,7 +97,7 @@ class AdminSettings {
             'app_id'                   => [
                 'name'    => 'app_id',
                 'label'   => __( 'App ID', 'dokan' ),
-                'desc'    => sprintf( '%s <a target="_blank" href="%s">%s</a>', __( 'Insert App ID', 'dokan' ), esc_url( 'https://talkjs.com/dashboard/signup/standard/' ), __( '( Get your App ID )', 'dokan' ) ),
+                'desc'    => sprintf( '%1$s <a target="_blank" href="%2$s">%3$s</a>', __( 'Insert App ID', 'dokan' ), esc_url( 'https://talkjs.com/dashboard/signup/standard/' ), __( 'Get your App ID', 'dokan' ) ),
                 'type'    => 'text',
                 'show_if' => [
                     'provider' => [
@@ -104,7 +108,7 @@ class AdminSettings {
             'app_secret'               => [
                 'name'    => 'app_secret',
                 'label'   => __( 'App Secret', 'dokan' ),
-                'desc'    => sprintf( '%s <a target="_blank" href="%s">%s</a>', __( 'Insert App Secret', 'dokan' ), esc_url( 'https://talkjs.com/dashboard/signup/standard/' ), __( '( Get your App Secret )', 'dokan' ) ),
+                'desc'    => sprintf( '%1$s <a target="_blank" href="%2$s">%3$s</a>', __( 'Insert App Secret', 'dokan' ), esc_url( 'https://talkjs.com/dashboard/signup/standard/' ), __( 'Get your App Secret', 'dokan' ) ),
                 'type'    => 'text',
                 'show_if' => [
                     'provider' => [
@@ -143,7 +147,7 @@ class AdminSettings {
                 'name'  => 'chat_button_seller_page',
                 'label' => __( 'Chat Button on Vendor Page', 'dokan' ),
                 'desc'  => __( 'Show chat button on vendor page', 'dokan' ),
-                'type'  => 'checkbox',
+                'type'  => 'switcher',
             ],
             'chat_button_product_page' => [
                 'name'    => 'chat_button_product_page',

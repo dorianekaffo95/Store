@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <tr class="shipping <?php echo ( ! empty( $class ) ) ? $class : ''; ?>" data-order_item_id="<?php echo $item_id; ?>">
 	<!-- <td class="check-column"><input type="checkbox" /></td> -->
 
-	<td class="thumb"><div><i class="fa fa-truck"></i></div></td>
+	<td class="thumb"><div><i class="fas fa-truck"></i></div></td>
 
 	<td class="name">
 		<div class="view">

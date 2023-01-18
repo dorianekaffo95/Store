@@ -64,7 +64,7 @@
         Dokan_Accommodation_Booking.trigger_accommodation();
 
         $( '.dokan-accommodation-timepicker' ).timepicker( {
-            timeFormat: dokan_accommodation_time.format,
+            timeFormat: dokan_helper.i18n_time_format,
         } );
     } );
 })(jQuery);

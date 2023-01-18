@@ -1,5 +1,6 @@
 <?php
 
+use WeDevs\Dokan\ProductCategory\Helper;
 use WeDevs\Dokan\Walkers\TaxonomyDropdown;
 global $post;
 
@@ -63,13 +64,29 @@ if ( ! empty( $_GET['errors'] ) ) {
             <?php } ?>
 
             <?php if ( $_visibility == 'hidden' ) { ?>
-                <span class="dokan-right dokan-label dokan-label-default dokan-product-hidden-label"><i class="fa fa-eye-slash"></i> <?php _e( 'Hidden', 'dokan' ); ?></span>
+                <span class="dokan-right dokan-label dokan-label-default dokan-product-hidden-label"><i class="far fa-eye-slash"></i> <?php _e( 'Hidden', 'dokan' ); ?></span>
             <?php } ?>
 
         <?php endif ?>
     </h1>
 </header><!-- .entry-header -->
-
+<?php
+if ( empty( $post_id ) ) {
+    /**
+     * Hook for `dokan_new_product_before_product_area`
+     *
+     * @since 3.5.2
+     */
+    do_action( 'dokan_new_product_before_product_area' );
+} else {
+    /**
+     * Hook for `dokan_edit_product_before_product_area`
+     *
+     * @since 3.7.5
+     */
+    do_action( 'dokan_edit_product_before_product_area' );
+}
+?>
 <div class="product-edit-new-container product-edit-container">
     <?php if ( dokan()->dashboard->templates->products::$errors ) { ?>
         <div class="dokan-alert dokan-alert-danger">
@@ -128,45 +145,22 @@ if ( ! empty( $_GET['errors'] ) ) {
                         </div>
                         <div class="dokan-form-group virtual-checkbox">
                             <label>
-                                <input type="checkbox" <?php checked( $is_virtual, true ); ?> class="_is_virtual" name="_virtual" id="_virtual"> <?php _e( 'Virtual', 'dokan' ); ?> <i class="fa fa-question-circle tips" aria-hidden="true" data-title="<?php _e( 'Virtual products are intangible and aren\'t shipped.', 'dokan' ); ?>"></i>
+                                <input type="checkbox" <?php checked( $is_virtual, true ); ?> class="_is_virtual" name="_virtual" id="_virtual"> <?php _e( 'Virtual', 'dokan' ); ?> <i class="fas fa-question-circle tips" aria-hidden="true" data-title="<?php _e( 'Virtual products are intangible and aren\'t shipped.', 'dokan' ); ?>"></i>
                             </label>
                         </div>
 
                         <div class="dokan-form-group accommodation-checkbox">
                             <label>
-                                <input type="checkbox" <?php checked( $is_accommodation, true ); ?> class="_is_dokan_accommodation" name="_is_dokan_accommodation" id="_is_dokan_accommodation"> <?php esc_html_e( 'Accommodation Booking', 'dokan' ); ?> <i class="fa fa-question-circle tips" aria-hidden="true" data-title="<?php esc_attr_e( 'Booking accommodation product', 'dokan' ); ?>"></i>
+                                <input type="checkbox" <?php checked( $is_accommodation, true ); ?> class="_is_dokan_accommodation" name="_is_dokan_accommodation" id="_is_dokan_accommodation"> <?php esc_html_e( 'Accommodation Booking', 'dokan' ); ?> <i class="fas fa-question-circle tips" aria-hidden="true" data-title="<?php esc_attr_e( 'Booking accommodation product', 'dokan' ); ?>"></i>
                             </label>
                         </div>
 
                         <div class="dokan-form-group">
-                            <label for="product_cat" class="form-label"><?php _e( 'Category', 'dokan' ); ?></label>
                             <?php
-                            $term = array();
-                            $term = wp_get_post_terms( $post_id, 'product_cat', array( 'fields' => 'ids') );
+                                $data = Helper::get_saved_products_category( $post_id );
+                                $data['from'] = 'new_booking_product';
 
-                            $multiple = dokan_get_option( 'product_category_style', 'dokan_selling', 'single' ) == 'single' ? '' : 'multiple';
-                            $select_name = "multiple" == $multiple ? 'product_cat[]' : 'product_cat';
-
-                            include_once DOKAN_LIB_DIR.'/class.taxonomy-walker.php';
-                            $category_args = array(
-                                'show_option_none' => __( '', 'dokan' ),
-                                'hierarchical'     => 1,
-                                'hide_empty'       => 0,
-                                'name'             => $select_name,
-                                'id'               => 'product_cat',
-                                'taxonomy'         => 'product_cat',
-                                'title_li'         => '',
-                                'class'            => 'product_cat dokan-form-control dokan-select2',
-                                'exclude'          => '',
-                                'selected'         => $term,
-                                'echo'             => 0,
-                                'walker'           => new TaxonomyDropdown( $post_id )
-                            );
-
-                            $drop_down_category = wp_dropdown_categories( apply_filters( 'dokan_product_cat_dropdown_args', $category_args ) );
-                            $replace_attrb      = "<select data-placeholder='".__( 'Select product category','dokan' )."' ". $multiple ;
-
-                            echo str_replace( '<select', $replace_attrb, $drop_down_category );
+                                dokan_get_template_part('products/dokan-category-header-ui', '', $data );
                             ?>
                         </div>
 
@@ -215,7 +209,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                             <div class="instruction-inside<?php echo $instruction_class; ?>">
                                 <input type="hidden" name="feat_image_id" class="dokan-feat-image-id" value="<?php echo $feat_image_id; ?>">
 
-                                <i class="fa fa-cloud-upload"></i>
+                                <i class="fas fa-cloud-upload-alt"></i>
                                 <a href="#" class="dokan-feat-image-btn btn btn-sm"><?php _e( 'Upload a product cover image', 'dokan' ); ?></a>
                             </div>
 
@@ -254,7 +248,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                                         }
                                         ?>
                                         <li class="add-image add-product-images tips" data-title="<?php _e( 'Add gallery image', 'dokan' ); ?>">
-                                            <a href="#" class="add-product-images"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                                            <a href="#" class="add-product-images"><i class="fas fa-plus" aria-hidden="true"></i></a>
                                         </li>
                                     </ul>
                                     <input type="hidden" id="product_image_gallery" name="product_image_gallery" value="<?php echo esc_attr( $product_images ); ?>">
@@ -370,7 +364,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                             <!--<input name="_wc_booking_enable_range_picker" id="_wc_booking_enable_range_picker" value="0" type="hidden" >-->
                             <input name="_wc_booking_enable_range_picker" id="_wc_booking_enable_range_picker" value="1" type="checkbox" <?php checked( $booking_range_picker ); ?> class="dokan-booking-confirmation"> <?php _e( 'Enable Calendar Range Picker?', 'dokan' ); ?>
                             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Lets the user select a start and end date on the calendar - duration will be calculated automatically.', 'dokan' ) ?>">
-                                <i class="fa fa-question-circle"></i>
+                                <i class="fas fa-question-circle"></i>
                             </span>
                         </label>
                     </div>
@@ -380,7 +374,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                             <!--<input name="_wc_booking_requires_confirmation" id="_wc_booking_requires_confirmation" value="0" type="hidden" >-->
                             <input name="_wc_booking_requires_confirmation" id="_wc_booking_requires_confirmation" value="1" type="checkbox" <?php checked( $booking_confirmation ); ?> class="dokan-booking-confirmation"> <?php _e( 'Requires Confirmation', 'dokan' ); ?>
                             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Check this box if the booking requires YOUR approval/confirmation. Payment will not be taken during CHECKOUT.', 'dokan' ) ?>">
-                                <i class="fa fa-question-circle"></i>
+                                <i class="fas fa-question-circle"></i>
                             </span>
                         </label>
                     </div>
@@ -392,7 +386,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                             <!--<input name="_wc_booking_user_can_cancel" value="0" type="hidden">-->
                             <input name="_wc_booking_user_can_cancel" id="_wc_booking_user_can_cancel" value="1" type="checkbox" <?php checked( $booking_cancellation, true ); ?> class="dokan-booking-confirmation"> <?php _e( 'Can Be Cancelled ?', 'dokan' ); ?>
                             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Check this box if the booking can be cancelled by the customer after it has been purchased. A refund will not be sent automatically.', 'dokan' ) ?>">
-                                <i class="fa fa-question-circle"></i>
+                                <i class="fas fa-question-circle"></i>
                             </span>
 
                         </label>
@@ -465,10 +459,10 @@ if ( ! empty( $_GET['errors'] ) ) {
                     <div id="bookings_availability" class="bookings_availability availability_fields dokan-edit-row dokan-clearfix">
 
                         <div class="dokan-section-heading" data-togglehandler="bookings_availability">
-                            <h2><i class="fa fa-calendar" aria-hidden="true"></i> <?php _e( 'Availability' , 'dokan' ) ?></h2>
+                            <h2><i class="far fa-calendar-alt" aria-hidden="true"></i> <?php _e( 'Availability' , 'dokan' ) ?></h2>
                             <p><?php _e( 'Set Availability options' , 'dokan' ) ?></p>
                             <a href="#" class="dokan-section-toggle">
-                                <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
+                                <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
                             </a>
                             <div class="dokan-clearfix"></div>
                         </div>
@@ -480,7 +474,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                             </div>
                             <div class="dokan-input-group content-half-part">
                                 <label for="_wc_booking_min_date" class="form-label"><?php _e( 'Minimum booking window ( into the future )', 'dokan' ); ?></label>
-                                <input type="number" class="dokan-form-control" name="_wc_booking_min_date" id="_wc_booking_min_date" value="<?php echo max( absint( get_post_meta( $post_id, '_wc_booking_min_date', true ) ), 1 ); ?>" step="1" min="1" style="margin-right: 7px; width: 4em;">
+                                <input type="number" class="dokan-form-control" name="_wc_booking_min_date" id="_wc_booking_min_date" value="<?php echo max( absint( get_post_meta( $post_id, '_wc_booking_min_date', true ) ), 0 ); ?>" step="1" min="0" style="margin-right: 7px; width: 4em;">
                                 <select name="_wc_booking_min_date_unit" id="_wc_booking_min_date_unit" class="dokan-form-control short" style="width: auto; margin-right: 7px;">
                                     <option value="month" <?php selected( $booking_min_date_unit, 'month' ); ?>><?php _e( 'Month(s)', 'dokan' ); ?></option>
                                     <option value="week" <?php selected( $booking_min_date_unit, 'week' ); ?>><?php _e( 'Week(s)', 'dokan' ); ?></option>
@@ -512,7 +506,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                                         <!--<input name="_wc_booking_apply_adjacent_buffer" id="_wc_booking_apply_adjacent_buffer" value="0" type="hidden" >-->
                                         <input name="_wc_booking_apply_adjacent_buffer" id="_wc_booking_apply_adjacent_buffer" value="1" type="checkbox" <?php checked( $adjacent_buffer_period ); ?> class="dokan-booking-adjacent-buffer"> <?php _e( 'Adjacent Buffering ?', 'dokan' ); ?>
                                         <span class="dokan-tooltips-help tips" title="" data-original-title="<?php esc_attr_e( 'By default buffer period applies forward into the future of a booking. Enabling this option will apply adjacently (before and after Bookings)', 'dokan' ) ?>">
-                                        <i class="fa fa-question-circle"></i>
+                                        <i class="fas fa-question-circle"></i>
                                     </span>
                                     </label>
                                 </div>
@@ -547,7 +541,7 @@ if ( ! empty( $_GET['errors'] ) ) {
                                     <?php _e( 'Restrict start and end days?', 'dokan' ); ?>
 
                                     <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Restrict bookings so that they can only start on certain days of the week. Does not affect availability.', 'dokan' ) ?>">
-                                        <i class="fa fa-question-circle"></i>
+                                        <i class="fas fa-question-circle"></i>
                                     </span>
 
                                 </label>
@@ -600,14 +594,14 @@ if ( ! empty( $_GET['errors'] ) ) {
                                             <th>
                                                 <?php _e( 'Bookable', 'dokan' ); ?>
                                                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'If not bookable, users won\'t be able to choose this block for their booking.', 'dokan' ); ?>">
-                                                    <i class="fa fa-question-circle"></i>
+                                                    <i class="fas fa-question-circle"></i>
                                                 </span>
                                             </th>
                                             <th>
 
                                                 <?php _e( 'Priority', 'dokan' ); ?>
                                                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'The lower the priority number, the earlier this rule gets applied. By default, global rules take priority over product rules which take priority over resource rules. By using priority numbers you can execute rules in different orders.', 'dokan' ); ?>">
-                                                    <i class="fa fa-question-circle"></i>
+                                                    <i class="fas fa-question-circle"></i>
                                                 </span>
                                             </th>
                                             <th class="remove" width="1%">&nbsp;</th>
@@ -644,10 +638,10 @@ if ( ! empty( $_GET['errors'] ) ) {
                     <?php dokan_get_template_part( 'booking/html-dokan-booking-pricing', '', $template_args );?>
                     <div class='extra_options dokan-edit-row'>
                          <div class="dokan-section-heading" data-togglehandler="extra_options">
-                            <h2><i class="fa fa-cubes" aria-hidden="true"></i> <?php _e( 'Extra Options' , 'dokan' ) ?></h2>
+                            <h2><i class="fas fa-cubes" aria-hidden="true"></i> <?php _e( 'Extra Options' , 'dokan' ) ?></h2>
                             <p><?php _e( 'Set more options' , 'dokan' ) ?></p>
                             <a href="#" class="dokan-section-toggle">
-                                <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
+                                <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
                             </a>
                             <div class="dokan-clearfix"></div>
                         </div>
@@ -711,10 +705,10 @@ if ( ! empty( $_GET['errors'] ) ) {
 
                 <div class="dokan-other-options dokan-edit-row dokan-clearfix">
                     <div class="dokan-section-heading" data-togglehandler="dokan_other_options">
-                        <h2><i class="fa fa-cog" aria-hidden="true"></i> <?php _e( 'Other Options', 'dokan' ); ?></h2>
+                        <h2><i class="fas fa-cog" aria-hidden="true"></i> <?php _e( 'Other Options', 'dokan' ); ?></h2>
                         <p><?php _e( 'Set your extra product options', 'dokan' ); ?></p>
                         <a href="#" class="dokan-section-toggle">
-                            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+                            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
                         </a>
                         <div class="dokan-clearfix"></div>
                     </div>
@@ -768,7 +762,7 @@ if ( ! empty( $_GET['errors'] ) ) {
 
                     dokan_get_template_part( 'booking/persons/html-other-options', '', $template_args  );
 
-                    do_action( 'dokan_product_edit_after_options' );
+                    do_action( 'dokan_product_edit_after_options', $post_id );
 
                     wp_nonce_field( 'dokan_edit_product', 'dokan_edit_product_nonce' );
                 ?>

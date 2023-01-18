@@ -864,10 +864,20 @@ class Helper {
      */
     public static function get_error_message( WP_Error $error ) {
         $error_message = $error->get_error_message();
-        if ( is_array( $error_message ) && isset( $error_message['details']['description'] ) ) {
+        if ( is_array( $error_message ) && isset( $error_message['details'][0]['description'] ) ) {
+            $messages = '';
+            foreach ( $error_message['details'] as $detail ) {
+                if ( isset( $detail['field'] ) && isset( $detail['issue'] ) && isset( $detail['description'] ) ) {
+                    $messages .= sprintf( '<p><strong>%s:</strong> <em>%s</em>, <strong>%s</strong></p>', $detail['issue'], $detail['field'], $detail['description'] );
+                }
+            }
+            $error_message = $messages;
+        } elseif ( is_array( $error_message ) && isset( $error_message['details']['description'] ) ) {
             $error_message = $error_message['details']['description'];
         } elseif ( is_array( $error_message ) && isset( $error_message['message'] ) ) {
             $error_message = $error_message['message'];
+        } elseif ( is_array( $error_message ) && isset( $error_message['error_description'] ) ) {
+            $error_message = $error_message['error_description'];
         }
         return $error_message;
     }
@@ -1212,7 +1222,7 @@ class Helper {
         if ( isset( $data['price'] ) ) {
             $billing_cycle_data['pricing_scheme'] = [
                 'fixed_price' => [
-                    'value'         => wc_format_decimal( $data['price'] ),
+                    'value'         => wc_format_decimal( $data['price'], 2 ),
                     'currency_code' => isset( $data['currency'] ) ? $data['currency'] : get_woocommerce_currency(),
                 ],
             ];

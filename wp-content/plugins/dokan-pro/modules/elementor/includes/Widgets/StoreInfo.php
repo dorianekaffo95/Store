@@ -75,8 +75,8 @@ class StoreInfo extends Widget_Icon_List {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->update_control(
             'section_icon',
@@ -109,7 +109,7 @@ class StoreInfo extends Widget_Icon_List {
                 'label'       => __( 'Icon', 'dokan' ),
                 'type'        => Controls_Manager::ICON,
                 'label_block' => true,
-                'default'     => 'fa fa-check',
+                'default'     => 'fas fa-check',
             ]
         );
 
@@ -139,11 +139,11 @@ class StoreInfo extends Widget_Icon_List {
                 'type'    => DynamicHidden::CONTROL_TYPE,
                 'dynamic' => [
                     'active'  => true,
-                    'default' => dokan_elementor()->elementor()->dynamic_tags->tag_data_to_tag_text( null, 'dokan-store-info' )
-                ]
+                    'default' => dokan_elementor()->elementor()->dynamic_tags->tag_data_to_tag_text( null, 'dokan-store-info' ),
+                ],
             ],
             [
-                'position' => [ 'of' => 'icon_list' ]
+                'position' => [ 'of' => 'icon_list' ],
             ]
         );
 
@@ -155,7 +155,7 @@ class StoreInfo extends Widget_Icon_List {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return string
      */
     protected function get_html_wrapper_class() {
         return parent::get_html_wrapper_class() . ' dokan-store-info elementor-widget-' . parent::get_name();
@@ -181,9 +181,9 @@ class StoreInfo extends Widget_Icon_List {
             $this->add_render_attribute( 'list_item', 'class', 'elementor-inline-item' );
         }
         ?>
-        <?php if ( ! empty( $settings['icon_list'] ) && ! empty( $settings['store_info'] ) ): ?>
+        <?php if ( ! empty( $settings['icon_list'] ) && ! empty( $settings['store_info'] ) ) : ?>
             <?php $store_info = json_decode( $settings['store_info'], true ); ?>
-            <?php if ( is_array( $store_info ) ): ?>
+            <?php if ( is_array( $store_info ) ) : ?>
                 <ul <?php echo $this->get_render_attribute_string( 'icon_list' ); ?>>
                     <?php
                     foreach ( $settings['icon_list'] as $index => $item ) :
@@ -193,10 +193,12 @@ class StoreInfo extends Widget_Icon_List {
 
                         $this->add_inline_editing_attributes( $repeater_setting_key );
 
-                        if ( $item['show'] ):
-                            $info_item = array_filter( $store_info, function ( $list_item ) use ( $item ) {
-                                return $list_item['key'] === $item['key'];
-                            } );
+                        if ( $item['show'] ) :
+                            $info_item = array_filter(
+                                $store_info, function ( $list_item ) use ( $item ) {
+									return $list_item['key'] === $item['key'];
+								}
+                            );
 
                             if ( empty( $info_item ) ) {
                                 continue;
@@ -209,18 +211,41 @@ class StoreInfo extends Widget_Icon_List {
                             if ( ! $text ) {
                                 continue;
                             }
-                        ?>
+							?>
                             <li class="elementor-icon-list-item" >
-                                <?php
-                                if ( ! empty( $item['icon'] ) ) :
-                                    ?>
+                                <?php if ( ! empty( $item['icon'] ) ) : ?>
                                     <span class="elementor-icon-list-icon">
                                         <i class="<?php echo esc_attr( $item['icon'] ); ?>" aria-hidden="true"></i>
                                     </span>
                                 <?php endif; ?>
                                 <span <?php echo $this->get_render_attribute_string( $repeater_setting_key ); ?>><?php echo $text; ?></span>
+                                <?php if ( ! empty( $item['times'] ) ) : ?>
+                                    <span class="elementor-icon-list-icon elementor-times-list-icon">
+                                        <i class="<?php echo esc_attr( $item['times'] ); ?>" aria-hidden="true"></i>
+                                    </span>
+
+                                    <?php
+                                    $seller_id         = (int) get_query_var( 'author' );
+                                    $store_info        = dokan()->vendor->get( $seller_id )->get_shop_info();
+                                    $dokan_store_times = ! empty( $store_info['dokan_store_time'] ) ? $store_info['dokan_store_time'] : [];
+                                    $current_time      = dokan_current_datetime();
+                                    $today             = strtolower( $current_time->format( 'l' ) );
+
+                                    // Vendor store times template shown here.
+                                    dokan_get_template_part(
+                                        'store-header-times', '', [
+                                            'today'             => $today,
+                                            'dokan_days'        => dokan_get_translated_days(),
+                                            'current_time' => $current_time,
+                                            'times_heading' => __( 'Weekly Store Timing', 'dokan' ),
+                                            'closed_status' => __( 'CLOSED', 'dokan' ),
+                                            'dokan_store_times' => $dokan_store_times,
+                                        ]
+                                    );
+                                    ?>
+                                <?php endif; ?>
                             </li>
-                        <?php
+							<?php
                         endif;
                     endforeach;
                     ?>

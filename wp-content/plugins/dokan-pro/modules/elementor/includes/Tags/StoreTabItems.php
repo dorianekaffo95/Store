@@ -6,7 +6,6 @@ use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 use Elementor\Controls_Manager;
 
 class StoreTabItems extends TagBase {
-
     /**
      * Tag name
      *
@@ -34,10 +33,9 @@ class StoreTabItems extends TagBase {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return array
      */
     protected function get_value() {
-
         if ( dokan_is_store_page() ) {
             $store = dokan()->vendor->get( get_query_var( 'author' ) );
 
@@ -69,7 +67,7 @@ class StoreTabItems extends TagBase {
                 '__dynamic__' => [
                     'text' => $item['title'],
                     'url'  => $url,
-                ]
+                ],
             ];
         }
 
@@ -84,7 +82,7 @@ class StoreTabItems extends TagBase {
     }
 
     protected function render() {
-        echo json_encode( $this->get_value() );
+        echo wp_json_encode( $this->get_value() );
     }
 
     /**
@@ -106,7 +104,7 @@ class StoreTabItems extends TagBase {
             ],
             'reviews' => [
                 'title' => __( 'Reviews', 'dokan' ),
-                'url'   => '#'
+                'url'   => '#',
             ],
             'vendor_biography' => [
                 'title' => apply_filters( 'dokan_vendor_biography_title', __( 'Vendor Biography', 'dokan' ) ),

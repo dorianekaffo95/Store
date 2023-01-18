@@ -42,7 +42,7 @@ class Dokan_VSP_User_Subscription {
     public function add_subscription_menu( $urls ) {
         $urls['user-subscription'] = [
             'title' => __( 'User Subscriptions', 'dokan' ),
-            'icon'  => '<i class="fa fa-users"></i>',
+            'icon'  => '<i class="fas fa-users"></i>',
             'url'   => dokan_get_navigation_url( 'user-subscription' ),
             'pos'   => 50,
             'permission' => 'dokan_view_order_menu'

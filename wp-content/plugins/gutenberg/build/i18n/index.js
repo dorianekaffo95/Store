@@ -1,8 +1,8 @@
-/******/ (function() { // webpackBootstrap
+/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 9588:
-/***/ (function(module) {
+/***/ 9756:
+/***/ ((module) => {
 
 /**
  * Memize options object.
@@ -169,8 +169,8 @@ module.exports = memize;
 
 /***/ }),
 
-/***/ 8975:
-/***/ (function(module, exports, __webpack_require__) {
+/***/ 124:
+/***/ ((module, exports, __webpack_require__) => {
 
 var __WEBPACK_AMD_DEFINE_RESULT__;/* global window, exports, define */
 
@@ -423,75 +423,75 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/* global window, exports, define */
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/compat get default export */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = function(module) {
+/******/ 		__webpack_require__.n = (module) => {
 /******/ 			var getter = module && module.__esModule ?
-/******/ 				function() { return module['default']; } :
-/******/ 				function() { return module; };
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
 /******/ 			__webpack_require__.d(getter, { a: getter });
 /******/ 			return getter;
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = function(exports, definition) {
+/******/ 		__webpack_require__.d = (exports, definition) => {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	!function() {
-/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
-/******/ 	}();
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
+/******/ 		__webpack_require__.r = (exports) => {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
-!function() {
+(() => {
 "use strict";
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "__": function() { return /* reexport */ __; },
-  "_n": function() { return /* reexport */ _n; },
-  "_nx": function() { return /* reexport */ _nx; },
-  "_x": function() { return /* reexport */ _x; },
-  "createI18n": function() { return /* reexport */ createI18n; },
-  "defaultI18n": function() { return /* reexport */ default_i18n; },
-  "getLocaleData": function() { return /* reexport */ getLocaleData; },
-  "hasTranslation": function() { return /* reexport */ hasTranslation; },
-  "isRTL": function() { return /* reexport */ isRTL; },
-  "resetLocaleData": function() { return /* reexport */ resetLocaleData; },
-  "setLocaleData": function() { return /* reexport */ setLocaleData; },
-  "sprintf": function() { return /* reexport */ sprintf_sprintf; },
-  "subscribe": function() { return /* reexport */ subscribe; }
+  "__": () => (/* reexport */ __),
+  "_n": () => (/* reexport */ _n),
+  "_nx": () => (/* reexport */ _nx),
+  "_x": () => (/* reexport */ _x),
+  "createI18n": () => (/* reexport */ createI18n),
+  "defaultI18n": () => (/* reexport */ default_i18n),
+  "getLocaleData": () => (/* reexport */ getLocaleData),
+  "hasTranslation": () => (/* reexport */ hasTranslation),
+  "isRTL": () => (/* reexport */ isRTL),
+  "resetLocaleData": () => (/* reexport */ resetLocaleData),
+  "setLocaleData": () => (/* reexport */ setLocaleData),
+  "sprintf": () => (/* reexport */ sprintf_sprintf),
+  "subscribe": () => (/* reexport */ subscribe)
 });
 
 // EXTERNAL MODULE: ./node_modules/memize/index.js
-var memize = __webpack_require__(9588);
+var memize = __webpack_require__(9756);
 var memize_default = /*#__PURE__*/__webpack_require__.n(memize);
 // EXTERNAL MODULE: ./node_modules/sprintf-js/src/sprintf.js
-var sprintf = __webpack_require__(8975);
+var sprintf = __webpack_require__(124);
 var sprintf_default = /*#__PURE__*/__webpack_require__.n(sprintf);
 ;// CONCATENATED MODULE: ./packages/i18n/build-module/sprintf.js
 /**
@@ -536,7 +536,7 @@ function sprintf_sprintf(format) {
     return format;
   }
 }
-//# sourceMappingURL=sprintf.js.map
+
 ;// CONCATENATED MODULE: ./node_modules/@tannin/postfix/index.js
 var PRECEDENCE, OPENERS, TERMINATORS, PATTERN;
 
@@ -1084,7 +1084,18 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
 /**
  * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
  *
- * Merges locale data into the Tannin instance by domain. Accepts data in a
+ * Merges locale data into the Tannin instance by domain. Note that this
+ * function will overwrite the domain configuration. Accepts data in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} AddLocaleData
+ *
+ * Merges locale data into the Tannin instance by domain. Note that this
+ * function will also merge the domain configuration. Accepts data in a
  * Jed-formatted JSON object shape.
  *
  * @see http://messageformat.github.io/Jed/
@@ -1172,7 +1183,11 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
  *
  * @typedef I18n
  * @property {GetLocaleData}   getLocaleData   Returns locale data by domain in a Jed-formatted JSON object shape.
- * @property {SetLocaleData}   setLocaleData   Merges locale data into the Tannin instance by domain. Accepts data in a
+ * @property {SetLocaleData}   setLocaleData   Merges locale data into the Tannin instance by domain. Note that this
+ *                                             function will overwrite the domain configuration. Accepts data in a
+ *                                             Jed-formatted JSON object shape.
+ * @property {AddLocaleData}   addLocaleData   Merges locale data into the Tannin instance by domain. Note that this
+ *                                             function will also merge the domain configuration. Accepts data in a
  *                                             Jed-formatted JSON object shape.
  * @property {ResetLocaleData} resetLocaleData Resets all current Tannin instance locale data and sets the specified
  *                                             locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
@@ -1235,22 +1250,45 @@ const createI18n = (initialData, initialDomain, hooks) => {
 
 
   const doSetLocaleData = function (data) {
+    var _tannin$data$domain;
+
     let domain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'default';
-    tannin.data[domain] = { ...DEFAULT_LOCALE_DATA,
-      ...tannin.data[domain],
+    tannin.data[domain] = { ...tannin.data[domain],
       ...data
     }; // Populate default domain configuration (supported locale date which omits
     // a plural forms expression).
 
     tannin.data[domain][''] = { ...DEFAULT_LOCALE_DATA[''],
-      ...tannin.data[domain]['']
-    };
+      ...((_tannin$data$domain = tannin.data[domain]) === null || _tannin$data$domain === void 0 ? void 0 : _tannin$data$domain[''])
+    }; // Clean up cached plural forms functions cache as it might be updated.
+
+    delete tannin.pluralForms[domain];
   };
   /** @type {SetLocaleData} */
 
 
   const setLocaleData = (data, domain) => {
     doSetLocaleData(data, domain);
+    notifyListeners();
+  };
+  /** @type {AddLocaleData} */
+
+
+  const addLocaleData = function (data) {
+    var _tannin$data$domain2;
+
+    let domain = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'default';
+    tannin.data[domain] = { ...tannin.data[domain],
+      ...data,
+      // Populate default domain configuration (supported locale date which omits
+      // a plural forms expression).
+      '': { ...DEFAULT_LOCALE_DATA[''],
+        ...((_tannin$data$domain2 = tannin.data[domain]) === null || _tannin$data$domain2 === void 0 ? void 0 : _tannin$data$domain2['']),
+        ...(data === null || data === void 0 ? void 0 : data[''])
+      }
+    }; // Clean up cached plural forms functions cache as it might be updated.
+
+    delete tannin.pluralForms[domain];
     notifyListeners();
   };
   /** @type {ResetLocaleData} */
@@ -1288,7 +1326,7 @@ const createI18n = (initialData, initialDomain, hooks) => {
     let number = arguments.length > 4 ? arguments[4] : undefined;
 
     if (!tannin.data[domain]) {
-      // use `doSetLocaleData` to set silently, without notifying listeners
+      // Use `doSetLocaleData` to set silently, without notifying listeners.
       doSetLocaleData(undefined, domain);
     }
 
@@ -1487,6 +1525,7 @@ const createI18n = (initialData, initialDomain, hooks) => {
   return {
     getLocaleData,
     setLocaleData,
+    addLocaleData,
     resetLocaleData,
     subscribe,
     __,
@@ -1497,9 +1536,9 @@ const createI18n = (initialData, initialDomain, hooks) => {
     hasTranslation
   };
 };
-//# sourceMappingURL=create-i18n.js.map
+
 ;// CONCATENATED MODULE: external ["wp","hooks"]
-var external_wp_hooks_namespaceObject = window["wp"]["hooks"];
+const external_wp_hooks_namespaceObject = window["wp"]["hooks"];
 ;// CONCATENATED MODULE: ./packages/i18n/build-module/default-i18n.js
 /**
  * Internal dependencies
@@ -1515,7 +1554,7 @@ const i18n = createI18n(undefined, undefined, external_wp_hooks_namespaceObject.
  * Default, singleton instance of `I18n`.
  */
 
-/* harmony default export */ var default_i18n = (i18n);
+/* harmony default export */ const default_i18n = (i18n);
 /*
  * Comments in this file are duplicated from ./i18n due to
  * https://github.com/WordPress/gutenberg/pull/20318#issuecomment-590837722
@@ -1647,13 +1686,14 @@ const isRTL = i18n.isRTL.bind(i18n);
  */
 
 const hasTranslation = i18n.hasTranslation.bind(i18n);
-//# sourceMappingURL=default-i18n.js.map
+
 ;// CONCATENATED MODULE: ./packages/i18n/build-module/index.js
 
 
 
-//# sourceMappingURL=index.js.map
-}();
+
+})();
+
 (window.wp = window.wp || {}).i18n = __webpack_exports__;
 /******/ })()
 ;

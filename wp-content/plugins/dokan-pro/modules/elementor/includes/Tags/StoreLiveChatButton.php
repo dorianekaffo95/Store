@@ -5,18 +5,6 @@ namespace WeDevs\DokanPro\Modules\Elementor\Tags;
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 
 class StoreLiveChatButton extends TagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 2.9.11
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *
@@ -47,17 +35,21 @@ class StoreLiveChatButton extends TagBase {
      * @return void
      */
     public function render() {
-        $online_indicator = '';
+        // check if module active
+        if ( ! dokan_pro()->module->is_active( 'live_chat' ) ) {
+            return;
+        }
 
         if ( dokan_get_option( 'chat_button_seller_page', 'dokan_live_chat' ) !== 'on' ) {
             return;
         }
 
-        if ( dokan_is_store_page() && class_exists( \WeDevs\DokanPro\Modules\LiveChat\Chat::class ) ) {
+        $online_indicator = '';
+        if ( dokan_is_store_page() ) {
             $chatter = dokan_pro()->module->live_chat->chat->provider;
 
             if ( ! is_null( $chatter ) && 'talkjs' === $chatter->get_name() && $chatter->dokan_is_seller_online() ) {
-                $online_indicator = '<i class="fa fa-circle" aria-hidden="true"></i>';
+                $online_indicator = '<i class="fas fa-circle" aria-hidden="true"></i>';
             }
         }
 

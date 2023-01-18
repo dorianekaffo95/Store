@@ -39,6 +39,10 @@ class Module {
         // Add localize script.
         add_filter( 'dokan_admin_localize_script', array( $this, 'add_subscription_packs_to_localize_script' ) );
 
+        // Loads frontend scripts and styles
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'init', array( $this, 'register_scripts' ) );
+
         // enable the settings only when the subscription is ON
         $enable_option = get_option( 'dokan_product_subscription', array( 'enable_pricing' => 'off' ) );
 
@@ -55,9 +59,6 @@ class Module {
      * @return void
      */
     public function init_hooks() {
-        // Loads frontend scripts and styles
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 99 );
-
         // Loads all actions
         add_filter( 'dokan_can_add_product', array( $this, 'seller_add_products' ), 1, 1 );
         add_filter( 'dokan_vendor_can_duplicate_product', array( $this, 'vendor_can_duplicate_product' ) );
@@ -65,6 +66,7 @@ class Module {
         add_action( 'dokan_can_post_notice', array( $this, 'display_product_pack' ) );
         add_filter( 'dokan_can_post', array( $this, 'can_post_product' ) );
         add_filter( 'dokan_product_cat_dropdown_args', [ __CLASS__, 'filter_category' ] );
+        add_filter( 'dokan_multistep_product_categories', [ $this, 'filter_multistep_category' ] );
 
         // filter product types
         add_filter( 'dokan_product_types', [ __CLASS__, 'filter_product_types' ], 99 );
@@ -252,25 +254,46 @@ class Module {
     }
 
     /**
-     * Enqueue admin scripts
+     * Register Scripts
      *
-     * Allows plugin assets to be loaded.
-     *
-     * @uses wp_enqueue_script()
-     * @uses wp_localize_script()
-     * @uses wp_enqueue_style
+     * @since 3.7.4
      */
-    public function enqueue_scripts() {
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
 
-        wp_enqueue_style( 'dps-custom-style', DPS_URL . '/assets/css/style' . $suffix . '.css', [], date( 'Ymd' ) );
-        wp_enqueue_script( 'dps-custom-js', DPS_URL . '/assets/js/script' . $suffix . '.js', array( 'jquery' ), time(), true );
+        wp_register_style( 'dps-custom-style', DPS_URL . '/assets/css/style' . $suffix . '.css', [], $version );
+        wp_register_script( 'dps-custom-js', DPS_URL . '/assets/js/script' . $suffix . '.js', array( 'jquery' ), $version, true );
         wp_localize_script(
             'dps-custom-js', 'dokanSubscription', array(
                 'cancel_string'   => __( 'Do you really want to cancel the subscription?', 'dokan' ),
                 'activate_string' => __( 'Want to activate the subscription again?', 'dokan' ),
-        ) );
+            )
+        );
+    }
+
+    /**
+     * Enqueue admin scripts
+     *
+     * Allows plugin assets to be loaded.
+     */
+    public function enqueue_scripts() {
+        global $wp, $typenow, $post;
+
+        $is_subscription_page = dokan_is_seller_dashboard() && isset( $wp->query_vars['subscription'] );
+        $is_new_product_page  = is_admin() && isset( $_GET['post_type'] ) && 'product' === sanitize_text_field( wp_unslash( $_GET['post_type'] ) ); //phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+
+
+        if ( ! $is_subscription_page && is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'dps_product_pack' ) ) {
+            $is_subscription_page = true;
+        }
+
+        if ( $is_subscription_page || 'product' === $typenow || $is_new_product_page || ( is_account_page() && ! is_user_logged_in() ) ) {
+            wp_enqueue_style( 'dps-custom-style' );
+        }
+
+        if ( $is_subscription_page || ( is_account_page() && ! is_user_logged_in() ) ) {
+            wp_enqueue_script( 'dps-custom-js' );
+        }
     }
 
     /**
@@ -389,14 +412,14 @@ class Module {
             if ( $installed_version > '2.3' ) {
                 $urls['subscription'] = array(
                     'title' => __( 'Subscription', 'dokan' ),
-                    'icon'  => '<i class="fa fa-book"></i>',
+                    'icon'  => '<i class="fas fa-book"></i>',
                     'url'   => $permalink,
                     'pos'   => 180,
                 );
             } else {
                 $urls['subscription'] = array(
                     'title' => __( 'Subscription', 'dokan' ),
-                    'icon'  => '<i class="fa fa-book"></i>',
+                    'icon'  => '<i class="fas fa-book"></i>',
                     'url'   => $permalink,
                 );
             }
@@ -1397,6 +1420,21 @@ class Module {
             return $ret;
         }
 
+        // send verify email if newly registered user role is a customer
+        if (
+            (
+                isset( $_POST['woocommerce-register-nonce'] ) &&
+                wp_verify_nonce( sanitize_key( wp_unslash( $_POST['woocommerce-register-nonce'] ) ), 'woocommerce-register' ) &&
+                isset( $_POST['role'] ) &&
+                'customer' === $_POST['role']
+            ) ||
+            (
+                isset( $_GET['dokan_email_verification'] ) && isset( $_GET['id'] ) && is_numeric( $_GET['id'] ) && ! isset( $_GET['page'] )
+            )
+        ) {
+            return false;
+        }
+
         // if product subscription is enabled on registration form, return true,
         // because we don't need to enable email verification if subscription module is active.
         return true;
@@ -1606,5 +1644,55 @@ class Module {
                 update_user_meta( $vendor_id, 'dokan_admin_additional_fee', '' );
             }
         }
+    }
+
+    /**
+     * Filter multi step vendor category according to subscription
+     *
+     * @since 3.7.4
+     *
+     * @param array $categories
+     *
+     * @return array
+     **/
+    public function filter_multistep_category( $categories ) {
+        $user_id = get_current_user_id();
+
+        if ( ! dokan_is_user_seller( $user_id ) ) {
+            return $categories;
+        }
+
+        $is_seller_enabled = dokan_is_seller_enabled( $user_id );
+
+        if ( ! $is_seller_enabled ) {
+            return $categories;
+        }
+
+        $vendor = dokan()->vendor->get( $user_id )->subscription;
+
+        if ( ! $vendor ) {
+            return $categories;
+        }
+
+        if ( ( self::can_post_product() ) && $vendor->has_subscription() ) {
+            $override_cat = get_user_meta( $user_id, 'vendor_allowed_categories', true );
+            $selected_cat = ! empty( $override_cat ) ? $override_cat : $vendor->get_allowed_product_categories();
+
+            if ( empty( $selected_cat ) ) {
+                return $categories;
+            }
+
+            $to_return = $categories;
+            $selected_cat = array_map( 'absint', $selected_cat );
+
+            foreach ( $categories as $key => $category ) {
+                if ( absint( $category['parent_id'] ) === 0 && ! in_array( $key, $selected_cat ) ) {
+                    unset( $to_return[ $key ] );
+                }
+            }
+            return $to_return;
+        }
+
+        return $categories;
     }
 }

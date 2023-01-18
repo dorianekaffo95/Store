@@ -7,8 +7,9 @@ use RankMath\Helper;
 use RankMath\Traits\Meta;
 use RankMath\Traits\Hooker;
 use RankMath\Helpers\Locale;
-use RankMath\Redirections\Cache;
+use MyThemeShop\Helpers\Url;
 use RankMath\Redirections\DB;
+use RankMath\Redirections\Cache;
 use RankMath\Admin\Admin_Helper;
 use RankMath\Admin\Metabox\IScreen;
 
@@ -139,7 +140,7 @@ class Screen implements IScreen {
      * @return array
      */
     public function get_values() {
-        $values      = array_merge_recursive(
+        $values = array_merge_recursive(
             $this->screen->get_values(),
             array(
                 'homeUrl'            => home_url(),
@@ -151,17 +152,19 @@ class Screen implements IScreen {
                 'defautOgImage'      => Helper::get_settings( 'titles.open_graph_image', rank_math()->plugin_url() . 'assets/admin/img/social-placeholder.jpg' ),
                 'customPermalinks'   => (bool) get_option( 'permalink_structure', false ),
                 'isUserRegistered'   => Helper::is_site_connected(),
+                'connectSiteUrl'     => Admin_Helper::get_activate_url( Url::get_current_url() ),
                 'maxTags'            => $this->do_filter( 'focus_keyword/maxtags', 5 ),
                 'trendsIcon'         => Admin_Helper::get_trends_icon_svg(),
                 'showScore'          => Helper::is_score_enabled(),
                 'siteFavIcon'        => $this->get_site_icon(),
                 'canUser'            => array(
-                    'general'   => current_user_can( 'dokan_edit_product' ),
-                    'advanced'  => current_user_can( 'dokan_edit_product' ) && Helper::is_advanced_mode(),
-                    'snippet'   => current_user_can( 'dokan_edit_product' ),
-                    'social'    => current_user_can( 'dokan_edit_product' ),
-                    'analysis'  => current_user_can( 'dokan_edit_product' ),
-                    'analytics' => current_user_can( 'dokan_edit_product' ),
+                    'general'    => current_user_can( 'dokan_edit_product' ),
+                    'advanced'   => current_user_can( 'dokan_edit_product' ) && Helper::is_advanced_mode(),
+                    'snippet'    => current_user_can( 'dokan_edit_product' ),
+                    'social'     => current_user_can( 'dokan_edit_product' ),
+                    'analysis'   => current_user_can( 'dokan_edit_product' ),
+                    'analytics'  => current_user_can( 'dokan_edit_product' ),
+                    'content_ai' => current_user_can( 'dokan_edit_product' ),
                 ),
                 'assessor'           => array(
                     'serpData'              => $this->get_object_values(),

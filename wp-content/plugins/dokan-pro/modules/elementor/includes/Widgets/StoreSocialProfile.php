@@ -75,8 +75,8 @@ class StoreSocialProfile extends Widget_Social_Icons {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $repeater = new Repeater();
 
@@ -86,16 +86,16 @@ class StoreSocialProfile extends Widget_Social_Icons {
                 'label'       => __( 'Icon', 'dokan' ),
                 'type'        => Controls_Manager::ICON,
                 'label_block' => true,
-                'default'     => 'fa fa-wordpress',
+                'default'     => 'fab fa-wordpress',
                 'include'     => [
-                    'fa fa-facebook',
-                    'fa fa-twitter',
-                    'fa fa-pinterest',
-                    'fa fa-linkedin',
-                    'fa fa-youtube',
-                    'fa fa-instagram',
-                    'fa fa-flickr',
-                    'fa fa-wordpress',
+                    'fab fa-facebook',
+                    'fab fa-twitter',
+                    'fab fa-pinterest',
+                    'fab fa-linkedin',
+                    'fab fa-youtube',
+                    'fab fa-instagram',
+                    'fab fa-flickr',
+                    'fab fa-wordpress',
                 ],
             ]
         );
@@ -128,52 +128,52 @@ class StoreSocialProfile extends Widget_Social_Icons {
                 'default' => [
                     [
                         'social_icon' => [
-                            'value' => 'fa fa-facebook',
+                            'value'   => 'fab fa-facebook',
                             'library' => 'fa-brands',
                         ],
-                        'social' => 'fa fa-facebook',
+                        'social' => 'fab fa-facebook',
                     ],
                     [
                         'social_icon' => [
-                            'value' => 'fa fa-twitter',
+                            'value'   => 'fab fa-twitter',
                             'library' => 'fa-brands',
                         ],
-                        'social' => 'fa fa-twitter',
+                        'social' => 'fab fa-twitter',
                     ],
                     [
                         'social_icon' => [
-                            'value' => 'fa fa-pinterest',
+                            'value'   => 'fab fa-pinterest',
                             'library' => 'fa-brands',
                         ],
-                        'social' => 'fa fa-pinterest',
+                        'social' => 'fab fa-pinterest',
                     ],
                     [
                         'social_icon' => [
-                            'value' => 'fa fa-linkedin',
+                            'value'   => 'fab fa-linkedin',
                             'library' => 'fa-brands',
                         ],
-                        'social' => 'fa fa-linkedin',
+                        'social' => 'fab fa-linkedin',
                     ],
                     [
                         'social_icon' => [
-                            'value' => 'fa fa-youtube',
+                            'value'   => 'fab fa-youtube',
                             'library' => 'fa-brands',
                         ],
-                        'social' => 'fa fa-youtube',
+                        'social' => 'fab fa-youtube',
                     ],
                     [
                         'social_icon' => [
-                            'value' => 'fa fa-instagram',
+                            'value'   => 'fab fa-instagram',
                             'library' => 'fa-brands',
                         ],
-                        'social' => 'fa fa-instagram',
+                        'social' => 'fab fa-instagram',
                     ],
                     [
                         'social_icon' => [
-                            'value' => 'fa fa-flickr',
+                            'value'   => 'fab fa-flickr',
                             'library' => 'fa-brands',
                         ],
-                        'social' => 'fa fa-flickr',
+                        'social' => 'fab fa-flickr',
                     ],
                 ],
             ]
@@ -212,7 +212,7 @@ class StoreSocialProfile extends Widget_Social_Icons {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return string
      */
     protected function get_html_wrapper_class() {
         return parent::get_html_wrapper_class() . ' dokan-store-social-profile elementor-widget-' . parent::get_name();
@@ -241,14 +241,14 @@ class StoreSocialProfile extends Widget_Social_Icons {
             $class_animation = ' elementor-animation-' . $settings['hover_animation'];
         }
         ?>
-        <div class="elementor-social-icons-wrapper">
+        <div class="elementor-social-icons-wrapper elementor-grid">
             <?php
             foreach ( $settings['social_icon_list'] as $index => $item ) {
                 if ( dokan_is_store_page() && empty( $store_social_links[ $item['social'] ] ) ) {
                     continue;
                 }
 
-                $social = str_replace( 'fa fa-', '', $item['social'] );
+                $social = str_replace( 'fab fa-', '', $item['social'] );
 
                 $link_key = 'link_' . $index;
 
@@ -279,7 +279,31 @@ class StoreSocialProfile extends Widget_Social_Icons {
      * @return void
      */
     protected function content_template() {
-        parent::content_template();
+        ?>
+        <# let iconsHTML = {}; #>
+		<div class="elementor-social-icons-wrapper elementor-grid">
+			<# _.each( settings.social_icon_list, function( item, index ) {
+				let link      = item.link ? item.link.url : '',
+					migrated  = elementor.helpers.isIconMigrated( item, 'social_icon' );
+					social    = elementor.helpers.getSocialNetworkNameFromIcon( item.social_icon, item.social, false, migrated ),
+                    icon_name = social.replace( 'fab fa-', '' );
+				#>
+				<span class="elementor-grid-item">
+					<a class="elementor-icon elementor-social-icon elementor-social-icon-{{ icon_name }} elementor-animation-{{ settings.hover_animation }} elementor-repeater-item-{{item._id}}" href="{{ link }}">
+						<span class="elementor-screen-only">{{{ icon_name }}}</span>
+						<#
+							iconsHTML[ index ] = elementor.helpers.renderIcon( view, item.social_icon, {}, 'i', 'object' );
+							if ( ( ! item.social || migrated ) && iconsHTML[ index ] && iconsHTML[ index ].rendered ) { #>
+								{{{ iconsHTML[ index ].value }}}
+							<# } else { #>
+								<i class="{{ item.social }}"></i>
+							<# }
+						#>
+					</a>
+				</span>
+			<# } ); #>
+		</div>
+        <?php
     }
 
     /**

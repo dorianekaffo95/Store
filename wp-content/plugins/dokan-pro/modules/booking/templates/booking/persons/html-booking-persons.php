@@ -1,10 +1,10 @@
 <div id="bookings_persons" class="bookings_persons_tab dokan-edit-row dokan-clearfix">
 
     <div class="dokan-section-heading" data-togglehandler="bookings_persons">
-        <h2><i class="fa fa-users" aria-hidden="true"></i> <?php _e( 'Persons', 'dokan' ) ?></h2>
+        <h2><i class="fas fa-users" aria-hidden="true"></i> <?php _e( 'Persons', 'dokan' ) ?></h2>
         <p><?php _e( 'Set Person Options', 'dokan' ) ?></p>
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true" style="margin-top: 9px;"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>
@@ -12,7 +12,7 @@
         <div class="dokan-form-group">
             <label for="_wc_booking_min_persons_group" class="form-label"><?php _e( 'Min persons', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'The minimum number of persons per booking.', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
             <?php dokan_post_input_box( $post_id, '_wc_booking_min_persons_group', array( 'min' => '0', 'step' => '1', 'value' => max( absint( get_post_meta( $post_id, '_wc_booking_min_persons_group', true ) ), 1 ) ), 'number' ); ?>
@@ -20,7 +20,7 @@
         <div class="dokan-form-group">
             <label for="_wc_booking_max_persons_group" class="form-label"><?php _e( 'Max persons', 'dokan' ); ?>
                 <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'The maximum number of persons per booking.', 'dokan' ); ?>">
-                    <i class="fa fa-question-circle"></i>
+                    <i class="fas fa-question-circle"></i>
                 </span>
             </label>
             <?php dokan_post_input_box( $post_id, '_wc_booking_max_persons_group', array( 'min' => '0', 'step' => '1', 'value' => get_post_meta( $post_id, '_wc_booking_max_persons_group', true ) ), 'number' ); ?>
@@ -31,7 +31,7 @@
                 <input name="_wc_booking_person_cost_multiplier" id="_wc_booking_person_cost_multiplier" value="yes" type="checkbox" <?php checked( get_post_meta( $post_id, '_wc_booking_person_cost_multiplier', true ), true ); ?> > <?php _e( 'Multiply all costs by person count', 'dokan' ); ?>
             </label>
             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Enable this to multiply the entire cost of the booking (block and base costs) by the person count.', 'dokan' ); ?>">
-                <i class="fa fa-question-circle"></i>
+                <i class="fas fa-question-circle"></i>
             </span>
         </div>
         <div class="dokan-form-group">
@@ -39,7 +39,7 @@
                 <input name="_wc_booking_person_qty_multiplier" id="_wc_booking_person_qty_multiplier" value="yes" type="checkbox" <?php checked( get_post_meta( $post_id, '_wc_booking_person_qty_multiplier', true ), true ); ?> > <?php _e( 'Count persons as bookings', 'dokan' ); ?>
             </label>
             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Enable this to multiply the entire cost of the booking (block and base costs) by the person count.', 'dokan' ); ?>">
-                <i class="fa fa-question-circle"></i>
+                <i class="fas fa-question-circle"></i>
             </span>
         </div>
         <div class="dokan-form-group">
@@ -47,7 +47,7 @@
                 <input name="_wc_booking_has_person_types" id="_wc_booking_has_person_types" value="yes" type="checkbox" <?php checked( get_post_meta( $post_id, '_wc_booking_has_person_types', true ), true ); ?> > <?php _e( 'Enable person types', 'dokan' ); ?>
             </label>
             <span class="dokan-tooltips-help tips" title="" data-original-title="<?php _e( 'Person types allow you to offer different booking costs for different types of individuals, for example, adults and children.', 'dokan' ); ?>">
-                <i class="fa fa-question-circle"></i>
+                <i class="fas fa-question-circle"></i>
             </span>
         </div>
 

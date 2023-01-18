@@ -288,11 +288,12 @@ class IntentController extends StripePaymentGateway {
                 continue;
             }
 
-            $tmp_order_id        = $tmp_order->get_id();
-            $vendor_id           = dokan_get_seller_id_by_order( $tmp_order_id );
-            $vendor_raw_earning  = dokan()->commission->get_earning_by_order( $tmp_order, 'seller' );
-            $connected_vendor_id = get_user_meta( $vendor_id, 'dokan_connected_vendor_id', true );
-            $tmp_order_total     = $tmp_order->get_total();
+            $tmp_order_id          = $tmp_order->get_id();
+            $vendor_id             = dokan_get_seller_id_by_order( $tmp_order_id );
+            $vendor_raw_earning    = dokan()->commission->get_earning_by_order( $tmp_order, 'seller' );
+            $connected_vendor_id   = get_user_meta( $vendor_id, 'dokan_connected_vendor_id', true );
+            $tmp_order_total       = $tmp_order->get_total();
+            $stripe_fee_for_vendor = 0;
 
             if ( $tmp_order_total == 0 ) {
                 $tmp_order->add_order_note( sprintf( __( 'Order %s payment completed', 'dokan' ), $tmp_order->get_order_number() ) );
@@ -379,19 +380,22 @@ class IntentController extends StripePaymentGateway {
                     sprintf(
                         __( 'Order %1$s payment is completed via %2$s with 3d secure on (Charge ID: %3$s)', 'dokan' ),
                         $tmp_order->get_order_number(),
-                        $this->get_title(),
+                        Helper::get_gateway_title(),
                         $charge_id
                     )
                 );
             }
 
             $tmp_order->update_meta_data( '_stripe_customer_id', $intent->customer );
-            $tmp_order->update_meta_data( '_transaction_id', $intent->charges->first()->id );
             $tmp_order->update_meta_data( '_stripe_source_id', $intent->source );
             $tmp_order->update_meta_data( '_stripe_intent_id', $intent->id );
             $tmp_order->update_meta_data( '_stripe_charge_captured', 'yes' );
 
             $tmp_order->save_meta_data();
+
+            // set transaction id
+            $tmp_order->set_transaction_id( $intent->charges->first()->id );
+            $tmp_order->save();
 
             $withdraw_data = [
                 'user_id'  => $vendor_id,
@@ -408,7 +412,7 @@ class IntentController extends StripePaymentGateway {
             sprintf(
                 __( 'Order %1$s payment is completed via %2$s 3d secure. (Charge ID: %3$s)', 'dokan' ),
                 $order->get_order_number(),
-                $this->get_title(),
+                Helper::get_gateway_title(),
                 $charge_id
             )
         );

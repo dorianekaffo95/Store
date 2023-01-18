@@ -93,7 +93,7 @@ class Processor {
                         'status'   => 'success',
                         '_wpnonce' => wp_create_nonce( 'dokan-paypal-marketplace-connect-success' ),
                     ],
-                    dokan_get_navigation_url( 'settings/payment' )
+                    dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                 ),
                 'return_url_description' => 'the url to return the merchant after the paypal onboarding process.',
                 'action_renewal_url'     => site_url(),

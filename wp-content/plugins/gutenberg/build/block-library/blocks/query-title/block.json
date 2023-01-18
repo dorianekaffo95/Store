@@ -16,13 +16,21 @@
 		"level": {
 			"type": "number",
 			"default": 1
+		},
+		"showSearchTerm": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
-			"gradients": true
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
 		"spacing": {
 			"margin": true

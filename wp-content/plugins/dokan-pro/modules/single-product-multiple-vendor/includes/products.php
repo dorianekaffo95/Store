@@ -485,10 +485,10 @@ class Dokan_SPMV_Products {
                         </div>
                         <div class="table-cell action-area">
                             <a href="<?php echo dokan_get_store_url( $post_author_id ); ?>" class="dokan-btn tips link" title="<?php _e( 'View Store', 'dokan' ); ?>">
-                                <i class="fa fa-external-link"></i>
+                                <i class="fas fa-external-link-alt"></i>
                             </a>
                             <a href="<?php echo $product_obj->get_permalink(); ?>" class="dokan-btn tips view" title="<?php _e( 'View Product', 'dokan' ); ?>">
-                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                <i class="far fa-eye" aria-hidden="true"></i>
                             </a>
                             <?php if ( 'simple' == $product_obj->get_type() ): ?>
                                 <?php
@@ -499,11 +499,11 @@ class Dokan_SPMV_Products {
                                     esc_attr( $product_obj->get_sku() ),
                                     'dokan-btn tips cart',
                                     __( 'Add to cart', 'dokan' ),
-                                    '<i class="fa fa-shopping-cart"></i>'
+                                    '<i class="fas fa-shopping-cart"></i>'
                                 );
                                 ?>
                             <?php elseif ( 'variable' == $product_obj->get_type() ) : ?>
-                                <a href="<?php echo $product_obj->get_permalink(); ?>" class="dokan-btn tips bars" title="<?php _e( 'Select Options', 'dokan' ); ?>"><i class="fa fa-bars"></i></a>
+                                <a href="<?php echo $product_obj->get_permalink(); ?>" class="dokan-btn tips bars" title="<?php _e( 'Select Options', 'dokan' ); ?>"><i class="fas fa-bars"></i></a>
                             <?php endif ?>
                         </div>
                     </div>

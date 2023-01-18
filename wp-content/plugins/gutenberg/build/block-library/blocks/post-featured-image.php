@@ -19,13 +19,19 @@ function gutenberg_render_block_core_post_featured_image( $attributes, $content,
 	}
 	$post_ID = $block->context['postId'];
 
-	$featured_image = get_the_post_thumbnail( $post_ID );
+	$is_link        = isset( $attributes['isLink'] ) && $attributes['isLink'];
+	$size_slug      = isset( $attributes['sizeSlug'] ) ? $attributes['sizeSlug'] : 'post-thumbnail';
+	$post_title     = trim( strip_tags( get_the_title( $post_ID ) ) );
+	$attr           = $is_link ? array( 'alt' => $post_title ) : array();
+	$featured_image = get_the_post_thumbnail( $post_ID, $size_slug, $attr );
 	if ( ! $featured_image ) {
 		return '';
 	}
 	$wrapper_attributes = get_block_wrapper_attributes();
-	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$featured_image = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $featured_image );
+	if ( $is_link ) {
+		$link_target    = $attributes['linkTarget'];
+		$rel            = ! empty( $attributes['rel'] ) ? 'rel="' . esc_attr( $attributes['rel'] ) . '"' : '';
+		$featured_image = sprintf( '<a href="%1$s" target="%2$s" %3$s>%4$s</a>', get_the_permalink( $post_ID ), esc_attr( $link_target ), $rel, $featured_image );
 	}
 
 	$has_width  = ! empty( $attributes['width'] );
@@ -43,7 +49,7 @@ function gutenberg_render_block_core_post_featured_image( $attributes, $content,
 		if ( ! empty( $attributes['scale'] ) ) {
 			$image_styles .= "object-fit:{$attributes['scale']};";
 		}
-		$featured_image = str_replace( 'src=', "style='$image_styles' src=", $featured_image );
+		$featured_image = str_replace( 'src=', 'style="' . esc_attr( $image_styles ) . '" src=', $featured_image );
 	}
 
 	return "<figure $wrapper_attributes>$featured_image</figure>";

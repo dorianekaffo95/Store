@@ -105,7 +105,7 @@
             e.preventDefault();
 
             if ( $( "input[name='dokan_gravatar']" ).val() == 0 ) {
-                dokan_sweetalert( dokan.i18n_gravater, { 
+                dokan_sweetalert( dokan.i18n_gravater, {
                     icon: 'warning',
                 } );
                 return;
@@ -167,7 +167,7 @@
             e.preventDefault();
 
             if ( $( "input[name = 'phone']" ).val() == '' ) {
-                dokan_sweetalert( dokan.i18n_phone_number, { 
+                dokan_sweetalert( dokan.i18n_phone_number, {
                     icon: 'warning',
                 } );
                 return;
@@ -226,7 +226,7 @@
             e.preventDefault();
 
             if ( $( "input[name = 'sms_code']" ).val() == '' ) {
-                dokan_sweetalert( dokan.i18n_sms_code, { 
+                dokan_sweetalert( dokan.i18n_sms_code, {
                     icon: 'warning',
                 } );
                 return;
@@ -453,7 +453,7 @@
                 const html = `
                     <div class="dokan-vendor-company-file-item" id="${customId}">
                         <a href="${attachment.url}" target="_blank" >${attachment.title}.${attachment.subtype}</a>
-                        <a href="#" onclick="companyVerificationRemoveList(event)" data-attachment_id="${customId}" class="dokan-btn dokan-btn-danger"><i class="fa fa-close" data-attachment_id="${customId}"></i></a>
+                        <a href="#" onclick="companyVerificationRemoveList(event)" data-attachment_id="${customId}" class="dokan-btn dokan-btn-danger"><i class="fas fa-times" data-attachment_id="${customId}"></i></a>
                         <input type="hidden" name="vendor_verification_files_ids[]" value="${attachment.id}" />
                     </div>
                 `;
@@ -462,6 +462,55 @@
 
             // Finally, open the modal
             file_frame.open();
+        });
+
+        $( '#dokan_v_address_submit' ).on( 'click', function (e) {
+            if ( ! $( '#vendor-proof-url' ).val() ) {
+                $( '.dokan-vendor-proof-alert' ).removeClass( 'dokan-hide' );
+                e.preventDefault();
+            }
+        });
+
+        let proof = '';
+        $( '#vendor-proof' ).on( 'click', function (e) {
+            $( '.dokan-vendor-proof-alert' ).addClass( 'dokan-hide' );
+
+            if ( proof ) {
+                proof.open();
+                return false;
+            }
+
+            proof = wp.media({
+                multiple : false,
+                title    : verify_data.upload_title,
+                button   : {
+                    text : verify_data.insert_title,
+                },
+            });
+
+            proof.on( 'select', function () {
+                const attachment   = proof.state().get( 'selection' ).first().toJSON(),
+                    attachment_url = attachment.url;
+
+                if ( attachment_url ) {
+                    $( '.vendor_img_container' ).show();
+                    $( '#vendor-proof-url' ).val( attachment_url );
+
+                    const attachment_icon = ( 'application/pdf' === attachment.mime ) ? attachment.icon : attachment_url;
+                    $( '.vendor_img_container' ).html( `<img src='${attachment_icon}' /><a class="dokan-close dokan-remove-proof-image">×</a>` );
+
+                    $( '.proof-button-area' ).hide();
+                }
+            });
+
+            proof.open();
+            e.preventDefault();
+        });
+
+        $( '.dokan-form-group' ).on( 'click', '.dokan-remove-proof-image', function (e) {
+            $( '#vendor-proof-url' ).val( '' );
+            $( '.proof-button-area' ).show();
+            $( '.vendor_img_container' ).hide();
         });
         //End
     } );

@@ -35,6 +35,7 @@ class Module {
 
         // Loads frontend scripts and styles
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'init', array( $this, 'register_scripts' ) );
     }
 
     /**
@@ -48,6 +49,17 @@ class Module {
     }
 
     /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_script( 'dpe-scripts', plugins_url( 'assets/js/enquiry.js', __FILE__ ), array( 'jquery' ), $version, true );
+    }
+
+    /**
      * Enqueue admin scripts
      *
      * Allows plugin assets to be loaded.
@@ -57,12 +69,14 @@ class Module {
      * @uses wp_enqueue_style
      */
     public function enqueue_scripts() {
-        wp_enqueue_script( 'dpe-scripts', plugins_url( 'assets/js/enquiry.js', __FILE__ ), array( 'jquery' ), false, true );
-        wp_localize_script(
-            'dpe-scripts', 'DokanEnquiry', array(
-				'ajaxurl' => admin_url( 'admin-ajax.php' ),
-            )
-        );
+        if ( is_product() ) {
+            wp_enqueue_script( 'dpe-scripts' );
+            wp_localize_script(
+                'dpe-scripts', 'DokanEnquiry', array(
+                    'ajaxurl' => admin_url( 'admin-ajax.php' ),
+                )
+            );
+        }
     }
 
     /**
@@ -102,48 +116,64 @@ class Module {
      * @return void
      */
     public function send_email() {
-        check_ajax_referer( 'dokan_product_enquiry' );
+        if ( ! isset( $_POST['dokan_product_enquiry_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['dokan_product_enquiry_nonce'] ) ), 'dokan_product_enquiry' ) ) {
+            wp_send_json_error( __( 'Nonce verification failed!', 'dokan' ) );
+        }
 
-        $posted = $_POST;
-        $url    = isset( $_POST['url'] ) ? $_POST['url'] : '';
+        $url             = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : '';
+        $message         = isset( $_POST['enq_message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['enq_message'] ) ) : '';
+        $product_id      = isset( $_POST['enquiry_id'] ) ? absint( wp_unslash( $_POST['enquiry_id'] ) ) : 0;
+        $vendor_id       = isset( $_POST['seller_id'] ) ? absint( wp_unslash( $_POST['seller_id'] ) ) : 0;
+        $recaptcha_token = isset( $_POST['dokan_product_enquiry_recaptcha_token'] ) ? wp_unslash( $_POST['dokan_product_enquiry_recaptcha_token'] ) : ''; // phpcs:ignore
 
         if ( ! empty( $url ) ) {
             wp_send_json_error( __( 'Boo ya!', 'dokan' ) );
         }
 
         if ( is_user_logged_in() ) {
-            $sender     = wp_get_current_user();
+            $sender         = wp_get_current_user();
             $customer_name  = $sender->display_name;
             $customer_email = $sender->user_email;
         } else {
-            $customer_name  = trim( strip_tags( $posted['author'] ) );
-            $customer_email = trim( strip_tags( $posted['email'] ) );
+            $customer_name  = isset( $_POST['author'] ) ? sanitize_text_field( wp_unslash( $_POST['author'] ) ) : '';
+            $customer_email = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
         }
 
-        $message = esc_attr( trim( $posted['enq_message'] ) );
-
-        if ( $message == '' ) {
-            wp_send_json_error( 'oops' );
+        if ( empty( $customer_name ) ) {
+            wp_send_json_error( __( 'Customer name cannot be empty!', 'dokan' ) );
         }
 
-        $product_id = (int) $posted['enquiry_id'];
-        $vendor_id  = (int) $posted['seller_id'];
-        $vendor     = dokan()->vendor->get( $vendor_id );
+        if ( empty( $customer_email ) ) {
+            wp_send_json_error( __( 'Customer email cannot be empty!', 'dokan' ) );
+        }
+
+        if ( empty( $message ) ) {
+            wp_send_json_error( __( 'Message cannot be empty!', 'dokan' ) );
+        }
 
         // no seller found
+        $vendor = dokan()->vendor->get( $vendor_id );
         if ( ! $vendor || is_wp_error( $vendor ) ) {
-            $message = sprintf( '<div class="alert alert-success">%s</div>', __( 'Something went wrong!', 'dokan' ) );
-            wp_send_json_error( $message );
+            wp_send_json_error( __( 'Something went wrong!', 'dokan' ) );
         }
 
         // no product found
         $product = wc_get_product( $product_id );
-
         if ( ! $product ) {
-            $message = sprintf( '<div class="alert alert-success">%s</div>', __( 'Something went wrong!', 'dokan' ) );
-            wp_send_json_error( $message );
+            wp_send_json_error( __( 'Something went wrong!', 'dokan' ) );
         }
 
+        // Validate recaptcha if site key and secret key exist.
+        if ( dokan_get_recaptcha_site_and_secret_keys( true ) ) {
+            $recaptcha_keys     = dokan_get_recaptcha_site_and_secret_keys();
+            $recaptcha_validate = dokan_handle_recaptcha_validation( 'dokan_product_enquiry_recaptcha', $recaptcha_token, $recaptcha_keys['secret_key'] );
+
+            if ( empty( $recaptcha_validate ) ) {
+                wp_send_json_error( __( 'reCAPTCHA verification failed!', 'dokan' ) );
+            }
+        }
+
+        // Email arguments.
         $email_args = array(
             $vendor,
             $product,
@@ -189,14 +219,14 @@ class Module {
     * @return void
     **/
     public function guest_user_settings( $settings_fields ) {
-        $settings_fields['enable_guest_user_enquiry'] = array(
+        $settings_fields['enable_guest_user_enquiry'] = [
             'name'    => 'enable_guest_user_enquiry',
             'label'   => __( 'Guest Product Enquiry', 'dokan' ),
             'desc'    => __( 'Enable/Disable product enquiry for guest user', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
             'default' => 'on',
             'tooltip' => __( 'When checked, user can inquire about products from the product page without signing in.', 'dokan' ),
-        );
+        ];
 
         return $settings_fields;
     }
@@ -247,7 +277,8 @@ class Module {
 
                         <?php do_action( 'dokan_product_enquiry_after_form' ); ?>
 
-                        <?php wp_nonce_field( 'dokan_product_enquiry' ); ?>
+                        <?php wp_nonce_field( 'dokan_product_enquiry', 'dokan_product_enquiry_nonce' ); ?>
+                        <input type="hidden" name="dokan_product_enquiry_recaptcha_token" class="dokan_recaptcha_token">
                         <input type="hidden" name="enquiry_id" value="<?php echo esc_attr( $post->ID ); ?>">
                         <input type="hidden" name="seller_id" value="<?php echo esc_attr( $post->post_author ); ?>">
                         <input type="hidden" name="action" value="dokan_product_enquiry">

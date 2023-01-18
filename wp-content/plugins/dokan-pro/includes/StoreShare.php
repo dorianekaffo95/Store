@@ -30,12 +30,11 @@ class StoreShare {
      *
      * @return void
      */
-    function init_hooks() {
+    public function init_hooks() {
         //register scripts
-        add_action( 'dokan_register_scripts', array( $this, 'register_scripts' ), 30 );
+        add_action( 'init', array( $this, 'register_scripts' ), 30 );
         //render
         add_action( 'dokan_enqueue_scripts', array( $this, 'enqueue_scripts' ), 30 );
-//        add_action( 'woocommerce_after_main_content', array( $this, 'render_html' ), 30 );
         add_action( 'dokan_after_store_tabs', array( $this, 'render_share_button' ), 1 );
         add_action( 'wp_footer', array( $this, 'render_script' ), 30 );
     }
@@ -45,14 +44,16 @@ class StoreShare {
     *
     * @return void
     **/
-    function register_scripts() {
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
         // register styles
-        wp_register_style( 'dokan-social-style', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials.css', false, time(), 'all' );
-        wp_register_style( 'dokan-social-theme-minimal', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials-theme-minima.css', false, time(), 'all' );
-        wp_register_style( 'dokan-social-theme-flat', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials-theme-flat.css', false, time(), 'all' );
+        wp_register_style( 'dokan-social-style', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials.css', [], $version, 'all' );
+        wp_register_style( 'dokan-social-theme-minimal', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials-theme-minima.css', [], $version, 'all' );
+        wp_register_style( 'dokan-social-theme-flat', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials-theme-flat.css', [], $version, 'all' );
 
         // register scripts
-        wp_register_script( 'dokan-social-script', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials.min.js', array( 'jquery', 'dokan-script' ), null, true );
+        wp_register_script( 'dokan-social-script', DOKAN_PRO_PLUGIN_ASSEST . '/vendor/jssocials/jssocials.min.js', array( 'jquery', 'dokan-script' ), $version, true );
     }
 
     /**
@@ -60,7 +61,7 @@ class StoreShare {
     *
     * @return void
     **/
-    function enqueue_scripts() {
+    public function enqueue_scripts() {
         if ( dokan_is_store_page() ) {
             wp_enqueue_script( 'dokan-social-script' );
             wp_enqueue_style( 'dokan-social-style' );
@@ -69,7 +70,7 @@ class StoreShare {
             wp_enqueue_style( 'dokan-social-theme-minimal' );
         }
 
-        if ( is_account_page() || is_checkout() ) {
+        if ( ( is_account_page() && ! is_user_logged_in() ) || is_checkout() ) {
             wp_enqueue_style( 'dokan-social-style' );
             wp_enqueue_style( 'dokan-social-theme-flat' );
         }
@@ -80,7 +81,7 @@ class StoreShare {
      *
      * @return string
      */
-    function render_html() {
+    public function render_html() {
         ob_start();
         ?>
         <div class="dokan-share-wrap">
@@ -98,10 +99,10 @@ class StoreShare {
      *
      * @return void
      */
-    function render_share_button(){
+    public function render_share_button() {
         ?>
         <li class="dokan-share-btn-wrap dokan-right">
-            <button class="dokan-share-btn dokan-btn dokan-btn-theme dokan-btn-sm"><?php echo esc_html( $this->share_text ); ?>  <i class="fa fa-external-link"></i></button>
+            <button class="dokan-share-btn dokan-btn dokan-btn-theme dokan-btn-sm"><?php echo esc_html( $this->share_text ); ?>  <i class="fas fa-external-link-alt"></i></button>
         </li>
         <?php
     }
@@ -111,8 +112,8 @@ class StoreShare {
      *
      * @return void
      */
-    function render_script(){
-        if ( !dokan_is_store_page() ) {
+    public function render_script() {
+        if ( ! dokan_is_store_page() ) {
             return;
         }
         ?>
@@ -135,7 +136,7 @@ class StoreShare {
                     },
 
                     showPopup : function(){
-                        var content = <?php echo json_encode( $this->render_html() ) ?>;
+                        var content = <?php echo wp_json_encode( $this->render_html() ); ?>;
                         $.magnificPopup.open({
                             items: {
                                 src: '<div class="white-popup dokan-share-popup-wrapper"><div id="ds-error-msg" ></div>'+ content +'</div>',

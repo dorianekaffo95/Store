@@ -30,25 +30,26 @@ get_header( 'shop' );
         <div id="vendor-biography">
             <div id="comments">
 
-            <h2 class="store-name" style="margin: 0.5em 0"><?php echo esc_html( $store_user->get_shop_name() ); ?></h2>
-            <p><i class="fa fa-map-marker"></i><?php echo wp_kses_post( $store_address ); ?></p>
-            <br>
-
-            <?php do_action( 'dokan_vendor_biography_tab_before', $store_user, $store_info ); ?>
+            <p style="color:#f00;"><i class="fa fa-map-marker"></i> <?php echo wp_kses_post( $store_address ); ?></p>
+            <?php //do_action( 'dokan_vendor_biography_tab_before', $store_user, $store_info ); ?>
 
             <?php do_action( 'dokan_sidebar_store_before', $store_user->data, $store_info );
                 $args = [
                     'before_widget' => '<aside class="widget dokan-store-widget %s">',
                     'after_widget'  => '</aside>',
-                    'before_title'  => '<h3 class="widget-title">',
-                    'after_title'   => '</h3>',
+                    'before_title'  => '<h4 style="margin:1rem 0;" class="widget-title">',
+                    'after_title'   => '</h4>',
                 ];
 
                 if ( ! empty( $map_location ) ) {
-                    the_widget( dokan()->widgets->store_location, [ 'title' => __( 'Localisation', 'dokan-lite' ) ], $args );
+                    the_widget( dokan()->widgets->store_location, [ 'title' => __( 'Google map location', 'vmc' ) ], $args );
                 }
+                //the_widget( dokan()->widgets->store_contact_form, [ 'title' => __( 'Contacter nous', 'vmc' ) ], $args );
+		?>
+                <h4 class="widget-title" style="margin:1rem 0;"><?php echo __( 'Contact us', 'vmc' ); ?></h4>
+                <?php 
 
-                the_widget( dokan()->widgets->store_contact_form, [ 'title' => __( 'Contacter le vendeur', 'dokan-lite' ) ], $args );
+		echo do_shortcode( '[contact-form-7 id="1211" title="contact-vendor" vendor-name=""]' );
 
                 do_action( 'dokan_sidebar_store_after', $store_user->data, $store_info );
 

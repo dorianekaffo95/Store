@@ -62,11 +62,11 @@ class Settings_General {
 				'callback'	=> 'select',
 				'section'	=> 'general_settings',
 				'args'		=> array(
-					'option_name'	=> $option_name,
-					'id'			=> 'template_path',
-					'options' 		=> $this->get_installed_templates_list(),
+					'option_name'      => $option_name,
+					'id'               => 'template_path',
+					'options_callback' => array( $this, 'get_installed_templates_list' ),
 					/* translators: 1,2. template paths */
-					'description'	=> sprintf( __( 'Want to use your own template? Copy all the files from <code>%1$s</code> to your (child) theme in <code>%2$s</code> to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), $plugin_template_path, $theme_template_path),
+					'description'      => sprintf( __( 'Want to use your own template? Copy all the files from <code>%1$s</code> to your (child) theme in <code>%2$s</code> to customize them' , 'woocommerce-pdf-invoices-packing-slips' ), $plugin_template_path, $theme_template_path),
 				)
 			),
 			array(
@@ -158,7 +158,6 @@ class Settings_General {
 				'args'		=> array(
 					'option_name'	=> $option_name,
 					'id'			=> 'shop_name',
-					'size'			=> '72',
 					'translatable'	=> true,
 				)
 			),
@@ -301,15 +300,14 @@ class Settings_General {
 	 */
 	public function find_templates() {
 		$installed_templates = array();
-
 		// get base paths
-		$template_base_path = ( function_exists( 'WC' ) && is_callable( 'WC', 'template_path' ) ) ? WC()->template_path() : 'woocommerce/';
-		$template_base_path = untrailingslashit( $template_base_path );
-		$template_paths = array (
+		$template_base_path  = ( function_exists( 'WC' ) && is_callable( array( WC(), 'template_path' ) ) ) ? WC()->template_path() : apply_filters( 'woocommerce_template_path', 'woocommerce/' );
+		$template_base_path  = untrailingslashit( $template_base_path );
+		$template_paths      = array (
 			// note the order: child-theme before theme, so that array_unique filters out parent doubles
-			'default'		=> WPO_WCPDF()->plugin_path() . '/templates/',
-			'child-theme'	=> get_stylesheet_directory() . "/{$template_base_path}/pdf/",
-			'theme'			=> get_template_directory() . "/{$template_base_path}/pdf/",
+			'default'     => WPO_WCPDF()->plugin_path() . '/templates/',
+			'child-theme' => get_stylesheet_directory() . "/{$template_base_path}/pdf/",
+			'theme'       => get_template_directory() . "/{$template_base_path}/pdf/",
 		);
 
 		$template_paths = apply_filters( 'wpo_wcpdf_template_paths', $template_paths );
@@ -320,10 +318,10 @@ class Settings_General {
 			$forwardslash_basepath = str_replace( '\\', '/', WP_CONTENT_DIR );
 		}
 
-		foreach ($template_paths as $template_source => $template_path) {
+		foreach ( $template_paths as $template_source => $template_path ) {
 			$dirs = (array) glob( $template_path . '*' , GLOB_ONLYDIR );
 			
-			foreach ($dirs as $dir) {
+			foreach ( $dirs as $dir ) {
 				// we're stripping abspath to make the plugin settings more portable
 				$forwardslash_dir = str_replace( '\\', '/', $dir );
 				$installed_templates[ str_replace( $forwardslash_basepath, '', $forwardslash_dir ) ] = basename($dir);
@@ -333,7 +331,7 @@ class Settings_General {
 		// remove parent doubles
 		$installed_templates = array_unique($installed_templates);
 
-		if (empty($installed_templates)) {
+		if ( empty( $installed_templates ) ) {
 			// fallback to Simple template for servers with glob() disabled
 			$simple_template_path = str_replace( ABSPATH, '', $template_paths['default'] . 'Simple' );
 			$installed_templates[$simple_template_path] = 'Simple';

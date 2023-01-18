@@ -46,17 +46,40 @@ i.order {color: transparent;-webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 0 rgba
 
 /* Auction activity style starts */
 
-.dokan-auction-activity-section .filter {
+.dokan-auction-product .filter, .dokan-auction-activity-section .filter {
     display: flex;
-    align-items: center;
+    justify-content: space-between;
+    flex-wrap:wrap;
 }
 
 .dokan-auction-activity-section .filter form {
-    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
     margin-bottom: 20px;
+}
+
+.dokan-auction-activity-section .filter form#auction-activity-form .dokan-form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+.dokan-auction-activity-section .filter input {
+    height: 35px;
+    width: 220px;
+}
+
+.dokan-auction-activity-section .filter form#auction-activity-form .dokan-form-group input#auction-activity-datetime-range {
+    margin-right: 7px;
+}
+
+.dokan-auction-activity-section .filter form#auction-activity-form .dokan-form-group .dokan-btn {
+    margin-left: 0!important;
+}
+
+.dokan-auction-activity-section .filter form#auction-activity-form .dokan-form-group .dokan-btn:last-child {
+    margin-left: 5px!important;
+    margin-right: 15px;
 }
 
 .dokan-auction-activity-section .filter form .search-box {
@@ -72,4 +95,29 @@ i.order {color: transparent;-webkit-box-shadow: inset 0 1px 0 #fff, 0 1px 0 rgba
     margin-right: 12px;
 }
 
+.dokan-dashboard-header span.back-to-auction {
+    font-size: 16px;
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.dokan-dashboard-header .button-ml,
+.product-listing-top .button-ml {
+    margin-left: 16px;
+}
+
 /* Auction activity style ends */
+
+/* Auction Products starts */
+
+#dokan-auction-products-filter {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#dokan-auction-products-filter input {
+    height: 35px;
+}
+
+/* Auction Products ends */

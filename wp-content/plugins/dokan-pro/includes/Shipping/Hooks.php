@@ -43,14 +43,14 @@ class Hooks {
      * @return array
      */
     public function add_settings_shipping_tab( $settings_fields ) {
-        $settings_fields['disable_shipping_tab'] = array(
+        $settings_fields['disable_shipping_tab'] = [
             'name'               => 'disable_shipping_tab',
             'label'              => __( 'Disable Shipping Tab', 'dokan' ),
-            'refresh_after_save' => true,
             'desc'               => __( 'Disable shipping tab on single product page', 'dokan' ),
-            'type'               => 'checkbox',
+            'type'               => 'switcher',
             'default'            => 'off',
-        );
+            'refresh_after_save' => true,
+        ];
 
         return $settings_fields;
     }
@@ -360,12 +360,15 @@ class Hooks {
         $country_obj = new WC_Countries();
         $countries   = $country_obj->countries;
         $states      = $country_obj->states;
+        $continents  = $country_obj->get_continents();
 
-        $shipping_countries = '';
-        $shipping_states    = '';
-        $location_code      = '';
-        $check_countries    = array();
-        $check_states       = array();
+        $shipping_countries  = '';
+        $shipping_states     = '';
+        $shipping_continents = '';
+        $location_code       = '';
+        $check_countries     = array();
+        $check_states        = array();
+        $check_continents    = array();
 
         if ( $shipping_zone ) {
             foreach ( $shipping_zone as $zone ) {
@@ -389,9 +392,23 @@ class Hooks {
                     $check_countries[ $location_code ] = $location_code;
                     $shipping_countries               .= $location_code . ', ';
                 }
+
+                if ( $zone['vendor_location_type'] === 'continent' && $continents[ $location_code ] && ! in_array( $continents[ $location_code ]['name'], $check_continents, true ) ) {
+                    $location_code                      = $continents[ $location_code ]['name'];
+                    $check_continents[ $location_code ] = $location_code;
+                    $shipping_continents               .= $location_code . ', ';
+                }
             }
         }
         ?>
+
+        <?php if ( $shipping_continents ) { ?>
+            <p>
+                <?php esc_html_e( 'Shipping Continents', 'dokan' ); ?>:
+                <strong><?php echo rtrim( $shipping_continents, ', ' ); ?></strong>
+            </p>
+            <hr>
+        <?php } ?>
 
         <?php if ( $shipping_countries ) { ?>
             <p>
@@ -530,6 +547,12 @@ class Hooks {
                     }
 
                     array_push( $package_to_keep, $key );
+
+                    // check if we already added same vendor under removed package
+                    $item_exists_on_remove_package = array_search( $key, $package_to_remove, true );
+                    if ( false !== $item_exists_on_remove_package ) {
+                        unset( $package_to_remove[ $item_exists_on_remove_package ] );
+                    }
                 }
 
                 if ( $product && ! $product->needs_shipping() && ! in_array( $key, $package_to_keep, true ) ) {
@@ -542,6 +565,9 @@ class Hooks {
             unset( $packages[ $package ] );
         }
 
+        /**
+         * @since 3.5.0
+         */
         return apply_filters( 'dokan_shipping_packages', $packages, $package_to_keep );
     }
 

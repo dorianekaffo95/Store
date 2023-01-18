@@ -95,7 +95,7 @@
         <form action="" method="GET" class="dokan-left">
             <div class="dokan-form-group">
                 <input type="text" class="datepicker" style="width:120px; padding-bottom:7px" name="order_date" id="order_date_filter" placeholder="<?php esc_attr_e( 'Filter by Date', 'dokan' ); ?>" value="<?php echo esc_attr( $filter_date ); ?>">
-                <input type="submit" name="dokan_order_filter" class="dokan-btn dokan-btn-sm dokan-btn-danger dokan-btn-theme" value="<?php esc_attr_e( 'Filter', 'dokan' ); ?>">
+                <input type="submit" name="dokan_order_filter" class="dokan-btn dokan-btn-sm" value="<?php esc_attr_e( 'Filter', 'dokan' ); ?>">
                 <?php wp_nonce_field( 'dokan-user-subscription-date', 'security', false ); ?>
             </div>
         </form>
@@ -152,8 +152,9 @@
                                 $price_content .= '<small class="meta" style="display:inline-block">';
                                 // translators: placeholder is the display name of a payment gateway a subscription was paid by
                                 $price_content .= esc_html( sprintf( __( 'Via %s', 'dokan' ), $subscription->get_payment_method_to_display() ) );
+                                $duplicate_site = version_compare( WC_Subscriptions::$version, '4.0.0', '>=' ) ? WCS_Staging::is_duplicate_site() : WC_Subscriptions::is_duplicate_site();
 
-                                if ( WC_Subscriptions::is_duplicate_site() && $subscription->has_payment_gateway() && ! $subscription->get_requires_manual_renewal() ) {
+                                if (  $duplicate_site && $subscription->has_payment_gateway() && ! $subscription->get_requires_manual_renewal() ) {
                                     // translators: placeholder is the Payment method name that is in live mode.
                                     $staging_message = sprintf( __( 'Subscription locked to Manual Renewal while the store is in staging mode. Live payment method: %s', 'dokan' ), $subscription->get_payment_method_title() );
                                     $price_content .= sprintf( '<span class="tips" data-toggle="tooltip" data-placement="top"> %s </span>', esc_html( $staging_message ) );

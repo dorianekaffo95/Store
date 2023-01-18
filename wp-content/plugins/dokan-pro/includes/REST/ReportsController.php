@@ -275,10 +275,10 @@ class ReportsController extends WP_REST_Controller {
             $product = wc_get_product( $product_id );
 
             $data[] = array(
-                'id'       => $product->get_id(),
-                'title'    => $product->get_title(),
-                'url'      => $product->get_permalink(),
-                'edit_url' => dokan_edit_product_url( $product_id ),
+                'id'       => $product ? $product->get_id() : 0,
+                'title'    => $product ? $product->get_title() : __( 'DELETED', 'dokan' ),
+                'url'      => $product ? $product->get_permalink() : '#',
+                'edit_url' => $product ? dokan_edit_product_url( $product_id ) : '#',
                 'sold_qty' => $sales,
             );
         }
@@ -343,10 +343,10 @@ class ReportsController extends WP_REST_Controller {
                 $product = wc_get_product( $product_id );
 
                 $data[] = array(
-                    'id'       => $product->get_id(),
-                    'title'    => $product->get_title(),
-                    'url'      => $product->get_permalink(),
-                    'edit_url' => dokan_edit_product_url( $product_id ),
+                    'id'       => $product ? $product->get_id() : 0,
+                    'title'    => $product ? $product->get_title() : __( 'DELETED', 'dokan' ),
+                    'url'      => $product ? $product->get_permalink() : '#',
+                    'edit_url' => $product ? dokan_edit_product_url( $product_id ) : '#',
                     'sales'    => $sales,
                 );
             }

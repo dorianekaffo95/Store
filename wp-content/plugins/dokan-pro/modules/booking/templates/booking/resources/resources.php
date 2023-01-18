@@ -4,7 +4,7 @@
 <header class="dokan-dashboard-header">
     <h1 class="entry-title"><?php _e( $title , 'dokan' ); ?>
         <span class="dokan-add-resource-link">
-            <button href="#" class="dokan-btn dokan-btn-theme dokan-right"><i class="fa fa-briefcase">&nbsp;</i><?php _e( 'Add new Resource', 'dokan' ) ?></button>
+            <button href="#" class="dokan-btn dokan-btn-theme dokan-right"><i class="fas fa-briefcase">&nbsp;</i><?php _e( 'Add new Resource', 'dokan' ) ?></button>
         </span>
     </h1>
 </header><!-- .dokan-dashboard-header -->

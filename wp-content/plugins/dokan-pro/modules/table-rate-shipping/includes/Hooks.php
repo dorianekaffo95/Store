@@ -556,6 +556,7 @@ class Hooks {
                         'rate_fee'       => $rate_fee,
                         'rate_break'     => $rate_break,
                         'rate_abort'     => $rate_abort,
+                        'rate_order'     => $i,
                     ),
                     array(
                         'rate_id' => $rate_id,
@@ -570,6 +571,7 @@ class Hooks {
                         '%s',
                         '%s',
                         '%s',
+                        '%d',
                         '%d',
                         '%d',
                     ),
@@ -594,6 +596,7 @@ class Hooks {
                         'rate_fee'       => $rate_fee,
                         'rate_break'     => $rate_break,
                         'rate_abort'     => $rate_abort,
+                        'rate_order'     => $i,
                     ),
                     array(
                         '%d',
@@ -605,6 +608,7 @@ class Hooks {
                         '%s',
                         '%s',
                         '%s',
+                        '%d',
                         '%d',
                         '%d',
                     )

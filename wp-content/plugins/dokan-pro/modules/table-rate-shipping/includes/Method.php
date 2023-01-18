@@ -74,6 +74,7 @@ class Method extends WC_Shipping_Method {
         // additional hooks for post-calculations settings
         add_filter( 'woocommerce_shipping_chosen_method', [ $this, 'select_default_rate' ], 10, 2 );
         add_action( 'woocommerce_update_options_shipping_' . $this->id, [ $this, 'process_admin_options' ] );
+        add_action( 'woocommerce_shipping_zone_method_deleted', [ $this, 'delete_table_rate_shipping_methods' ], 10, 3 );
     }
 
     /**
@@ -972,5 +973,50 @@ class Method extends WC_Shipping_Method {
         }
 
         return $chosen_method;
+    }
+
+    /**
+     * Delete Table Rate shipping methods, created by Vendor, if Admin delete 'Vendor Table Rate' in WC > Settings > Shipping > Zone
+     *
+     * @since 3.7.0
+     *
+     * @param int $instance_id
+     * @param string $method_id
+     * @param int $zone_id
+     */
+    public function delete_table_rate_shipping_methods( $instance_id, $method_id, $zone_id ) {
+        global $wpdb;
+
+        if ( 'dokan_table_rate_shipping' !== $method_id ) {
+            return;
+        }
+
+        $table_rate_shipping_method_ids = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT instance_id FROM {$wpdb->prefix}dokan_shipping_zone_methods WHERE zone_id = %d AND method_id = 'dokan_table_rate_shipping'",
+                $zone_id
+            )
+        );
+
+        if ( empty( $table_rate_shipping_method_ids ) ) {
+            return;
+        }
+
+        $table_rate_shipping_method_ids = array_map( 'absint', $table_rate_shipping_method_ids );
+        $table_rate_shipping_method_ids = implode( ',', $table_rate_shipping_method_ids );
+
+        //delete the table rate rules first
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE from {$wpdb->prefix}dokan_table_rate_shipping WHERE instance_id IN ($table_rate_shipping_method_ids)"
+            )
+        );
+
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->prefix}dokan_shipping_zone_methods WHERE zone_id = %d AND method_id = 'dokan_table_rate_shipping'",
+                $zone_id
+            )
+        );
     }
 }

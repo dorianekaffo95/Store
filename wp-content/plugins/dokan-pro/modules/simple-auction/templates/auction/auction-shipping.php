@@ -49,10 +49,10 @@ if ( $tax_classes ) {
 <?php if ( ( $wc_shipping_enabled && ! $is_shipping_disabled ) || $wc_tax_enabled ) : ?>
 <div class="dokan-product-shipping-tax hide_if_virtual hide_if_grouped dokan-edit-row dokan-clearfix dokan-border-top <?php echo ! $wc_shipping_enabled ? 'woocommerce-no-shipping' : '' ?> <?php echo ! $wc_tax_enabled ? 'woocommerce-no-tax' : '' ?>">
     <div class="dokan-section-heading" data-togglehandler="dokan_product_shipping_tax">
-        <h2><i class="fa fa-truck" aria-hidden="true"></i> <?php echo esc_html( $tab_title ); ?></h2>
+        <h2><i class="fas fa-truck" aria-hidden="true"></i> <?php echo esc_html( $tab_title ); ?></h2>
         <p><?php echo esc_html( $tab_desc ); ?></p>
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>

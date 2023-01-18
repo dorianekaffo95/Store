@@ -129,7 +129,7 @@ class Dokan_Store_Verification_list extends WP_Widget {
         ?>
 
         <li class="clearfix">
-            <i class="fa fa-<?php echo $key ?>-square"></i><span><?php echo ucfirst( $key ) ?></span><i class="fa fa-check-circle-o verification-icon dokan-right"></i>
+            <i class="fas fa-<?php echo $key ?>-square"></i><span><?php echo ucfirst( $key ) ?></span><i class="far fa-check-circle verification-icon dokan-right"></i>
         </li>
 
     <?php
@@ -141,7 +141,7 @@ class Dokan_Store_Verification_list extends WP_Widget {
             if ( $item['dokan_v_id_status'] === 'approved' ) {
                 ?>
                 <li class="clearfix">
-                    <i class="fa fa-user"></i><span><?php _e( 'Photo ID', 'dokan' ); ?></span><i class="fa fa-check-circle-o verification-icon dokan-right"></i>
+                    <i class="fas fa-user"></i><span><?php _e( 'Photo ID', 'dokan' ); ?></span><i class="far fa-check-circle verification-icon dokan-right"></i>
                 </li>
             <?php
             }
@@ -151,7 +151,7 @@ class Dokan_Store_Verification_list extends WP_Widget {
             if ( sizeof( $this->verify_address( $item['store_address'] ) ) == 0 ) {
                 ?>
                 <li class="clearfix">
-                    <i class="fa fa-map-marker"></i><span><?php _e( 'Postal Address', 'dokan' ); ?></span><i class="fa fa-check-circle-o verification-icon dokan-right"></i>
+                    <i class="fas fa-map-marker-alt"></i><span><?php _e( 'Postal Address', 'dokan' ); ?></span><i class="far fa-check-circle verification-icon dokan-right"></i>
                 </li>
             <?php
             }
@@ -161,7 +161,7 @@ class Dokan_Store_Verification_list extends WP_Widget {
             if ( $item['phone_status'] === 'verified' ) {
                 ?>
                 <li class="clearfix">
-                    <i class="fa fa-phone-square"></i><span><?php _e( 'Phone', 'dokan' ); ?></span><i class="fa fa-check-circle-o verification-icon dokan-right"></i>
+                    <i class="fas fa-phone-square"></i><span><?php _e( 'Phone', 'dokan' ); ?></span><i class="far fa-check-circle verification-icon dokan-right"></i>
                 </li>
             <?php
             }

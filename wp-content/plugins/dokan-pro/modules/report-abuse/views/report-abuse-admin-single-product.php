@@ -41,7 +41,7 @@
                         </td>
                         <td>
                             <button type="button" class="button button-small dokan-report-abuse-admin-single-product-delete-item" data-id="<?php echo esc_attr( $report['id'] ); ?>">
-                                <i class="fa fa-trash"></i> <?php esc_html_e( 'Delete', 'dokan' ); ?>
+                                <i class="far fa-trash-alt"></i> <?php esc_html_e( 'Delete', 'dokan' ); ?>
                             </button>
                         </td>
                     </tr>

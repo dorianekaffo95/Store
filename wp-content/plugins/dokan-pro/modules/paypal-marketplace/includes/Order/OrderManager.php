@@ -61,22 +61,10 @@ class OrderManager {
         $shipping_total = wc_format_decimal( $order->get_shipping_total(), 2 );
 
         $seller_id     = dokan_get_seller_id_by_order( $order->get_id() );
-        $merchant_id   = Helper::get_seller_merchant_id( $seller_id );
+        $merchant_id   = apply_filters( 'dokan_paypal_marketplace_purchase_unit_merchant_id', Helper::get_seller_merchant_id( $seller_id ), $order );
         $platform_fee  = wc_format_decimal( dokan()->commission->get_earning_by_order( $order, 'admin' ), 2 );
 
         $product_items = static::get_product_items( $order );
-
-        //if tax fee recipient is 'admin' then it will added with platform fee
-        if ( 'admin' === get_post_meta( $order->get_id(), 'tax_fee_recipient', true ) ) {
-            $subtotal     += $tax_total;
-            $tax_total    = 0.00;
-        }
-
-        //if shipping fee recipient is 'admin' then it will added with platform fee
-        if ( 'admin' === get_post_meta( $order->get_id(), 'shipping_fee_recipient', true ) ) {
-            $subtotal       += $shipping_total;
-            $shipping_total = 0.00;
-        }
 
         // calculate discounts
         $total_discount = $order->get_total_discount() + static::get_lot_discount( $order ) + static::get_minimum_order_discount( $order );
@@ -254,32 +242,9 @@ class OrderManager {
     public static function get_product_items( \WC_Order $order ) {
         $items = [];
 
-        $extra_fee      = 0;
-        $tax_total      = static::get_tax_amount( $order );
-        $shipping_total = wc_format_decimal( $order->get_shipping_total(), 2 );
-
-        $no_of_items = count( $order->get_items( 'line_item' ) );
-
-        //if tax fee recipient is 'admin' then it will added with line item value.
-        if ( 'admin' === get_post_meta( $order->get_id(), 'tax_fee_recipient', true ) ) {
-            $extra_fee += ( $tax_total / $no_of_items );
-        }
-
-        //if shipping fee recipient is 'admin' then will added with line item value.
-        if ( 'admin' === get_post_meta( $order->get_id(), 'shipping_fee_recipient', true ) ) {
-            $extra_fee += ( $shipping_total / $no_of_items );
-        }
-
         foreach ( $order->get_items( 'line_item' ) as $key => $line_item ) {
             $product  = wc_get_product( $line_item->get_product_id() );
             $category = $product->is_downloadable() || $product->is_virtual() || Helper::is_vendor_subscription_product( $product ) ? 'DIGITAL_GOODS' : 'PHYSICAL_GOODS';
-
-            //dividing the extra fee by the quantity
-            $item_extra_fee = ( $extra_fee / $line_item->get_quantity() );
-
-            //get single item price by quantity. sometimes there will be product warranty add-on
-            $item_price = ( $line_item->get_subtotal() / $line_item->get_quantity() ) + $item_extra_fee;
-            $item_price = wc_format_decimal( $item_price, 2 );
 
             $items[] = [
                 'name'        => $line_item->get_name(),

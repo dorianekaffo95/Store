@@ -39,11 +39,11 @@ class Templates {
      * @return bool|array
      */
     public static function pre_http_request( $pre, $r, $url ) {
-        $templates   = [
+        $templates = [
             '1000001' => '1',
             '1000002' => '2',
             '1000003' => '3',
-            '1000004' => '4'
+            '1000004' => '4',
         ];
 
         $template_id = ! empty( $r['body']['id'] ) ? $r['body']['id'] : 0;
@@ -58,7 +58,7 @@ class Templates {
                     'response' => [
                         'code' => 200,
                     ],
-                    'body' => json_encode( $content )
+                    'body' => wp_json_encode( $content ),
                 ];
             }
         }
@@ -74,81 +74,85 @@ class Templates {
      * @param array $value
      */
     public static function add_template_library( $value ) {
-        if ( 'string' === gettype($value['categories']) ) {
+        if ( 'string' === gettype( $value['categories'] ) ) {
             $categories          = json_decode( $value['categories'], true );
             $categories[]        = 'single store';
-            $value['categories'] = $categories;
+            $value['categories'] = wp_json_encode( $categories );
         } else {
             $value['categories'][] = 'single store';
         }
 
         $store_templates = [
             [
-                'id'                => "1000001",
-                'source'            => "remote",
-                'type'              => "block",
-                'subtype'           => "single store",
-                'title'             => "Store Header Layout 1",
+                'id'                => '1000001',
+                'source'            => 'remote',
+                'type'              => 'block',
+                'subtype'           => 'single store',
+                'title'             => 'Store Header Layout 1',
                 'thumbnail'         => DOKAN_PLUGIN_ASSEST . '/images/store-header-templates/default.png',
-                'tmpl_created'      => "1475067229",
-                'author'            => "weDevs",
+                'tmpl_created'      => '1475067229',
+                'author'            => 'weDevs',
                 'tags'              => '',
-                'is_pro'            => false,
+                'is_pro'            => 0,
+                'access_level'      => 0,
                 'popularity_index'  => 1,
                 'trend_index'       => 1,
-                'favorite'          => false,
-                'has_page_settings' => false,
+                'favorite'          => 0,
+                'has_page_settings' => 0,
                 'url'               => home_url( '/?wc-api=dokan-elementor-template-preview&id=01' ),
             ],
             [
-                'id'                => "1000002",
-                'source'            => "remote",
-                'type'              => "block",
-                'subtype'           => "single store",
-                'title'             => "Store Header Layout 2",
+                'id'                => '1000002',
+                'source'            => 'remote',
+                'type'              => 'block',
+                'subtype'           => 'single store',
+                'title'             => 'Store Header Layout 2',
                 'thumbnail'         => DOKAN_PLUGIN_ASSEST . '/images/store-header-templates/layout1.png',
-                'tmpl_created'      => "1475067229",
-                'author'            => "weDevs",
+                'tmpl_created'      => '1475067229',
+                'author'            => 'weDevs',
                 'tags'              => '',
-                'is_pro'            => false,
+                'is_pro'            => 0,
+                'access_level'      => 0,
                 'popularity_index'  => 1,
                 'trend_index'       => 1,
-                'favorite'          => false,
-                'has_page_settings' => false,
+                'favorite'          => 0,
+                'has_page_settings' => 0,
                 'url'               => home_url( '/?wc-api=dokan-elementor-template-preview&id=02' ),
             ],
             [
-                'id'                => "1000003",
-                'source'            => "remote",
-                'type'              => "block",
-                'subtype'           => "single store",
-                'title'             => "Store Header Layout 3",
+                'id'                => '1000003',
+                'source'            => 'remote',
+                'type'              => 'block',
+                'subtype'           => 'single store',
+                'title'             => 'Store Header Layout 3',
                 'thumbnail'         => DOKAN_PLUGIN_ASSEST . '/images/store-header-templates/layout2.png',
-                'tmpl_created'      => "1475067229",
-                'author'            => "weDevs",
+                'tmpl_created'      => '1475067229',
+                'author'            => 'weDevs',
                 'tags'              => '',
-                'is_pro'            => false,
+                'is_pro'            => 0,
+                'access_level'      => 0,
                 'popularity_index'  => 1,
                 'trend_index'       => 1,
-                'favorite'          => false,
-                'has_page_settings' => false,
+                'favorite'          => 0,
+                'has_page_settings' => 0,
                 'url'               => home_url( '/?wc-api=dokan-elementor-template-preview&id=03' ),
             ],
             [
-                'id'                => "1000004",
-                'source'            => "remote",
-                'type'              => "block",
-                'subtype'           => "single store",
-                'title'             => "Store Header Layout 4",
+                'id'                => '1000004',
+                'source'            => 'remote',
+                'type'              => 'block',
+                'subtype'           => 'single store',
+                'title'             => 'Store Header Layout 4',
                 'thumbnail'         => DOKAN_PLUGIN_ASSEST . '/images/store-header-templates/layout3.png',
-                'tmpl_created'      => "1475067229",
-                'author'            => "weDevs",
+                'tmpl_created'      => '1475067229',
+                'author'            => 'weDevs',
                 'tags'              => '',
-                'is_pro'            => false,
+                'is_pro'            => 0,
+                'access_level'      => 0,
                 'popularity_index'  => 1,
                 'trend_index'       => 1,
-                'favorite'          => false,
-                'has_page_settings' => false,
+                'favorite'          => 0,
+                'has_page_settings' => 0,
                 'url'               => home_url( '/?wc-api=dokan-elementor-template-preview&id=04' ),
             ],
         ];

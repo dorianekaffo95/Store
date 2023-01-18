@@ -163,7 +163,7 @@ class Reports {
     public function add_reports_menu( $urls ) {
         $urls['reports'] = array(
             'title' => __( 'Reports', 'dokan' ),
-            'icon'  => '<i class="fa fa-line-chart"></i>',
+            'icon'  => '<i class="fas fa-chart-line"></i>',
             'url'   => dokan_get_navigation_url( 'reports' ),
             'pos'   => 60,
             'permission' => 'dokan_view_report_menu',

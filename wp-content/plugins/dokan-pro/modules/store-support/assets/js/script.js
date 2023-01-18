@@ -124,6 +124,7 @@
 
         init : function() {
             $('body').on( 'submit', '#dokan-support-commentform', this.submitComment );
+            Dokan_support_comment.scroolTOBottomList();
         },
 
         submitComment : function(e){
@@ -135,11 +136,10 @@
                 form_data : self.serialize(),
             };
 
-            if( $('#comment').val() === '' ){
-                alert('Comment box is empty');
+            if( $('#comment').val().trim().length === 0 ){
+                dokan_sweetalert( 'Comment box is empty', { confirmButtonColor: '#f54242',icon: 'error', } );
                 return;
             }
-
 
             var formurl = self.attr('action');
 
@@ -149,9 +149,21 @@
                 if(resp){
                     $('.dokan-support-topic-wrapper').unblock();
                     $('.dokan-support-topic-wrapper').html($(resp).find('.dokan-support-topic-wrapper').html());
+
+                    Dokan_support_comment.scroolTOBottomList();
                 }
-            } )
-        }
+            } );
+        },
+
+        scroolTOBottomList : function(){
+            // let messageBody = $('.dokan-dss-chat-box');
+            // messageBody.animate({ scrollTop: messageBody.height() }, "slow");
+
+            const comments = $('.dokan-dss-chat-box');
+            $.each( comments, function ( i, val ) {
+                val.scrollIntoView();
+            } );
+        },
 
     };
 

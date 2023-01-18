@@ -338,7 +338,7 @@ class Notice {
         if ( current_user_can( 'dokandar' ) ) {
             $urls['announcement'] = array(
                 'title' => __( 'Announcements', 'dokan' ),
-                'icon'  => '<i class="fa fa-bell"></i>',
+                'icon'  => '<i class="fas fa-bell"></i>',
                 'url'   => dokan_get_navigation_url( 'announcement' ),
                 'pos'   => 181,
             );

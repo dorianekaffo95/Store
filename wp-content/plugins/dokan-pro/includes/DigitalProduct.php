@@ -49,15 +49,16 @@ class DigitalProduct {
             'name'    => 'global_digital_mode',
             'label'   => __( 'Selling Product Types', 'dokan' ),
             'desc'    => __( 'Select a type for vendors what type of product they can sell only', 'dokan' ),
-            'type'    => 'select',
+            'type'    => 'radio',
             'default' => 'sell_both',
+            'tooltip' => __( 'Select the type of products vendor can sell.', 'dokan' ),
             'options' => apply_filters(
                 'dokan_digital_product_types',
-                array(
-                    'sell_both'     => __( 'I plan to sell both physical and digital products', 'dokan' ),
-                    'sell_physical' => __( 'I plan to sell only physical products', 'dokan' ),
-                    'sell_digital'  => __( 'I plan to sell only digital products', 'dokan' ),
-                )
+                [
+                    'sell_physical' => __( 'Physical', 'dokan' ),
+                    'sell_digital'  => __( 'Digital', 'dokan' ),
+                    'sell_both'     => __( 'Both', 'dokan' ),
+                ]
             ),
         );
 
@@ -89,11 +90,11 @@ class DigitalProduct {
             'digital_mode' => $this->get_selling_product_type(),
             'plans' => apply_filters(
                 'dokan_digital_product_types',
-                array(
-                    'sell_both'     => __( 'I plan to sell both physical and digital products', 'dokan' ),
-                    'sell_physical' => __( 'I plan to sell only physical products', 'dokan' ),
-                    'sell_digital'  => __( 'I plan to sell only digital products', 'dokan' ),
-                )
+                [
+                    'sell_physical' => __( 'Physical', 'dokan' ),
+                    'sell_digital'  => __( 'Digital', 'dokan' ),
+                    'sell_both'     => __( 'Both', 'dokan' ),
+                ]
             ),
         );
 

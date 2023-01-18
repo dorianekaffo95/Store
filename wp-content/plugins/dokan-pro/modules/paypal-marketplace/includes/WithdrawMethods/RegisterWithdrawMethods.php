@@ -34,6 +34,11 @@ class RegisterWithdrawMethods {
         add_action( 'dokan_dashboard_before_widgets', [ $this, 'send_announcement_to_non_connected_vendor' ], 10 );
         // display notice
         add_action( 'dokan_dashboard_content_inside_before', [ $this, 'display_notice_on_vendor_dashboard' ] );
+
+        add_filter( 'dokan_withdraw_method_settings_title', [ $this, 'get_heading' ], 10, 2 );
+        add_filter( 'dokan_withdraw_method_icon', [ $this, 'get_icon' ], 10, 2 );
+        add_filter( 'dokan_is_seller_connected_to_payment_method', [ $this, 'is_seller_connected' ], 10, 3 );
+        add_filter( 'dokan_profile_completion_progress_for_payment_methods', [ $this, 'calculate_profile_progress' ] );
     }
 
     /**
@@ -81,10 +86,18 @@ class RegisterWithdrawMethods {
         $disconnect_paypal_url = wp_nonce_url(
             add_query_arg(
                 [ 'action' => 'dokan-paypal-marketplace-disconnect' ],
-                dokan_get_navigation_url( 'settings/payment' )
+                dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
             ),
             'dokan-paypal-marketplace-disconnect'
         );
+
+        // update merchant status if already not updated
+        if ( ! $is_seller_enabled && ! empty( $merchant_id ) ) {
+            if ( WithdrawManager::update_merchant_status( $merchant_id, get_current_user_id() ) ) {
+                $is_seller_enabled = Helper::is_seller_enable_for_receive_payment( get_current_user_id() );
+                $primary_email     = get_user_meta( get_current_user_id(), Helper::get_seller_primary_email_confirmed_key(), true );
+            }
+        }
 
         Helper::get_template(
             'vendor-settings-payment',
@@ -120,7 +133,7 @@ class RegisterWithdrawMethods {
                             'status'  => 'error',
                             'message' => rawurlencode( __( 'Nonce Verification Failed.', 'dokan' ) ),
                         ],
-                        dokan_get_navigation_url( 'settings/payment' )
+                        dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                     ),
                 ]
             );
@@ -140,7 +153,7 @@ class RegisterWithdrawMethods {
                             'status'  => 'error',
                             'message' => rawurlencode( __( 'Email address field is required.', 'dokan' ) ),
                         ],
-                        dokan_get_navigation_url( 'settings/payment' )
+                        dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                     ),
                 ]
             );
@@ -163,7 +176,7 @@ class RegisterWithdrawMethods {
                             'status'  => 'error',
                             'message' => rawurlencode( __( 'Selected country is not supported by PayPal. Please change your Country from Vendor Dashboard --> Settings --> Country', 'dokan' ) ),
                         ],
-                        dokan_get_navigation_url( 'settings/payment' )
+                        dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                     ),
                 ]
             );
@@ -186,7 +199,7 @@ class RegisterWithdrawMethods {
                             'status'  => 'error',
                             'message' => rawurlencode( $error_message ),
                         ],
-                        dokan_get_navigation_url( 'settings/payment' )
+                        dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                     ),
                 ]
             );
@@ -241,7 +254,7 @@ class RegisterWithdrawMethods {
         $get_data = wp_unslash( $_GET );
 
         if ( isset( $get_data['_wpnonce'] ) && 'dokan-paypal-marketplace-connect' === $get_data['action'] && ! wp_verify_nonce( $get_data['_wpnonce'], 'dokan-paypal-marketplace-connect' ) ) {
-            wp_safe_redirect( add_query_arg( [ 'message' => 'error' ], dokan_get_navigation_url( 'settings/payment' ) ) );
+            wp_safe_redirect( add_query_arg( [ 'message' => 'error' ], dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' ) ) );
             exit();
         }
 
@@ -252,14 +265,14 @@ class RegisterWithdrawMethods {
                         'status'  => 'error',
                         'message' => 'paypal_connect_error',
                     ],
-                    dokan_get_navigation_url( 'settings/payment' )
+                    dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                 )
             );
             exit();
         }
 
         if ( isset( $get_data['_wpnonce'] ) && $_GET['action'] === 'dokan-paypal-merchant-status-update' && ! wp_verify_nonce( $get_data['_wpnonce'], 'dokan-paypal-merchant-status-update' ) ) {
-            wp_safe_redirect( add_query_arg( [ 'message' => 'error' ], dokan_get_navigation_url( 'settings/payment' ) ) );
+            wp_safe_redirect( add_query_arg( [ 'message' => 'error' ], dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' ) ) );
             exit();
         }
 
@@ -272,7 +285,7 @@ class RegisterWithdrawMethods {
                             'status'  => 'error',
                             'message' => Helper::get_error_message( $response ),
                         ],
-                        dokan_get_navigation_url( 'settings/payment' )
+                        dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                     )
                 );
                 exit();
@@ -289,12 +302,14 @@ class RegisterWithdrawMethods {
                             'status'  => 'error',
                             'message' => Helper::get_error_message( $response ),
                         ],
-                        dokan_get_navigation_url( 'settings/payment' )
+                        dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
                     )
                 );
                 exit();
             }
         }
+
+        dokan_pro()->store_settings->save_store_data( $user_id );
     }
 
     /**
@@ -338,9 +353,10 @@ class RegisterWithdrawMethods {
                 'status'  => 'success',
                 'message' => __( 'PayPal account disconnected successfully.', 'dokan' ),
             ],
-            dokan_get_navigation_url( 'settings/payment' )
+            dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' )
         );
 
+        dokan_pro()->store_settings->save_store_data( $vendor_id );
         wp_safe_redirect( $url );
         exit;
     }
@@ -359,7 +375,7 @@ class RegisterWithdrawMethods {
         $_get_data = wp_unslash( $_GET );//phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
         $status     = isset( $_get_data['status'] ) ? sanitize_text_field( rawurldecode( $_get_data['status'] ) ) : '';
-        $message    = isset( $_get_data['message'] ) ? esc_html( rawurldecode( $_get_data['message'] ) ) : '';
+        $message    = isset( $_get_data['message'] ) ? wp_kses_post( rawurldecode( $_get_data['message'] ) ) : '';
         $class      = $status === 'error' ? 'dokan-error' : 'dokan-message';
 
         if ( ! empty( $status ) && ! empty( $message ) ) {
@@ -471,6 +487,10 @@ class RegisterWithdrawMethods {
             return;
         }
 
+        if ( ! dokan_is_withdraw_method_enabled( 'dokan-paypal-marketplace' ) ) {
+            return;
+        }
+
         echo '<div class="dokan-alert dokan-alert-danger dokan-panel-alert">' . $this->connect_messsage() . '</div>';
     }
 
@@ -480,8 +500,10 @@ class RegisterWithdrawMethods {
     private function connect_messsage() {
         return wp_kses(
             sprintf(
-                'Your account is not connected with PayPal Marketplace. Connect your <a href="%1$s">PayPal</a> account to receive automatic payouts.',
-                dokan_get_navigation_url( 'settings/payment' )
+            // Translators: %1$s is the link to the settings page, %2$s is anchor end tag.
+                __( 'Your account is not connected with PayPal Marketplace. Connect your %1$s PayPal%2$s account to receive automatic payouts.', 'dokan' ),
+                sprintf( '<a href="%1$s">', dokan_get_navigation_url( 'settings/payment-manage-dokan-paypal-marketplace' ) ),
+                '</a>'
             ),
             [
                 'a' => [
@@ -490,5 +512,86 @@ class RegisterWithdrawMethods {
                 ],
             ]
         );
+    }
+
+    /**
+     * Get the Withdrawal method icon
+     *
+     * @since 3.5.6
+     *
+     * @param string $method_icon
+     * @param string $method_key
+     *
+     * @return string
+     */
+    public function get_icon( $method_icon, $method_key ) {
+        if ( 'dokan-paypal-marketplace' === $method_key ) {
+            $method_icon = DOKAN_PAYPAL_MP_ASSETS . 'images/paypal-withdraw-method.svg';
+        }
+
+        return $method_icon;
+    }
+
+    /**
+     * Get the heading for this payment's settings page
+     *
+     * @since 3.5.6
+     *
+     * @param string $heading
+     * @param string $slug
+     *
+     * @return string
+     */
+    public function get_heading( $heading, $slug ) {
+        if ( false !== strpos( $slug, 'dokan-paypal-marketplace' ) ) {
+            $heading = __( 'Paypal Marketplace Settings', 'dokan' );
+        }
+
+        return $heading;
+    }
+
+    /**
+     * Get if a seller is connected to this payment method
+     *
+     * @since 3.6.1
+     *
+     * @param bool $connected
+     * @param string $payment_method_id
+     * @param int $seller_id
+     *
+     * @return bool
+     */
+    public function is_seller_connected( $connected, $payment_method_id, $seller_id ) {
+        if ( 'dokan-paypal-marketplace' === $payment_method_id && Helper::is_seller_enable_for_receive_payment( $seller_id ) ) {
+            $connected = true;
+        }
+
+        return $connected;
+    }
+
+    /**
+     * Calculate Dokan profile completeness value
+     *
+     * @since 3.7.1
+     *
+     * @param array $progress_track_value
+     *
+     * @return array
+     */
+    public function calculate_profile_progress( $progress_track_value ) {
+        if (
+            ! Helper::is_seller_enable_for_receive_payment( dokan_get_current_user_id() ) ||
+            ! isset( $progress_track_value['progress'] ) ||
+            ! isset( $progress_track_value['current_payment_val'] ) ||
+            $progress_track_value['current_payment_val'] <= 0
+        ) {
+            return $progress_track_value;
+        }
+
+        $progress_track_value['progress'] += $progress_track_value['current_payment_val'];
+        $progress_track_value[ Helper::get_gateway_id() ] = $progress_track_value['current_payment_val'];
+        $progress_track_value['current_payment_val'] = 0;
+
+        return $progress_track_value;
     }
 }

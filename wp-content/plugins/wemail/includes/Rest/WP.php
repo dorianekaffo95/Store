@@ -2,8 +2,9 @@
 
 namespace WeDevs\WeMail\Rest;
 
-use WP_Query;
 use WeDevs\WeMail\RestController;
+use WP_Post;
+use WP_Query;
 
 class WP extends RestController {
 
@@ -28,9 +29,8 @@ class WP extends RestController {
     /**
      * Register routes
      *
-     * @since 1.0.0
-     *
      * @return void
+     * @since 1.0.0
      */
     public function register_routes() {
         $this->get( '/post-types', 'post_types', 'can_update_campaign' );
@@ -38,19 +38,19 @@ class WP extends RestController {
         $this->get( '/user-roles', 'user_roles', 'can_manage_settings' );
         $this->get( '/users', 'users', 'can_create_subscriber' );
         $this->get( '/products', 'products', 'can_update_campaign' );
+        $this->get( '/post-types/(?P<post_type>[\w]+)/taxonomies/(?P<taxonomy>post_tag|category)', 'terms', 'can_update_campaign' );
     }
 
     /**
      * Get all public post types
      *
-     * @since 1.0.0
-     *
      * @param \WP_REST_Request $request
      *
      * @return \WP_REST_Response|mixed
+     * @since 1.0.0
      */
     public function post_types( $request ) {
-        $post_types = [];
+        $post_types       = [];
         $registered_types = get_post_types( [ 'public' => true ], 'objects' );
 
         foreach ( $registered_types as $name => $object ) {
@@ -59,7 +59,7 @@ class WP extends RestController {
             }
 
             $post_types[] = [
-                'name' => $object->name,
+                'name'  => $object->name,
                 'label' => $object->label,
             ];
         }
@@ -70,56 +70,60 @@ class WP extends RestController {
     /**
      * Get public posts
      *
-     * @since 1.0.0
-     *
      * @param \WP_REST_Request $request
      *
      * @return \WP_REST_Response|mixed
+     * @since 1.0.0
      */
     public function posts( $request ) {
-        $post_type = $request->get_param( 'post_type' );
-        $search = $request->get_param( 's' );
+        $post_type   = $request->get_param( 'post_type' );
+        $search      = $request->get_param( 's' );
+        $tag_id      = $request->get_param( 'tag_id' );
+        $category_id = $request->get_param( 'category_id' );
+        $limit       = $request->get_param( 'limit' );
 
-        $posts = [];
+        $limit = empty( $limit ) ? 5 : $limit;
 
         $args = [
-            'post_type' => $post_type ? $post_type : 'post',
-            's' => $search,
+            'post_type'           => ! empty( $post_type ) ? $post_type : 'post',
+            's'                   => $search,
+            'posts_per_page'      => $limit,
+            'ignore_sticky_posts' => true,
         ];
 
-        // The Query
-        $query = new WP_Query( $args );
+        if ( ! empty( $category_id ) ) {
+            $args['cat'] = $category_id;
+        }
 
-        // The Loop
-        if ( $query->have_posts() ) {
-            while ( $query->have_posts() ) {
+        if ( ! empty( $tag_id ) ) {
+            $args['tag_id'] = $tag_id;
+        }
+
+        // The Query
+        $query = new WP_Query();
+
+        $posts = array_map(
+            function ( WP_Post $post ) use ( $query ) {
                 $query->the_post();
 
-                $id = $query->post->ID;
-
-                $post_thumb_id = get_post_thumbnail_id( $id );
-                $image = wemail_get_image_url( $post_thumb_id );
-
-                $posts [] = [
-                    'id' => $id,
-                    'image' => get_the_post_thumbnail_url( $id ),
-                    'title' => wp_strip_all_tags( $query->post->post_title ),
-                    'postType' => $query->post->post_type,
-                    'postStatus' => $query->post->post_status,
-                    'url' => get_permalink( $id ),
-                    'content' => $query->post->post_content,
-                    'excerpt' => wp_strip_all_tags( $query->post->post_excerpt ),
-                    'meta' => [
-                        'tags' => $this->get_tags( get_the_tags( $id ) ),
-                        'postDate' => get_the_date( 'Y-m-d', $id ),
-                        'author' => get_the_author(),
-                        'categories' => $this->get_categories( get_the_category( $id ) ),
+                return [
+                    'id'         => get_the_ID(),
+                    'image'      => get_the_post_thumbnail_url(),
+                    'title'      => html_entity_decode( get_the_title() ),
+                    'postType'   => $post->post_type,
+                    'postStatus' => $post->post_status,
+                    'url'        => get_permalink(),
+                    'content'    => get_the_content(),
+                    'excerpt'    => html_entity_decode( get_the_excerpt() ),
+                    'meta'       => [
+                        'tags'       => $this->get_tags( get_the_tags() ),
+                        'postDate'   => get_the_date( 'Y-m-d' ),
+                        'author'     => get_the_author(),
+                        'categories' => $this->get_categories( get_the_category() ),
                     ],
                 ];
-            }
-
-            wp_reset_postdata();
-        }
+            }, $query->query( $args )
+        );
 
         return rest_ensure_response( $posts );
     }
@@ -127,11 +131,10 @@ class WP extends RestController {
     /**
      * Get all user roles
      *
-     * @since 1.0.0
-     *
      * @param \WP_REST_Request $request
      *
      * @return \WP_REST_Response|mixed
+     * @since 1.0.0
      */
     public function user_roles( $request ) {
         global $wp_roles;
@@ -141,13 +144,10 @@ class WP extends RestController {
         $roles = $wp_roles->get_names();
 
         foreach ( $roles as $name => $title ) {
-            array_push(
-                $user_roles,
-                [
-                    'name' => $name,
-                    'title' => $title,
-                ]
-            );
+            $user_roles[] = [
+                'name'  => $name,
+                'title' => $title,
+            ];
         }
 
         return rest_ensure_response( [ 'data' => $user_roles ] );
@@ -156,21 +156,20 @@ class WP extends RestController {
     /**
      * Get WordPress Users
      *
-     * @since 1.0.0
-     *
      * @param \WP_REST_Request $request
      *
      * @return \WP_REST_Response|mixed
+     * @since 1.0.0
      */
     public function users( $request ) {
         $roles   = $request->get_param( 'roles' );
         $include = $request->get_param( 'include' );
 
         $args = [
-            'role__in'    => ! empty( $roles ) ? $roles : [],
-            'orderby'     => 'ID',
-            'order'       => 'ASC',
-            'fields'      => 'all_with_meta',
+            'role__in' => ! empty( $roles ) ? $roles : [],
+            'orderby'  => 'ID',
+            'order'    => 'ASC',
+            'fields'   => 'all_with_meta',
         ];
 
         if ( empty( $include ) ) {
@@ -193,7 +192,7 @@ class WP extends RestController {
         add_action( 'pre_user_query', [ $this, 'pre_user_query' ] );
 
         $user_query = new \WP_User_Query( $args );
-        $wp_users = $user_query->get_results();
+        $wp_users   = $user_query->get_results();
 
         remove_action( 'pre_user_query', [ $this, 'pre_user_query' ] );
 
@@ -201,11 +200,11 @@ class WP extends RestController {
 
         foreach ( $wp_users as $user ) {
             $users[] = [
-                'ID' => $user->ID,
-                'first_name'    => $user->get( 'first_name' ),
-                'last_name'     => $user->get( 'last_name' ),
-                'user_email'    => $user->user_email,
-                'user_login'    => $user->user_login,
+                'ID'         => $user->ID,
+                'first_name' => $user->get( 'first_name' ),
+                'last_name'  => $user->get( 'last_name' ),
+                'user_email' => $user->user_email,
+                'user_login' => $user->user_login,
             ];
         }
 
@@ -215,11 +214,10 @@ class WP extends RestController {
     /**
      * Hooked method for pre_user_query action
      *
-     * @since 1.0.0
-     *
      * @param object $query
      *
      * @return void
+     * @since 1.0.0
      */
     public function pre_user_query( $query ) {
         $query_after_id = absint( $this->user_query_after_id );
@@ -229,15 +227,49 @@ class WP extends RestController {
         }
     }
 
-    /** Get woo commerce products
+    /**
+     * Get terms
+     *
      * @param \WP_REST_Request $request
+     *
+     * @return \WP_REST_Response
+     */
+    public function terms( \WP_REST_Request $request ) {
+        add_filter(
+            'terms_clauses', function ( $clauses, $taxonomy, $args ) {
+				global $wpdb;
+
+				$clauses['join']  .= " INNER JOIN $wpdb->term_relationships AS r ON r.term_taxonomy_id = tt.term_taxonomy_id INNER JOIN $wpdb->posts AS p ON p.ID = r.object_id";
+				$clauses['where'] .= " AND p.post_type = '" . esc_sql( $args['post_type'] ) . "' GROUP BY t.term_id";
+
+				return $clauses;
+			}, 10, 3
+        );
+
+        $post_type = $request->get_param( 'post_type' );
+        $taxonomy  = $request->get_param( 'taxonomy' );
+
+        $terms = get_terms(
+            [
+                'taxonomy'  => $taxonomy,
+                'post_type' => $post_type,
+            ]
+        );
+
+        return new \WP_REST_Response( $terms );
+    }
+
+    /** Get woo commerce products
+     *
+     * @param \WP_REST_Request $request
+     *
      * @return mixed|\WP_REST_Response
      */
     public function products( $request ) {
         if ( ! class_exists( 'WooCommerce' ) ) {
             return rest_ensure_response(
                 [
-                    'data' => (object) [],
+                    'data'    => (object) [],
                     'message' => __( 'Please install or active woocomerce plugin.', 'wemail' ),
                 ]
             );
@@ -257,34 +289,35 @@ class WP extends RestController {
             $id = $product->get_id();
 
             $post_thumb_id = get_post_thumbnail_id( $id );
-            $image = wemail_get_image_url( $post_thumb_id );
+            $image         = wemail_get_image_url( $post_thumb_id );
 
-            array_push(
-                $products,
-                [
-                    'id'                => $product->get_id(),
-                    'name'              => $product->get_name(),
-                    'type'              => $product->get_type(),
-                    'rating'            => $product->get_average_rating(),
-                    'status'            => $product->get_status(),
-                    'image'             => $image,
-                    'description'       => $product->get_description(),
-                    'short_description' => $product->get_short_description(),
-                    'price'             => wc_price( $product->get_price() ),
-                    'read_more'         => get_permalink( $id ),
-                ]
-            );
+            $products[] = [
+                'id'                => $product->get_id(),
+                'name'              => $product->get_name(),
+                'type'              => $product->get_type(),
+                'rating'            => $product->get_average_rating(),
+                'status'            => $product->get_status(),
+                'image'             => $image,
+                'description'       => $product->get_description(),
+                'short_description' => $product->get_short_description(),
+                'price'             => wc_price( $product->get_price() ),
+                'read_more'         => get_permalink( $id ),
+            ];
         }
 
         return rest_ensure_response(
             [
-                'data' => $products,
+                'data'    => $products,
                 'message' => __( 'You don\'t have any products on your store.', 'wemail' ),
             ]
         );
     }
 
     protected function get_tags( $tags ) {
+        if ( ! is_array( $tags ) ) {
+            return '';
+        }
+
         return implode(
             ', ',
             array_map(

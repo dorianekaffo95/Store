@@ -618,17 +618,14 @@ class AdminCoupons {
      * @return boolean
      */
     public function coupon_is_valid_for_product( $valid, $product, $coupon ) {
+        if ( ! $valid ) {
+            return $valid;
+        }
+
         $vendors  = array( intval( get_post_field( 'post_author', $product->get_id() ) ) );
         $products = array( $product->get_id() );
 
-        if (
-            array_intersect( $products, $coupon->get_product_ids() ) ||
-            dokan_pro()->coupon->is_admin_coupon_valid( $coupon, $vendors, $products )
-        ) {
-            return true;
-        }
-
-        return $valid;
+        return dokan_pro()->coupon->is_admin_coupon_valid( $coupon, $vendors, $products );
     }
 
     /**
@@ -664,6 +661,26 @@ class AdminCoupons {
         } else {
             $exclude_vendors_ids = '';
         }
+
+        /**
+         * Do action if needed before saving coupon data
+         *
+         * @since 3.7.4
+         */
+        do_action(
+            'dokan_admin_coupon_options_before_save',
+            $post_id,
+            [
+                'admin_coupons_enabled_for_vendor' => $enabled_for_vendor,
+                'coupon_commissions_type' => $coupon_type,
+                'coupons_vendors_ids' => $vendors_ids,
+                'coupons_exclude_vendors_ids' => $exclude_vendors_ids,
+                'admin_shared_coupon_amount' => $shared_coupon_amount,
+                'admin_shared_coupon_type' => $shared_coupon_type,
+                'admin_coupons_send_notify_to_vendors' => $notify_to_vendors,
+                'admin_coupons_show_on_stores' => $show_on_stores,
+            ]
+        );
 
         update_post_meta( $post_id, 'admin_coupons_enabled_for_vendor', $enabled_for_vendor );
         update_post_meta( $post_id, 'coupon_commissions_type', $coupon_type );

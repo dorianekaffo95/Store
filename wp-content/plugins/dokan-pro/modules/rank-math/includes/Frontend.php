@@ -27,10 +27,10 @@ class Frontend implements Runner {
     public function process() {
         // Instantiate assets manager
         new Assets();
-
+        // Instantiate Content AI
+        new ContentAi();
         // Register hooks
         $this->hooks();
-
         // Instantiate Schema generator
         new Schema();
     }
@@ -70,41 +70,9 @@ class Frontend implements Runner {
 
         \CMB2_Hookup::enqueue_cmb_css();
 
-        wp_enqueue_style(
-            'rank-math-metabox',
-            rank_math()->plugin_url() . 'assets/admin/css/metabox.css',
-            array(
-                'rank-math-common',
-                'rank-math-cmb2',
-                'rank-math-post-metabox',
-                'wp-components',
-            ),
-            rank_math()->version
-        );
+        wp_enqueue_style( 'rank-math-metabox' );
 
-        wp_enqueue_script(
-            'rank-math-metabox',
-            rank_math()->plugin_url() . 'assets/admin/js/classic.js',
-            array(
-                'clipboard',
-                'wp-hooks',
-                'moment',
-                'wp-date',
-                'wp-data',
-                'wp-api-fetch',
-                'wp-components',
-                'wp-element',
-                'wp-i18n',
-                'wp-url',
-                'wp-media-utils',
-                'rank-math-common',
-                'rank-math-analyzer',
-                'rank-math-validate',
-                'wp-block-editor',
-            ),
-            rank_math()->version,
-            true
-        );
+        wp_enqueue_script( 'rank-math-editor' );
 
         $this->do_action( 'enqueue_scripts/assessor' );
     }
@@ -118,7 +86,7 @@ class Frontend implements Runner {
      */
     private function enqueue_commons() {
         wp_register_style(
-            'rank-math-post-metabox',
+            'rank-math-editor',
             rank_math()->plugin_url() . 'assets/admin/css/gutenberg.css',
             array( 'rank-math-common' ),
             rank_math()->version

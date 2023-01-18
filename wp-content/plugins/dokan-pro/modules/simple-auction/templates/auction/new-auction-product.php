@@ -2,6 +2,7 @@
 do_action( 'dokan_dashboard_wrap_start' );
 
 use WeDevs\DokanPro\Products;
+use WeDevs\Dokan\ProductCategory\Helper;
 use WeDevs\Dokan\Walkers\TaxonomyDropdown;
 
 ?>
@@ -41,7 +42,14 @@ use WeDevs\Dokan\Walkers\TaxonomyDropdown;
                 <?php _e( 'Add New Auction Product', 'dokan' ); ?>
             </h1>
         </header><!-- .entry-header -->
-
+        <?php
+        /**
+         * Hook for `dokan_new_product_before_product_area`
+         *
+         * @since 3.5.2
+         */
+        do_action( 'dokan_new_product_before_product_area' );
+        ?>
         <div class="dokan-new-product-area">
             <?php if ( Dokan_Template_Auction::$errors ) { ?>
                 <div class="dokan-alert dokan-alert-danger">
@@ -68,7 +76,7 @@ use WeDevs\Dokan\Walkers\TaxonomyDropdown;
                                     <div class="dokan-feat-image-upload">
                                         <div class="instruction-inside">
                                             <input type="hidden" name="feat_image_id" class="dokan-feat-image-id" value="0">
-                                            <i class="fa fa-cloud-upload"></i>
+                                            <i class="fas fa-cloud-upload-alt"></i>
                                             <a href="#" class="dokan-feat-image-btn dokan-btn"><?php _e( 'Upload Product Image', 'dokan' ); ?></a>
                                         </div>
 
@@ -84,7 +92,7 @@ use WeDevs\Dokan\Walkers\TaxonomyDropdown;
                                         <div id="product_images_container">
                                             <ul class="product_images dokan-clearfix">
                                                 <li class="add-image add-product-images tips" data-title="<?php _e( 'Add gallery image', 'dokan' ); ?>">
-                                                    <a href="#" class="add-product-images"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                                                    <a href="#" class="add-product-images"><i class="fas fa-plus" aria-hidden="true"></i></a>
                                                 </li>
                                             </ul>
                                             <input type="hidden" id="product_image_gallery" name="product_image_gallery" value="">
@@ -102,50 +110,14 @@ use WeDevs\Dokan\Walkers\TaxonomyDropdown;
                                     <textarea name="post_excerpt" id="post-excerpt" rows="5" class="dokan-form-control" placeholder="<?php esc_attr_e( 'Short description about the product...', 'dokan' ); ?>"><?php echo dokan_posted_textarea( 'post_excerpt' ); ?></textarea>
                                 </div>
 
-                                <?php if ( dokan_get_option( 'product_category_style', 'dokan_selling', 'single' ) == 'single' ): ?>
-                                    <div class="dokan-form-group dokan-auction-category">
+                                <div class="dokan-form-group dokan-auction-category">
+                                    <?php
+                                        $data = Helper::get_saved_products_category();
+                                        $data['from'] = 'new_booking_product';
 
-                                        <?php
-                                        $category_args =  array(
-                                            'show_option_none' => __( '- Select a category -', 'dokan' ),
-                                            'hierarchical'     => 1,
-                                            'hide_empty'       => 0,
-                                            'name'             => 'product_cat',
-                                            'id'               => 'product_cat',
-                                            'taxonomy'         => 'product_cat',
-                                            'title_li'         => '',
-                                            'class'            => 'product_cat dokan-form-control dokan-select2',
-                                            'exclude'          => '',
-                                            'selected'         => dokan()->dashboard->templates->products::$product_cat,
-                                        );
-
-                                        wp_dropdown_categories( apply_filters( 'dokan_product_cat_dropdown_args', $category_args ) );
-                                        ?>
-                                    </div>
-                                <?php elseif ( dokan_get_option( 'product_category_style', 'dokan_selling', 'single' ) == 'multiple' ): ?>
-                                    <div class="dokan-form-group dokan-auction-category">
-                                        <?php
-                                        $term = array();
-                                        include_once DOKAN_LIB_DIR.'/class.taxonomy-walker.php';
-                                        $drop_down_category = wp_dropdown_categories( array(
-                                            'show_option_none' => __( '', 'dokan' ),
-                                            'hierarchical'     => 1,
-                                            'hide_empty'       => 0,
-                                            'name'             => 'product_cat[]',
-                                            'id'               => 'product_cat',
-                                            'taxonomy'         => 'product_cat',
-                                            'title_li'         => '',
-                                            'class'            => 'product_cat dokan-form-control dokan-select2',
-                                            'exclude'          => '',
-                                            'selected'         => $term,
-                                            'echo'             => 0,
-                                            'walker'           => new TaxonomyDropdown()
-                                        ) );
-
-                                        echo str_replace( '<select', '<select data-placeholder="'.__( 'Select product category', 'dokan' ).'" multiple="multiple" ', $drop_down_category );
-                                        ?>
-                                    </div>
-                                <?php endif; ?>
+                                        dokan_get_template_part('products/dokan-category-header-ui', '', $data );
+                                    ?>
+                                </div>
 
                                 <div class="dokan-form-group dokan-auction-tags">
                                     <?php
@@ -192,7 +164,7 @@ use WeDevs\Dokan\Walkers\TaxonomyDropdown;
                             <div class="dokan-edit-row dokan-auction-general-sections dokan-clearfix">
 
                                 <div class="dokan-section-heading" data-togglehandler="dokan_product_inventory">
-                                    <h2><i class="fa fa-cubes" aria-hidden="true"></i> <?php _e( 'General Options', 'dokan' ) ?></h2>
+                                    <h2><i class="fas fa-cubes" aria-hidden="true"></i> <?php _e( 'General Options', 'dokan' ) ?></h2>
                                     <p><?php _e( 'Manage your auction product data', 'dokan' ); ?></p>
                                     <div class="dokan-clearfix"></div>
                                 </div>
@@ -235,7 +207,7 @@ use WeDevs\Dokan\Walkers\TaxonomyDropdown;
                                                 <label for="_auction_sealed">
                                                     <input type="checkbox" name="_auction_sealed" value="yes" id="_auction_sealed">
                                                     <?php _e( 'Enable sealed bidding for this auction product', 'dokan' );?>
-                                                    <i class="fa fa-question-circle tips" data-title="<?php _e( 'In this type of auction all bidders simultaneously submit sealed bids so that no bidder knows the bid of any other participant. The highest bidder pays the price they submitted. If two bids with same value are placed for auction the one which was placed first wins the auction.', 'dokan' ); ?>"></i>
+                                                    <i class="fas fa-question-circle tips" data-title="<?php _e( 'In this type of auction all bidders simultaneously submit sealed bids so that no bidder knows the bid of any other participant. The highest bidder pays the price they submitted. If two bids with same value are placed for auction the one which was placed first wins the auction.', 'dokan' ); ?>"></i>
                                                 </label>
                                             </div>
                                         </div>

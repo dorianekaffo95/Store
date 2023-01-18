@@ -36,7 +36,7 @@
                     <?php _e( 'Staff', 'dokan' ); ?>
 
                     <span class="left-header-content dokan-right">
-                        <a href="<?php echo add_query_arg( array( 'view' => 'add_staffs' ), dokan_get_navigation_url( 'staffs' ) ); ?>" class="dokan-btn dokan-btn-theme dokan-right"><i class="fa fa-user">&nbsp;</i> <?php _e( 'Add new staff', 'dokan' ); ?></a>
+                        <a href="<?php echo add_query_arg( array( 'view' => 'add_staffs' ), dokan_get_navigation_url( 'staffs' ) ); ?>" class="dokan-btn dokan-btn-theme dokan-right"><i class="fas fa-user">&nbsp;</i> <?php _e( 'Add new staff', 'dokan' ); ?></a>
                     </span>
                 </h1>
             </span>
@@ -156,6 +156,19 @@
         </article>
 
         <style>
+            table.vendor-staff-table tbody td a,
+            table.vendor-staff-table tbody td .row-actions a {
+                color: #6d6d6d;
+            }
+
+            table.vendor-staff-table tbody td a:hover,
+            table.vendor-staff-table tbody td .row-actions a:hover {
+                color: #000;
+            }
+
+            table.vendor-staff-table tbody td .row-actions .delete a:hover {
+                color: #ff0000;
+            }
 
             table.vendor-staff-table tbody .row-actions {
                 font-size: 12px;

@@ -6,8 +6,7 @@
  * @package DokanPro
  */
 
-$vendor_infos        = isset( $vendor_infos ) ? $vendor_infos : [];
-$delivery_date_label = isset( $info['vendor_delivery_options']['delivery_date_label'] ) ? $info['vendor_delivery_options']['delivery_date_label'] : __( 'Select date', 'dokan' );
+$vendor_infos = isset( $vendor_infos ) ? $vendor_infos : [];
 
 wp_add_inline_script( 'dokan-delivery-time-main-script', 'let dokan_delivery_time_vendor_infos =' . wp_json_encode( $vendor_infos ), 'before' );
 ?>
@@ -66,6 +65,9 @@ wp_add_inline_script( 'dokan-delivery-time-main-script', 'let dokan_delivery_tim
                      * @param array $info
                      */
                     do_action( 'dokan_after_delivery_box_info_message', $id, $info );
+
+                    // Delivery date input label set by admin or by default Select date
+                    $delivery_date_label = isset( $info['vendor_delivery_options']['delivery_date_label'] ) ? $info['vendor_delivery_options']['delivery_date_label'] : __( 'Select date', 'dokan' );
                     ?>
 
                     <input id="delivery-time-date-picker-<?php echo esc_attr( $id ); ?>" data-vendor_id="<?php echo esc_attr( $id ); ?>"

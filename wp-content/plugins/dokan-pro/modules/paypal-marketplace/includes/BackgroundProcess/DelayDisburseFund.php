@@ -36,7 +36,7 @@ class DelayDisburseFund extends WC_Background_Process {
 
         if ( is_wp_error( $dispatched ) ) {
             dokan_log(
-                sprintf( 'Unable to dispatch Dokan Vendor Zone Data Sync: %s', $dispatched->get_error_message() ),
+                sprintf( 'Unable to dispatch Dokan PayPal Marketplace delay disbursement funds : %s', $dispatched->get_error_message() ),
                 'error'
             );
         }

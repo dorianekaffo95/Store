@@ -5,18 +5,6 @@ namespace WeDevs\DokanPro\Modules\Elementor\Tags;
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 
 class StoreCoupons extends TagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 2.9.11
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *
@@ -67,6 +55,7 @@ class StoreCoupons extends TagBase {
                 foreach ( $store_coupons as $i => $store_coupon ) {
                     $coupons[ $i ] = [
                         'coupon'       => $store_coupon['coupon'],
+                        // translators: 1) coupon discount amount
                         'coupon_title' => sprintf( __( '%s Discount', 'dokan' ), $store_coupon['coupon_amount_formatted'] ),
                         'expiry_date'  => '',
                         'current_time' => $store_coupon['current_time'],
@@ -75,21 +64,23 @@ class StoreCoupons extends TagBase {
                     if ( ! empty( $store_coupon['expiry_date'] ) ) {
                         $expiry_date = $store_coupon['expiry_date'];
                         $expiry_date = is_object( $expiry_date ) ? $expiry_date->getTimestamp() : $expiry_date;
+                        // translators: 1) Coupon expiration time
                         $coupons[ $i ]['expiry_date'] = sprintf( __( 'Expiring in %s', 'dokan' ), human_time_diff( $store_coupon['current_time'], $expiry_date ) );
                     }
                 }
             }
-
         } else {
             $coupon               = new \StdClass();
             $coupon->post_content = 'Coupon Description';
             $coupon->post_title   = 'HOLIDAY25';
 
+            // translators: 1) coupon discount amount
             $coupon_title = sprintf( __( '%s Discount', 'dokan' ), '25%' );
 
-            $current_time = current_time( 'timestamp', true );
+            $current_time = time();
             $expiry_date  = $current_time + ( 7 * 24 * 60 * 60 ); // current_time + 7 days
 
+            // translators: coupon expiration time
             $expiry_date = sprintf( __( 'Expiring in %s', 'dokan' ), human_time_diff( $current_time, $expiry_date ) );
 
             for ( $i = 0; $i < 8; $i++ ) {
@@ -102,6 +93,6 @@ class StoreCoupons extends TagBase {
             }
         }
 
-        echo json_encode( $coupons );
+        echo wp_json_encode( $coupons );
     }
 }

@@ -6,18 +6,6 @@ use WeDevs\DokanPro\Modules\Elementor\Abstracts\DataTagBase;
 use Elementor\Controls_Manager;
 
 class StoreProfilePicture extends DataTagBase {
-
-    /**
-     * Class constructor
-     *
-     * @since 2.9.11
-     *
-     * @param array $data
-     */
-    public function __construct( $data = [] ) {
-        parent::__construct( $data );
-    }
-
     /**
      * Tag name
      *
@@ -53,7 +41,7 @@ class StoreProfilePicture extends DataTagBase {
         if ( empty( $picture['id'] ) ) {
             $settings = $this->get_settings();
 
-            if ( ! empty( $settings['fallback']['id'] ) ) {
+            if ( ! empty( $settings['fallback'] ) ) {
                 $picture = $settings['fallback'];
             }
         }
@@ -68,7 +56,7 @@ class StoreProfilePicture extends DataTagBase {
      *
      * @return void
      */
-    protected function _register_controls() {
+    protected function register_controls() {
         $this->add_control(
             'fallback',
             [
@@ -77,7 +65,7 @@ class StoreProfilePicture extends DataTagBase {
                 'default' => [
                     'id'  => 0,
                     'url' => get_avatar_url( 0 ),
-                ]
+                ],
             ]
         );
     }

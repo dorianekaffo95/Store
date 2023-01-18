@@ -32,7 +32,7 @@ class ProductSeo {
      * @return void
      */
     public function init_hooks() {
-        if ( ! class_exists( 'WPSEO_Frontend' ) ) {
+        if ( ! defined( 'WPSEO_VERSION' ) ) {
             return;
         }
 

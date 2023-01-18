@@ -22,6 +22,8 @@
 .dokan-follow-store-button.dokan-follow-store-button-working:after {
   content: "\f110";
   display: inline-block;
+  font-family: 'Font Awesome\ 5 Free';
+  font-weight: 900;
   font: normal normal normal 14px/1 FontAwesome;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;

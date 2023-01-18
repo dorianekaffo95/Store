@@ -2,12 +2,12 @@
 # This file is distributed under the same license as the Plugins - MC4WP: Mailchimp for WordPress - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2021-06-24 09:06:41+0000\n"
+"PO-Revision-Date: 2022-08-25 14:09:05+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: GlotPress/3.0.0-alpha.2\n"
+"X-Generator: GlotPress/4.0.0-alpha.1\n"
 "Language: fr\n"
 "Project-Id-Version: Plugins - MC4WP: Mailchimp for WordPress - Stable (latest release)\n"
 
@@ -23,7 +23,7 @@ msgstr "Envoi en cours…"
 msgid "Resource does not exist."
 msgstr "La ressource n'existe pas."
 
-#: includes/forms/class-admin.php:161 includes/forms/class-admin.php:280
+#: includes/forms/class-admin.php:161 includes/forms/class-admin.php:288
 msgid "Form saved."
 msgstr "Formulaire sauvegardé."
 
@@ -426,7 +426,7 @@ msgstr "Quand une liste de choix est proposée, c'est ce texte qui s'affiche qua
 msgid "No list selected"
 msgstr "Aucune liste sélectionnée"
 
-#: includes/forms/class-admin.php:458
+#: includes/forms/class-admin.php:466
 msgid "Select the form to show"
 msgstr "Choisissez le formulaire à afficher"
 
@@ -909,11 +909,11 @@ msgstr "Données de l'URL ou d'un formulaire envoyé."
 msgid "Form preview"
 msgstr "Prévisualisation du formulaire"
 
-#: includes/forms/class-admin.php:391
+#: includes/forms/class-admin.php:399
 msgid "Go back"
 msgstr "Retour"
 
-#: includes/forms/class-admin.php:389
+#: includes/forms/class-admin.php:397
 msgid "Form not found."
 msgstr "Formulaire introuvable"
 
@@ -1331,7 +1331,7 @@ msgstr "Lettre d'information"
 msgid "Displays your Mailchimp for WordPress sign-up form"
 msgstr "Affiche votre formulaire d'inscription de \"MailChimp pour WordPress\""
 
-#: includes/forms/class-admin.php:454 includes/forms/class-widget.php:31
+#: includes/forms/class-admin.php:462 includes/forms/class-widget.php:31
 msgid "Mailchimp Sign-Up Form"
 msgstr "Formulaire d’enregistrement à MailChimp"
 

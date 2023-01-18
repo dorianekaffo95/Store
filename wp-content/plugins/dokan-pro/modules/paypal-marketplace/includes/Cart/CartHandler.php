@@ -28,6 +28,22 @@ class CartHandler {
         add_action( 'wp_enqueue_scripts', [ $this, 'payment_scripts' ] );
         add_action( 'woocommerce_after_checkout_validation', [ $this, 'after_checkout_validation' ], 15, 2 );
         add_filter( 'woocommerce_add_to_cart_validation', [ $this, 'validate_vendor_is_connected' ], 10, 2 );
+        add_action( 'wp', [ $this, 'register_scripts' ] );
+    }
+
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        $paypal_js_sdk_url = CartManager::get_paypal_sdk_url();
+
+        wp_register_script( 'dokan_paypal_sdk', $paypal_js_sdk_url, [], false, false ); //phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+        wp_register_script( 'dokan_paypal_checkout', DOKAN_PAYPAL_MP_ASSETS . 'js/paypal-checkout' . $suffix . '.js', [ 'dokan_paypal_sdk' ], time(), true ); // don't cache this script
+        wp_register_style( 'dokan_paypal_payment_method', DOKAN_PAYPAL_MP_ASSETS . 'css/paypal-payment-method' . $suffix . '.css', [], $version );
     }
 
     /**
@@ -61,17 +77,12 @@ class CartHandler {
 
             //get order id if this is a order review page
             $order_id = isset( $wp->query_vars['order-pay'] ) ? $wp->query_vars['order-pay'] : null;
-            // Use minified libraries if SCRIPT_DEBUG is turned off
-            $suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-            $version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : DOKAN_PRO_PLUGIN_VERSION;
-
-            $paypal_js_sdk_url = CartManager::get_paypal_sdk_url();
 
             //paypal sdk enqueue
-            wp_enqueue_script( 'dokan_paypal_sdk', $paypal_js_sdk_url, [], null, false ); //phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+            wp_enqueue_script( 'dokan_paypal_sdk' );
 
-            wp_enqueue_script( 'dokan_paypal_checkout', DOKAN_PAYPAL_MP_ASSETS . 'js/paypal-checkout' . $suffix . '.js', [ 'dokan_paypal_sdk' ], time(), true ); // don't cache this script
-            wp_enqueue_style( 'dokan_paypal_payment_method', DOKAN_PAYPAL_MP_ASSETS . 'css/paypal-payment-method' . $suffix . '.css', [], $version );
+            wp_enqueue_script( 'dokan_paypal_checkout' ); // don't cache this script
+            wp_enqueue_style( 'dokan_paypal_payment_method' );
 
             //localize data
             $data = [
@@ -249,7 +260,7 @@ class CartHandler {
         foreach ( WC()->cart->get_cart() as $item ) {
             $product_id = $item['data']->get_id();
             // check if this is a vendor subscription product
-            if ( Helper::is_vendor_subscription_product( $product_id ) ) {
+            if ( apply_filters( 'dokan_paypal_marketplace_escape_after_checkout_validation', Helper::is_vendor_subscription_product( $product_id ), $item ) ) {
                 continue;
             }
 

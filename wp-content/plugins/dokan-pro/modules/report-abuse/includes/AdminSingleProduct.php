@@ -12,6 +12,7 @@ class AdminSingleProduct {
      * @return void
      */
     public function __construct() {
+        add_action( 'init', [ self::class, 'register_scripts' ] );
         add_action( 'add_meta_boxes', [ self::class, 'add_abuse_report_meta_box' ] );
     }
 
@@ -24,6 +25,18 @@ class AdminSingleProduct {
      */
     public static function add_abuse_report_meta_box() {
         add_meta_box( 'dokan_report_abuse_reports', __( 'Abuse Reports', 'dokan' ), [ self::class, 'meta_box' ], 'product', 'normal', 'core' );
+    }
+
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public static function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan-report-abuse-admin-single-product', DOKAN_REPORT_ABUSE_ASSETS . '/css/dokan-report-abuse-admin-single-product' . $suffix . '.css', [ 'dokan-fontawesome' ], $version );
+        wp_register_script( 'dokan-report-abuse-admin-single-product', DOKAN_REPORT_ABUSE_ASSETS . '/js/dokan-report-abuse-admin-single-product' . $suffix . '.js', [ 'jquery' ], $version, true );
     }
 
     /**
@@ -49,8 +62,8 @@ class AdminSingleProduct {
             'time_format' => get_option( 'time_format', 'g:i a' ),
         ] );
 
-        wp_enqueue_style( 'dokan-report-abuse-admin-single-product', DOKAN_REPORT_ABUSE_ASSETS . '/css/dokan-report-abuse-admin-single-product' . $suffix . '.css', ['dokan-fontawesome'], DOKAN_PRO_PLUGIN_VERSION );
-        wp_enqueue_script( 'dokan-report-abuse-admin-single-product', DOKAN_REPORT_ABUSE_ASSETS . '/js/dokan-report-abuse-admin-single-product' . $suffix . '.js', ['jquery'], DOKAN_PRO_PLUGIN_VERSION, true );
+        wp_enqueue_style( 'dokan-report-abuse-admin-single-product' );
+        wp_enqueue_script( 'dokan-report-abuse-admin-single-product' );
 
         wp_localize_script( 'dokan-report-abuse-admin-single-product', 'dokanReportAbuse', [
             'rest' => [

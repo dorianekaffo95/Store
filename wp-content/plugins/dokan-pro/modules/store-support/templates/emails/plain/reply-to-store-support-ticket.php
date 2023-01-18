@@ -11,7 +11,7 @@
  * the readme will list any important changes.
  *
  * @author      Dokan
- * 
+ *
  * @version     3.3.4
  */
 
@@ -21,11 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 echo '= ' . $email_heading . " =\n\n";
 
-esc_html_e( 'Hi,', 'dokan' );
+esc_html_e( 'Hi,', 'dokan' ) . " =\n\n";
 
-esc_html_e( 'A new reply was made in the ticket ', 'dokan' ) . esc_html( $email_data['ticket_title'] ) . "\n\n";
+/* translators: %s is replaced with "comment_author" */
+echo esc_html( sprintf( __( '%s has replied to conversation: ', 'dokan' ), $email_data['comment']->comment_author ) );
+echo '#' . esc_html( $email_data['ticket_id'] ) . " =\n\n";
 
-esc_html_e( 'See the details by going here: ', 'dokan' ) . esc_url( $email_data['ticket_url'] ) . "\n\n";
+esc_html_e( 'Ticket URL: ', 'dokan' ) . esc_url( $email_data['ticket_url'] ) . "\n\n";
 
 echo '---' . "\n\n";
 esc_html_e( 'From ', 'dokan' ) . esc_html( $email_data['store_name'] ) . "\n\n";

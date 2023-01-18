@@ -236,7 +236,7 @@ function dokan_geo_product_location() {
 function dokan_geo_remove_seller_listing_footer_content_hook() {
     add_action(
         'dokan_seller_listing_footer_content', function () {
-            remove_action( 'dokan_seller_listing_footer_content', array( Dokan_Geolocation_Vendor_View::class, 'seller_listing_footer_content' ) );
+            remove_action( 'dokan_seller_listing_footer_content', array( Dokan_Geolocation_Vendor_View::class, 'seller_listing_footer_content' ), 11, 1 );
         }, 9
     );
 }

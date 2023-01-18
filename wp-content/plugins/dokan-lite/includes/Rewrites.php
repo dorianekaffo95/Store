@@ -27,7 +27,6 @@ class Rewrites {
         add_filter( 'template_include', [ $this, 'store_toc_template' ], 99 );
         add_filter( 'query_vars', [ $this, 'register_query_var' ] );
         add_filter( 'woocommerce_get_breadcrumb', [ $this, 'store_page_breadcrumb' ] );
-        add_action( 'pre_user_query', [ $this, 'random_store_query' ] );
     }
 
     /**
@@ -37,7 +36,7 @@ class Rewrites {
      *
      * @since 2.4.7
      *
-     * @return array $crumbs
+     * @return void | array $crumbs
      */
     public function store_page_breadcrumb( $crumbs ) {
         if ( ! dokan_is_store_page() ) {
@@ -52,7 +51,12 @@ class Rewrites {
 
         $author      = get_query_var( $this->custom_store_url );
         $seller_info = get_user_by( 'slug', $author );
-        $crumbs[1]   = [ ucwords( $this->custom_store_url ), site_url() . '/' . $this->custom_store_url ];
+
+        if ( ! $seller_info ) {
+            return;
+        }
+
+        $crumbs[1]   = [ ucwords( $this->custom_store_url ), get_permalink( dokan_get_option( 'store_listing', 'dokan_pages' ) ) ];
         $crumbs[2]   = [ $author, dokan_get_store_url( $seller_info->data->ID ) ];
 
         return $crumbs;
@@ -79,6 +83,8 @@ class Rewrites {
                 'new-product',
                 'orders',
                 'withdraw',
+                'withdraw-requests',
+                'reverse-withdrawal',
                 'settings',
                 'edit-account',
             ]
@@ -298,6 +304,17 @@ class Rewrites {
             $tax_query                    = [];
             $query->query['term_section'] = isset( $query->query['term_section'] ) ? $query->query['term_section'] : [];
 
+            $attributes = dokan_get_chosen_taxonomy_attributes();
+            if ( ! empty( $attributes ) ) {
+                foreach ( $attributes as $key => $attribute ) {
+                    $tax_query[] = [
+                        'taxonomy' => $key,
+                        'field'    => 'name',
+                        'terms'    => $attribute['terms'],
+                    ];
+                }
+            }
+
             if ( $query->query['term_section'] ) {
                 array_push(
                     $tax_query, [
@@ -329,22 +346,16 @@ class Rewrites {
 
             $query->set( 'tax_query', apply_filters( 'dokan_store_tax_query', $tax_query ) );
 
-            if ( isset( $_GET['product_name'] ) && ! empty( $_GET['product_name'] ) ) {
+            if ( ! empty( $_GET['product_name'] ) ) { //phpcs:ignore
                 $product_name = wc_clean( wp_unslash( $_GET['product_name'] ) ); //phpcs:ignore
-
                 $query->set( 's', $product_name );
             }
 
             // set orderby param
-            if ( isset( $_GET['product_orderby'] ) && ! empty( $_GET['product_orderby'] ) ) {
-                $orderby  = wc_clean( wp_unslash( $_GET['product_orderby'] ) ); //phpcs:ignore
-                $ordering = $this->get_catalog_ordering_args( $orderby );
+            $ordering = $this->get_catalog_ordering_args();
 
-                $query->set( 'orderby', $ordering['orderby'] );
-                $query->set( 'order', $ordering['order'] );
-            } else {
-                $query->set( 'orderby', 'post_date ID' );
-            }
+            $query->set( 'orderby', $ordering['orderby'] );
+            $query->set( 'order', $ordering['order'] );
         }
     }
 
@@ -384,7 +395,7 @@ class Rewrites {
         $args    = array(
             'orderby'  => $orderby,
             'order'    => ( 'DESC' === $order ) ? 'DESC' : 'ASC',
-            'meta_key' => '',
+            'meta_key' => '', // @codingStandardsIgnoreLine
         );
 
         switch ( $orderby ) {
@@ -403,17 +414,15 @@ class Rewrites {
                 $args['order']   = 'DESC';
                 break;
             case 'rand':
-                $args['orderby'] = 'rand';
+                $args['orderby'] = 'rand'; // @codingStandardsIgnoreLine
                 break;
             case 'date':
                 $args['orderby'] = 'date ID';
                 $args['order']   = ( 'ASC' === $order ) ? 'ASC' : 'DESC';
                 break;
             case 'price':
-                add_filter( 'posts_clauses', [ $this, 'order_by_price_asc_post_clauses' ] );
-                break;
-            case 'price-desc':
-                add_filter( 'posts_clauses', [ $this, 'order_by_price_desc_post_clauses' ] );
+                $callback = 'DESC' === $order ? 'order_by_price_desc_post_clauses' : 'order_by_price_asc_post_clauses';
+                add_filter( 'posts_clauses', [ $this, $callback ] );
                 break;
             case 'popularity':
                 add_filter( 'posts_clauses', [ $this, 'order_by_popularity_post_clauses' ] );
@@ -504,42 +513,5 @@ class Rewrites {
             $sql .= " LEFT JOIN {$wpdb->wc_product_meta_lookup} wc_product_meta_lookup ON $wpdb->posts.ID = wc_product_meta_lookup.product_id ";
         }
         return $sql;
-    }
-
-    /**
-     * Store listing page make order by random
-     *
-     * @since DOKAN_PRO_SINCE
-     *
-     * @param WP_User_Query
-     *
-     * @return WP_User_Query
-     */
-    public function random_store_query( $query ) {
-        if ( ! dokan_is_store_listing() ) {
-            return $query;
-        }
-
-        if ( 'random' === $query->query_vars['orderby'] ) {
-            $order_by = [
-                'ID',
-                'user_login, ID',
-                'user_email',
-                'user_registered, ID',
-                'user_nicename, ID',
-            ];
-
-            $selected_orderby = get_transient( 'dokan_store_listing_random_orderby' );
-
-            if ( false === $selected_orderby ) {
-                $selected_orderby = $order_by[ array_rand( $order_by, 1 ) ];
-
-                set_transient( 'dokan_store_listing_random_orderby', $selected_orderby, MINUTE_IN_SECONDS * 10 );
-            }
-
-            $query->query_orderby = "ORDER BY $selected_orderby";
-        }
-
-        return $query;
     }
 }

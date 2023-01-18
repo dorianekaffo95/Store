@@ -3,7 +3,7 @@
         <div class="elementor-repeater-row-tools">
             <# if ( itemActions.drag_n_drop ) {  #>
                 <div class="elementor-repeater-row-handle-sortable">
-                    <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                    <i class="fas fa-ellipsis-v" aria-hidden="true"></i>
                     <span class="elementor-screen-only"><?php esc_html_e( 'Drag & Drop', 'dokan' ); ?></span>
                 </div>
             <# } #>

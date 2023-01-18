@@ -18,6 +18,7 @@ class Store extends Single {
     public function __construct( $data = [] ) {
         parent::__construct( $data );
 
+        add_action( 'init', [ $this, 'register_scripts' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ], 11 );
     }
 
@@ -29,11 +30,24 @@ class Store extends Single {
      * @return void
      */
     public function enqueue_scripts() {
-        wp_enqueue_style(
+        wp_enqueue_style( 'dokan-elementor-doc-store' );
+    }
+
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     *
+     * @return void
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style(
             'dokan-elementor-doc-store',
             DOKAN_ELEMENTOR_ASSETS . '/css/dokan-elementor-document-store.css',
             [],
-            DOKAN_ELEMENTOR_VERSION
+            $version
         );
     }
 

@@ -58,8 +58,8 @@ class StoreTabItems extends StoreInfo {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->remove_control( 'store_info' );
 
@@ -79,11 +79,11 @@ class StoreTabItems extends StoreInfo {
                 'type'    => DynamicHidden::CONTROL_TYPE,
                 'dynamic' => [
                     'active'  => true,
-                    'default' => dokan_elementor()->elementor()->dynamic_tags->tag_data_to_tag_text( null, 'dokan-store-tab-items' )
-                ]
+                    'default' => dokan_elementor()->elementor()->dynamic_tags->tag_data_to_tag_text( null, 'dokan-store-tab-items' ),
+                ],
             ],
             [
-                'position' => [ 'of' => 'icon_list' ]
+                'position' => [ 'of' => 'icon_list' ],
             ]
         );
     }
@@ -93,7 +93,7 @@ class StoreTabItems extends StoreInfo {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return string
      */
     protected function get_html_wrapper_class() {
         return parent::get_html_wrapper_class() . ' dokan-store-tab-items elementor-widget-' . parent::get_name();
@@ -119,9 +119,9 @@ class StoreTabItems extends StoreInfo {
             $this->add_render_attribute( 'list_item', 'class', 'elementor-inline-item' );
         }
         ?>
-        <?php if ( ! empty( $settings['icon_list'] ) && ! empty( $settings['tab_items'] ) ): ?>
+        <?php if ( ! empty( $settings['icon_list'] ) && ! empty( $settings['tab_items'] ) ) : ?>
             <?php $tab_items = json_decode( $settings['tab_items'], true ); ?>
-            <?php if ( is_array( $tab_items ) ): ?>
+            <?php if ( is_array( $tab_items ) ) : ?>
                 <ul <?php echo $this->get_render_attribute_string( 'icon_list' ); ?>>
                     <?php
                     foreach ( $settings['icon_list'] as $index => $item ) :
@@ -131,10 +131,12 @@ class StoreTabItems extends StoreInfo {
 
                         $this->add_inline_editing_attributes( $repeater_setting_key );
 
-                        if ( $item['show'] ):
-                            $tab_item = array_filter( $tab_items, function ( $list_item ) use ( $item ) {
-                                return $list_item['key'] === $item['key'];
-                            } );
+                        if ( $item['show'] ) :
+                            $tab_item = array_filter(
+                                $tab_items, function ( $list_item ) use ( $item ) {
+                                    return $list_item['key'] === $item['key'];
+                                }
+                            );
 
                             if ( empty( $tab_item ) ) {
                                 continue;
@@ -152,7 +154,7 @@ class StoreTabItems extends StoreInfo {
                             $link_key = 'link_' . $index;
 
                             $this->add_render_attribute( $link_key, 'href', $url );
-                        ?>
+							?>
                             <li class="elementor-icon-list-item" >
                                 <a <?php echo $this->get_render_attribute_string( $link_key ); ?>>
                                     <?php
@@ -165,7 +167,7 @@ class StoreTabItems extends StoreInfo {
                                     <span <?php echo $this->get_render_attribute_string( $repeater_setting_key ); ?>><?php echo $text; ?></span>
                                 </a>
                             </li>
-                        <?php
+							<?php
                         endif;
                     endforeach;
                     ?>

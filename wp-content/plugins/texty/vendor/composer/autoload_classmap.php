@@ -10,6 +10,7 @@ return array(
     'Appsero\\Insights' => $vendorDir . '/appsero/client/src/Insights.php',
     'Appsero\\License' => $vendorDir . '/appsero/client/src/License.php',
     'Appsero\\Updater' => $vendorDir . '/appsero/client/src/Updater.php',
+    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
     'Texty\\Admin' => $baseDir . '/includes/Admin.php',
     'Texty\\Admin\\Menu' => $baseDir . '/includes/Admin/Menu.php',
     'Texty\\Admin\\Profile' => $baseDir . '/includes/Admin/Profile.php',

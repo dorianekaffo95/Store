@@ -68,11 +68,15 @@ class Dokan_Vendor_Analytics_Admin_Settings {
      * @return array
      */
     public function add_settings_section( $sections ) {
-        $sections['dokan_vendor_analytics'] = array(
-            'id'    => 'dokan_vendor_analytics',
-            'title' => __( 'Vendor Analytics', 'dokan' ),
-            'icon'  => 'dashicons-chart-area'
-        );
+        $sections['dokan_vendor_analytics'] = [
+            'id'                   => 'dokan_vendor_analytics',
+            'title'                => __( 'Vendor Analytics', 'dokan' ),
+            'icon_url'             => DOKAN_VENDOR_ANALYTICS_ASSETS . '/images/analytics.svg',
+            'description'          => __( 'Setup Analytics', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/modules/dokan-vendor-analytics/',
+            'settings_title'       => __( 'Vendor Analytics Settings', 'dokan' ),
+            'settings_description' => __( 'Configure Dokan to give vendors the ability to measure and track their store performances.', 'dokan' ),
+        ];
 
         return $sections;
     }
@@ -138,13 +142,8 @@ class Dokan_Vendor_Analytics_Admin_Settings {
                     'name'    => 'add_tracking_code',
                     'label'   => __( 'Add Tracking Code', 'dokan' ),
                     'desc'    => __( 'This is an optional settings that will add Analytics Global Site Tag in you site header. If you use any SEO plugin or add your tracking code by other means, then choose `no` in the settings.', 'dokan' ),
-                    'type'    => 'radio',
+                    'type'    => 'switcher',
                     'default' => 'no',
-                    'options' => array(
-                        'yes' => __( 'Yes', 'dokan' ),
-                        'no'  => __( 'No', 'dokan' ),
-                    ),
-
                 ),
             );
         }
@@ -198,7 +197,7 @@ class Dokan_Vendor_Analytics_Admin_Settings {
             return;
         }
 
-        $api_data  = get_option( 'dokan_vendor_analytics_google_api_data', array() );
+        $api_data = get_option( 'dokan_vendor_analytics_google_api_data', array() );
 
         if ( empty( $api_data['profiles_map'] ) || ! isset( $api_data['profiles_map'][ $profile ] ) ) {
             return;

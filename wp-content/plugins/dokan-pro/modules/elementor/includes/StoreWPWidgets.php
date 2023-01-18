@@ -244,15 +244,15 @@ class StoreWPWidgets {
             }
 
             $open = [
-                'status'         => 'open',
-                'opening_time' => '8:00 AM',
-                'closing_time' => '05:00 PM',
+                'status'       => 'open',
+                'opening_time' => [ '8:00 AM' ],
+                'closing_time' => [ '05:00 PM' ],
             ];
 
             $close = [
-                'status'         => 'close',
-                'opening_time' => '',
-                'closing_time' => '',
+                'status'       => 'close',
+                'opening_time' => [],
+                'closing_time' => [],
             ];
 
             $store_time = [
@@ -268,6 +268,7 @@ class StoreWPWidgets {
             dokan_get_template_part(
                 'widgets/store-open-close', '', [
 					'dokan_store_time' => $store_time,
+                    'dokan_days'       => dokan_get_translated_days(),
 				]
             );
 

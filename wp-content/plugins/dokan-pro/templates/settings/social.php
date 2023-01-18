@@ -13,9 +13,11 @@ do_action( 'dokan_profile_settings_before_form', $current_user, $profile_info );
             <label class="dokan-w3 dokan-control-label"><?php echo $field['title']; ?></label>
 
             <div class="dokan-w5">
-                <div class="dokan-input-group dokan-form-group">
-                    <span class="dokan-input-group-addon"><i class="fa fa-<?php echo isset( $field['icon'] ) ? $field['icon'] : ''; ?>"></i></span>
-                    <input id="settings[social][<?php echo $key; ?>]" value="<?php echo isset( $profile_info['social'][$key] ) ? esc_url( $profile_info['social'][$key] ) : ''; ?>" name="settings[social][<?php echo $key; ?>]" class="dokan-form-control" placeholder="http://" type="url">
+                <div class="dokan-form-group">
+                    <div class="dokan-input-group">
+                        <span class="dokan-input-group-addon"><i class="fab fa-<?php echo isset( $field['icon'] ) ? $field['icon'] : ''; ?>"></i></span>
+                        <input id="settings[social][<?php echo $key; ?>]" value="<?php echo isset( $profile_info['social'][ $key ] ) ? esc_url( $profile_info['social'][ $key ] ) : ''; ?>" name="settings[social][<?php echo $key; ?>]" class="dokan-form-control" placeholder="http://" type="url">
+                    </div>
                 </div>
             </div>
         </div>

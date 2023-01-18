@@ -33,11 +33,10 @@ class Module {
             return $notices;
         }
 
-		// translators: %1$s: Distance rate label, %2$s: Google map api label, %3$s: Setting url
-
         $notices[] = [
             'type'        => 'alert',
             'title'       => __( 'Dokan Table Rate Shipping module is almost ready!', 'dokan' ),
+            // translators: %1$s: Distance rate label, %2$s: Google map api label, %3$s: Setting url
             'description' => sprintf( __( '%1$s shipping requires %2$s key. Please set your API Key in %3$s.', 'dokan' ), 'Dokan <strong>Distance Rate</strong>', '<strong>Google Map API</strong>', '<strong>Dokan Admin Settings > Appearance</strong>' ),
             'priority'    => 10,
             'actions'     => [
@@ -101,6 +100,7 @@ class Module {
      * @return void
      */
     public function hooks() {
+        add_action( 'init', [ $this, 'register_scripts' ] );
         add_action( 'wp_enqueue_scripts', [ $this, 'load_scripts' ] );
         add_filter( 'dokan_set_template_path', [ $this, 'load_product_trs_templates' ], 10, 3 );
         add_action( 'woocommerce_shipping_methods', [ $this, 'register_shipping' ] );
@@ -170,9 +170,18 @@ class Module {
      * @return void
      */
     public function enqueue_scripts() {
-        $version = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? time() : DOKAN_PLUGIN_VERSION;
+        wp_enqueue_style( 'dokan-table-rate-shipping-style' );
+    }
 
-        wp_enqueue_style( 'dokan-table-rate-shipping-style', DOKAN_TABLE_RATE_SHIPPING_ASSETS_DIR . '/css/main-style.css', false, $version, 'all' );
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan-table-rate-shipping-style', DOKAN_TABLE_RATE_SHIPPING_ASSETS_DIR . '/css/main-style.css', false, $version, 'all' );
         wp_register_script( 'dokan-shipping-table-rate-rows', DOKAN_TABLE_RATE_SHIPPING_ASSETS_DIR . '/js/table-rate-shipping.js', [ 'jquery', 'wp-util' ], $version, true );
 
         $params = [
@@ -423,7 +432,7 @@ class Module {
     public function get_shipping_distance_rates( $output = OBJECT, $instance_id = null ) {
         global $wpdb;
 
-        $rates = $wpdb->get_results( $wpdb->prepare( "SELECT * from {$wpdb->prefix}dokan_distance_rate_shipping WHERE instance_id = %d ORDER BY rate_id ASC", $instance_id ), $output );
+        $rates = $wpdb->get_results( $wpdb->prepare( "SELECT * from {$wpdb->prefix}dokan_distance_rate_shipping WHERE instance_id = %d ORDER BY rate_order ASC", $instance_id ), $output );
 
         return apply_filters( 'dokan_distance_rate_get_shipping_rates', $rates );
     }
@@ -573,6 +582,7 @@ class Module {
                   `rate_fee` varchar(50) NOT NULL,
                   `rate_break` int(5) NOT NULL,
                   `rate_abort` int(5) NOT NULL,
+                  `rate_order` int(11) NOT NULL DEFAULT 0,
                   PRIMARY KEY  (`rate_id`),
                   KEY `key_vendor_id` (`vendor_id`),
                   KEY `key_zone_id` (`zone_id`),

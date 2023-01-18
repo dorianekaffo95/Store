@@ -162,7 +162,6 @@ class Module {
                 $staff->add_cap( 'delete_posts' );
                 $staff->add_cap( 'manage_categories' );
                 $staff->add_cap( 'moderate_comments' );
-                $staff->add_cap( 'unfiltered_html' );
                 $staff->add_cap( 'upload_files' );
                 $staff->add_cap( 'edit_shop_orders' );
                 $staff->add_cap( 'edit_product' );
@@ -217,7 +216,6 @@ class Module {
                 $staff->remove_cap( 'delete_posts' );
                 $staff->remove_cap( 'manage_categories' );
                 $staff->remove_cap( 'moderate_comments' );
-                $staff->remove_cap( 'unfiltered_html' );
                 $staff->remove_cap( 'upload_files' );
                 $staff->remove_cap( 'edit_shop_orders' );
                 $staff->remove_cap( 'edit_product' );
@@ -308,7 +306,7 @@ class Module {
         if ( dokan_is_seller_enabled( get_current_user_id() ) && current_user_can( 'dokandar' ) && ! current_user_can( 'vendor_staff' ) ) {
             $urls['staffs'] = array(
                 'title' => __( 'Staff', 'dokan' ),
-                'icon'  => '<i class="fa fa-users"></i>',
+                'icon'  => '<i class="fas fa-users"></i>',
                 'url'   => dokan_get_navigation_url( 'staffs' ),
                 'pos'   => 172,
             );
@@ -325,7 +323,8 @@ class Module {
      * @return array
      */
     public function load_staff_emails( $emails ) {
-        $emails['Dokan_Staff_New_Order'] = include DOKAN_VENDOR_STAFF_INC_DIR . '/class-staff-new-order-email.php';
+        $emails['Dokan_Staff_New_Order']       = include DOKAN_VENDOR_STAFF_INC_DIR . '/class-staff-new-order-email.php';
+        $emails['Dokan_Staff_Password_Update'] = include DOKAN_VENDOR_STAFF_INC_DIR . '/class-staff-password-update-email.php';
 
         return $emails;
     }
@@ -339,6 +338,8 @@ class Module {
      */
     public function set_email_template_directory( $template_array ) {
         array_push( $template_array, 'staff-new-order.php' );
+        array_push( $template_array, 'staff-password-update.php' );
+
         return $template_array;
     }
 }

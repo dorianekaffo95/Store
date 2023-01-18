@@ -15,6 +15,7 @@ class Install {
     public static function install() {
         // create tables
         self::create_tables();
+        self::add_installed_time();
 
         // update the current version
         update_option( 'wemail_version', WEMAIL_VERSION );
@@ -30,7 +31,7 @@ class Install {
                 'headers' => [
                     'x-api-key' => $api_key,
                 ],
-                'body' => [
+                'body'    => [
                     'deactivated' => false,
                 ],
             ]
@@ -46,8 +47,20 @@ class Install {
      * @return void
      */
     public static function create_tables() {
-        $path = trailingslashit( __DIR__ );
+        $path      = trailingslashit( __DIR__ );
         $file_name = 'Upgrades/upgrade-1.0.0.php';
+
+        include $path . $file_name;
+    }
+
+    /**
+     * Adds plugin installation time.
+     *
+     * @return void
+     */
+    public static function add_installed_time() {
+        $path      = trailingslashit( __DIR__ );
+        $file_name = 'Upgrades/upgrade-1.10.0.php';
 
         include $path . $file_name;
     }

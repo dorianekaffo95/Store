@@ -133,7 +133,7 @@ class Module {
         $response = wp_remote_post( $base_url, $args );
 
         if ( is_wp_error( $response ) ) {
-            wp_send_json_error( 'Error', 'Something went wrong' );
+            wp_send_json_error( 'Error', __( 'Something went wrong', 'dokan' ) );
         }
 
         if ( isset( $response['response']['code'] ) && $response['response']['code'] === '200' ) {

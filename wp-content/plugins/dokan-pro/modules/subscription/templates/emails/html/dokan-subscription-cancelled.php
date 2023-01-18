@@ -17,13 +17,16 @@ do_action( 'woocommerce_email_header', $email_heading, $email );
 
 printf( '<p>%s</p>', __( 'Hello there', 'dokan' ) );
 
-printf( "<p>%s</p>", __( "A subscription has been cancelled by {$vendor->get_store_name()}", "dokan" ) );
+/* translators: %s is the store name */
+printf( '<p>%s</p>', sprintf( __( 'A subscription has been cancelled by %s', 'dokan' ), $vendor->get_store_name() ) );
 
 if ( $subscription ) {
     printf( '<p>%s</p>', __( 'Subscription Details:', 'dokan' ) );
 
-    printf( '<p>%s</p>', __( 'Subscription Pack: ' . $subscription->get_package_title(), 'dokan' ) );
-    printf( '<p>%s</p>', __( 'Price : ' . wc_price( $subscription->get_price() ) , 'dokan' ) );
+    /* translators: %s is the subscription package title */
+    printf( '<p>%s</p>', sprintf( __( 'Subscription Pack: %s', 'dokan' ), $subscription->get_package_title() ) );
+    /* translators: %s is the subscription package price */
+    printf( '<p>%s</p>', sprintf( __( 'Price: %s' , 'dokan' ), wc_price( $subscription->get_price() ) ) );
 }
 
 echo '<hr>';

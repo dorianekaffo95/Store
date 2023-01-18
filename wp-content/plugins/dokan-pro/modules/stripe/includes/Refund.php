@@ -435,8 +435,9 @@ class Refund {
             $refund_amount = $vendor_refund - $gateway_fee_refunded;
         } else {
             $refund_amount = $vendor_refund - $gateway_fee_refunded;
-            $refund_amount = $refund_amount > 0 ? $refund_amount : 0; // making sure amount is not negative
         }
+
+        $refund_amount = $refund_amount > 0 ? $refund_amount : 0; // making sure amount is not negative
 
         // check if balance transaction is greater than $refund_amount
         try {
@@ -547,7 +548,7 @@ class Refund {
      * @return void
      */
     private function update_gateway_fee( $order, $gateway_fee_refunded ) {
-        $gateway_fee = wc_format_decimal( $order->get_meta( 'dokan_gateway_stripe_fee', true ), 2 );
+        $gateway_fee = wc_format_decimal( $order->get_meta( 'dokan_gateway_fee', true ), 2 );
         $gateway_fee = $gateway_fee - $gateway_fee_refunded;
         /*
          * If there is no remaining amount then its full refund and we are updating the processing fee to 0.

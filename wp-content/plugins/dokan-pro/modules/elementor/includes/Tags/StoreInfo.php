@@ -6,7 +6,6 @@ use WeDevs\DokanPro\Modules\Elementor\Abstracts\TagBase;
 use Elementor\Controls_Manager;
 
 class StoreInfo extends TagBase {
-
     /**
      * Tag name
      *
@@ -34,7 +33,7 @@ class StoreInfo extends TagBase {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return array
      */
     protected function get_value() {
         $store_data = dokan_elementor()->get_store_data();
@@ -44,51 +43,51 @@ class StoreInfo extends TagBase {
                 'key'         => 'address',
                 'title'       => __( 'Address', 'dokan' ),
                 'text'        => $store_data['address'],
-                'icon'        => 'fa fa-map-marker',
+                'icon'        => 'fas fa-map-marker',
                 'show'        => true,
                 '__dynamic__' => [
                     'text' => $store_data['address'],
-                ]
+                ],
             ],
             [
                 'key'         => 'phone',
                 'title'       => __( 'Phone No', 'dokan' ),
                 'text'        => $store_data['phone'],
-                'icon'        => 'fa fa-mobile',
+                'icon'        => 'fas fa-mobile',
                 'show'        => true,
                 '__dynamic__' => [
                     'text' => $store_data['phone'],
-                ]
+                ],
             ],
             [
                 'key'         => 'email',
                 'title'       => __( 'Email', 'dokan' ),
                 'text'        => $store_data['email'],
-                'icon'        => 'fa fa-envelope-o',
+                'icon'        => 'fas fa-envelope-open',
                 'show'        => true,
                 '__dynamic__' => [
                     'text' => $store_data['email'],
-                ]
+                ],
             ],
             [
                 'key'         => 'rating',
                 'title'       => __( 'Rating', 'dokan' ),
                 'text'        => $store_data['rating'],
-                'icon'        => 'fa fa-star',
+                'icon'        => 'fas fa-star',
                 'show'        => true,
                 '__dynamic__' => [
                     'text' => $store_data['rating'],
-                ]
+                ],
             ],
             [
                 'key'         => 'open_close_status',
                 'title'       => __( 'Open/Close Status', 'dokan' ),
                 'text'        => $store_data['open_close'],
-                'icon'        => 'fa fa-shopping-cart',
+                'icon'        => 'fas fa-shopping-cart',
                 'show'        => true,
                 '__dynamic__' => [
                     'text' => $store_data['open_close'],
-                ]
+                ],
             ],
         ];
 
@@ -103,6 +102,6 @@ class StoreInfo extends TagBase {
     }
 
     protected function render() {
-        echo json_encode( $this->get_value() );
+        echo wp_json_encode( $this->get_value() );
     }
 }

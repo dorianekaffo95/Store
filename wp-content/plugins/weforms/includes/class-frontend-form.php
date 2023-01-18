@@ -67,7 +67,9 @@ class WeForms_Frontend_Form {
         $show_credit      = weforms_get_settings( 'credit', false );
         $formid           = 'weforms-' . $form->id;
         $use_theme_css    = isset( $form_settings['use_theme_css'] ) ? $form_settings['use_theme_css'] : 'wpuf-style';
-
+        // if ( $use_theme_css === $form_settings['use_theme_css'] ) {
+        //     wp_dequeue_style( 'weforms-css' );
+        // }
         if ( isset( $atts['modal'] ) && 'true' == $atts['modal'] ) {
             wp_enqueue_script( 'weforms-modal-js', WEFORMS_ASSET_URI . '/modal/jquery.modal.js', [ 'jquery', 'weforms-form' ], false, false );
             wp_enqueue_style( 'weforms_modal_styles', WEFORMS_ASSET_URI . '/modal/jquery.modal.css' );
@@ -173,9 +175,13 @@ class WeForms_Frontend_Form {
 
             <?php do_action( 'weforms_submit_btn', $form_id, $form_settings ); ?>
 
-            <input type="submit" class="weforms_submit_btn wpuf_submit_<?php echo esc_attr( $form_id ); ?>" name="submit" value="<?php echo
-            esc_attr( $form_settings['submit_text'] ); ?>" />
-
+            <?php if ( 'wpuf-style' == $form_settings['use_theme_css'] ) : ?>
+                <input type="submit" class="weforms_submit_btn wpuf_submit_<?php echo esc_attr( $form_id ); ?>" name="submit" value="<?php echo
+                esc_attr( $form_settings['submit_text'] ); ?>" />
+            <?php else : ?>
+                <input type="submit" class="button button-primary wpuf_submit_<?php echo esc_attr( $form_id ); ?>" name="submit" value="<?php echo
+                esc_attr( $form_settings['submit_text'] ); ?>" />
+            <?php endif; ?>
         </li>
     <?php
     }

@@ -69,7 +69,7 @@ class StoreTabContents extends StoreName {
      *
      * @return void
      */
-    protected function _register_controls() {
+    protected function register_controls() {
         $this->add_control(
             'products',
             [
@@ -77,7 +77,7 @@ class StoreTabContents extends StoreName {
                 'dynamic' => [
                     'active' => true,
                     'default' => dokan_elementor()->elementor()->dynamic_tags->tag_data_to_tag_text( null, 'dokan-store-dummy-products' ),
-                ]
+                ],
             ],
             [
                 'position' => [ 'of' => '_title' ],
@@ -90,7 +90,7 @@ class StoreTabContents extends StoreName {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return string
      */
     protected function get_html_wrapper_class() {
         return parent::get_html_wrapper_class() . ' dokan-store-tab-content elementor-widget-' . parent::get_name();

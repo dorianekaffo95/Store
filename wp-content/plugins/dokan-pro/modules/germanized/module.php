@@ -71,6 +71,7 @@ class Module {
             add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
         }
         add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_frontend_scripts' ] );
+        add_action( 'init', [ $this, 'register_scripts' ] );
     }
 
     /**
@@ -132,6 +133,19 @@ class Module {
     }
 
     /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_script( 'dokan-germanized-admin', DOKAN_GERMANIZED_ASSETS_DIR . '/js/script-admin' . $suffix . '.js', array( 'dokan-vue-bootstrap' ), $version, true );
+        wp_register_script( 'dokan-germanized', DOKAN_GERMANIZED_ASSETS_DIR . '/js/script-public' . $suffix . '.js', array( 'jquery' ), $version, true );
+        wp_register_style( 'dokan-germanized', DOKAN_GERMANIZED_ASSETS_DIR . '/css/style-public' . $suffix . '.css', array(), $version, 'all' );
+    }
+
+    /**
      * Load scripts and styles
      *
      * @since 3.3.1
@@ -156,12 +170,12 @@ class Module {
 
         // load script only in product edit page
         if ( ! empty( $product ) ) {
-            wp_enqueue_script( 'dokan-germanized', DOKAN_GERMANIZED_ASSETS_DIR . '/js/script-public' . $suffix . '.js', array( 'jquery' ), DOKAN_PRO_PLUGIN_VERSION, true );
-            wp_enqueue_style( 'dokan-germanized', DOKAN_GERMANIZED_ASSETS_DIR . '/css/style-public' . $suffix . '.css', array(), DOKAN_PRO_PLUGIN_VERSION, 'all' );
+            wp_enqueue_script( 'dokan-germanized' );
+            wp_enqueue_style( 'dokan-germanized' );
         }
 
         if ( dokan_is_store_page() ) {
-            wp_enqueue_style( 'dokan-germanized', DOKAN_GERMANIZED_ASSETS_DIR . '/css/style-public' . $suffix . '.css', array(), DOKAN_PRO_PLUGIN_VERSION, 'all' );
+            wp_enqueue_style( 'dokan-germanized' );
         }
     }
 
@@ -173,12 +187,9 @@ class Module {
      * @return void
      */
     public function enqueue_admin_scripts( $hook ) {
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
         // load vue app inside the parent menu only
         if ( 'toplevel_page_dokan' === $hook ) {
-            wp_enqueue_script( 'dokan-germanized-admin', DOKAN_GERMANIZED_ASSETS_DIR . '/js/script-admin' . $suffix . '.js', array( 'dokan-vue-bootstrap' ), time(), true );
+            wp_enqueue_script( 'dokan-germanized-admin' );
         }
     }
 }

@@ -245,6 +245,18 @@ class DSR_View {
 
             Cache::invalidate_group( 'store_reviews' );
 
+            /**
+             * This hook will call After successfully saved store review.
+             *
+             * @param int   $post_id
+             * @param array $postdata
+             * @param int   $rating
+             *
+             * @since 3.5.5
+             */
+            WC_Emails::instance();
+            do_action( 'dokan_store_review_saved', $post_id, $postdata, $rating );
+
             wp_send_json( array(
                 'success' => true,
                 'msg'     => __( 'Thanks for your review', 'dokan' ),

@@ -984,6 +984,11 @@ class StripeConnect extends StripePaymentGateway {
      * @return void
      */
     public function payment_scripts() {
+        // Don't load the scripts if the gateway is not available.
+        if ( ! $this->is_available() ) {
+            return;
+        }
+
         if (
             ! is_checkout()
             && ! isset( $_GET['pay_for_order'] ) // wpcs: csrf ok.

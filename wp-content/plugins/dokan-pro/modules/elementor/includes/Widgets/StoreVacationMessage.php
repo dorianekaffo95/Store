@@ -70,8 +70,8 @@ class StoreVacationMessage extends Widget_Alert {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->update_control(
             'alert_title',
@@ -124,7 +124,7 @@ class StoreVacationMessage extends Widget_Alert {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return string
      */
     protected function get_html_wrapper_class() {
         return parent::get_html_wrapper_class() . ' dokan-store-vacation-message elementor-widget-' . parent::get_name();
@@ -157,7 +157,7 @@ class StoreVacationMessage extends Widget_Alert {
         $this->add_render_attribute( 'wrapper', 'role', 'alert' );
         ?>
         <div <?php echo $this->get_render_attribute_string( 'wrapper' ); ?>>
-            <?php if ( ! empty( $settings['show_title'] ) && 'show' === $settings['show_title'] && ! empty( $settings['alert_title'] ) ): ?>
+            <?php if ( ! empty( $settings['show_title'] ) && 'show' === $settings['show_title'] && ! empty( $settings['alert_title'] ) ) : ?>
                 <span <?php echo $this->get_render_attribute_string( 'alert_title' ); ?>><?php echo $settings['alert_title']; ?></span>
             <?php endif; ?>
 

@@ -217,7 +217,7 @@ $is_enable_op_discount  = dokan_get_option( 'discount_edit', 'dokan_selling', ''
                     }
                     ?>
                     <li class="add-image add-product-images tips" data-title="<?php _e( 'Add gallery image', 'dokan' ); ?>">
-                        <a href="#" class="add-product-images"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                        <a href="#" class="add-product-images"><i class="fas fa-plus" aria-hidden="true"></i></a>
                     </li>
                 </ul>
 

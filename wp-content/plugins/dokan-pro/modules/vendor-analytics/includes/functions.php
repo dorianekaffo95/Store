@@ -86,7 +86,7 @@ function dokan_general_analytics() {
     $Vendor_filter = new Dokan_Vendor_Analytics_Reports();
     $result = $Vendor_filter->dokan_get_vendor_analytics( $start_date, $end_date, $metrics, $dimensions, $sort );
 
-    if ( empty( $result->totalsForAllResults ) ) {
+    if ( null === $result || is_wp_error( $result ) || empty( $result->totalsForAllResults ) ) {
         echo __( 'There is no analytics found for your store.', 'dokan' );
         return;
     }
@@ -376,9 +376,9 @@ function dokan_geographic_analytics() {
         'rows'                      => ( isset( $results->rows ) && ! empty( $results->rows ) ) ? $results->rows : array(),
     );
 
-    wp_enqueue_script( 'echarts-js', DOKAN_VENDOR_ANALYTICS_ASSETS . '/js/echarts.min.js', array(), false, true );
-    wp_enqueue_script( 'echarts-js-map-world', DOKAN_VENDOR_ANALYTICS_ASSETS . '/js/world.js', array( 'echarts-js' ), false, true );
-    wp_enqueue_script( 'dokan-vendor-analytics-locations', DOKAN_VENDOR_ANALYTICS_ASSETS . '/js/dokan-vendor-analytics-locations.js', array( 'echarts-js', 'echarts-js-map-world' ), false, true );
+    wp_enqueue_script( 'echarts-js' );
+    wp_enqueue_script( 'echarts-js-map-world' );
+    wp_enqueue_script( 'dokan-vendor-analytics-locations' );
     wp_localize_script( 'dokan-vendor-analytics-locations', 'dokanVendorAnalytics', array(
         'chart_data' => $chart_data,
     ) );

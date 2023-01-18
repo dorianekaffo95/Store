@@ -20,10 +20,10 @@ do_action( 'dokan_before_listing_product' );
     <h1 class="entry-title"><?php echo esc_html( $title ); ?>
         <span class="dokan-add-product-link">
             <?php if ( ! Dokan_WC_Booking_Helper::is_global_addon_rma_active() ): ?>
-            <a href="<?php echo esc_url( $booking_url . 'add-booking' ); ?>" class="dokan-btn dokan-right dokan-add-new-product"><i class="fa fa-calendar"></i> <?php esc_html_e( 'Add Booking', 'dokan' ); ?></a>
+            <a href="<?php echo esc_url( $booking_url . 'add-booking' ); ?>" class="dokan-btn dokan-right dokan-add-new-product"><i class="far fa-calendar-alt"></i> <?php esc_html_e( 'Add Booking', 'dokan' ); ?></a>
             <?php endif; ?>
 
-            <a href="<?php echo esc_url( $booking_url . 'new-product' ); ?>" class="dokan-btn dokan-btn-theme dokan-right dokan-add-new-product"><i class="fa fa-briefcase">&nbsp;</i> <?php esc_html_e( 'Add New Booking Product', 'dokan' ); ?></a>
+            <a href="<?php echo esc_url( $booking_url . 'new-product' ); ?>" class="dokan-btn dokan-btn-theme dokan-right dokan-add-new-product"><i class="fas fa-briefcase">&nbsp;</i> <?php esc_html_e( 'Add New Booking Product', 'dokan' ); ?></a>
         </span>
     </h1>
     <?php } ?>

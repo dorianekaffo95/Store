@@ -257,7 +257,7 @@ class AnnouncementController extends DokanRESTController {
         $data = array(
             'ID'           => $request['id'],
             'post_title'   => sanitize_text_field( $request['title'] ),
-            'post_content' => sanitize_textarea_field( $request['content'] ),
+            'post_content' => wp_kses_post( $request['content'] ),
         );
 
         if ( $status ) {

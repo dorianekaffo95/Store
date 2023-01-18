@@ -40,7 +40,7 @@ class Dokan_Booking_Accommodation_Admin {
 
         wp_register_script( 'dokan_accommodation_booking_admin_script', DOKAN_WC_BOOKING_PLUGIN_ASSET . '/js/admin.js', [ 'jquery' ], DOKAN_PRO_PLUGIN_VERSION, true );
 
-        wp_register_script( 'dokan_accommodation_booking_script', DOKAN_WC_BOOKING_PLUGIN_ASSET . '/js/accommodation.js', [ 'jquery' ], DOKAN_PRO_PLUGIN_VERSION, true );
+        wp_register_script( 'dokan_accommodation_booking_script', DOKAN_WC_BOOKING_PLUGIN_ASSET . '/js/accommodation.js', [ 'jquery', 'dokan-util-helper' ], DOKAN_PRO_PLUGIN_VERSION, true );
         wp_localize_script( 'dokan_accommodation_booking_script', 'dokan_accommodation_i18n', $accommodation_i18n );
     }
 

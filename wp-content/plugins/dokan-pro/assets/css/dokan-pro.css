@@ -147,6 +147,9 @@ ul.dokan-account-migration-lists li .right-content {
   background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
   background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
 }
+#dokan-profile-progressbar-closer {
+  cursor: pointer !important;
+}
 /*
 To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
@@ -889,11 +892,31 @@ ol.dokan-order-shipment-notes-updates {
   border: 1px solid #EDEDED;
   padding: 2px 5px;
 }
+.dokan-reports-content .dokan-reports-area .report-filter#dokan-v-dashboard-reports div.dokan-form-group {
+  display: flex;
+  align-items: center;
+}
+.dokan-reports-content .dokan-reports-area .report-filter#dokan-v-dashboard-reports div.dokan-form-group input[type=text].datepicker {
+  height: 38px;
+  margin-right: 3px;
+  margin-left: 3px;
+}
+.dokan-reports-content .dokan-reports-area .report-filter#dokan-v-dashboard-reports div.dokan-form-group input[type=submit].dokan-btn-success {
+  height: 36px;
+}
 .dokan-reports-content .dokan-reports-area table.table {
   margin-top: 15px;
 }
 .dokan-reports-content .dokan-reports-area table.table .progress {
   margin-bottom: 0;
+}
+.dokan-reports-content .dokan-reports-area table.table tbody tr th a,
+.dokan-reports-content .dokan-reports-area table.table tbody tr td a {
+  color: #6d6d6d;
+}
+.dokan-reports-content .dokan-reports-area table.table tbody tr th a:hover,
+.dokan-reports-content .dokan-reports-area table.table tbody tr td a:hover {
+  color: #000;
 }
 .dokan-reports-content .dokan-reports-area .dokan-reports-main h3 {
   margin: 0 0 15px 0;
@@ -928,6 +951,9 @@ ol.dokan-order-shipment-notes-updates {
 }
 .dokan-reviews-content .dokan-reviews-area .dokan-comments-wrap ul.dokan-cmt-row-actions a {
   text-decoration: none;
+}
+.dokan-reviews-content .dokan-reviews-area .dokan-comments-wrap ul.dokan-cmt-row-actions a[data-cmt_status='delete']:hover {
+  color: red !important;
 }
 .dokan-reviews-content .dokan-reviews-area .dokan-comments-wrap ul.dokan-cmt-row-actions li {
   display: inline;
@@ -1000,7 +1026,7 @@ To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates
 and open the template in the editor.
 */
-/* 
+/*
     Created on : Feb 6, 2017, 11:10:34 AM
     Author     : rafsun
 */

@@ -73,6 +73,7 @@ class Module {
      */
     private function hooks() {
         if ( $this->has_map_api_key ) {
+            add_action( 'init', array( $this, 'register_scripts' ) );
             add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
             add_action( 'widgets_init', array( $this, 'register_widget' ) );
             add_action( 'dokan_new_seller_created', array( $this, 'set_default_geolocation_data' ), 35 );
@@ -164,18 +165,10 @@ class Module {
         update_option( 'dokan_background_processes', $processes, 'no' );
     }
 
-    /**
-     * Enqueue module scripts
-     *
-     * @since 1.0.0
-     *
-     * @return void
-     */
-    public function enqueue_scripts() {
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
 
-        wp_enqueue_style( 'dokan-geolocation', DOKAN_GEOLOCATION_ASSETS . '/css/geolocation' . $suffix . '.css', array( 'dokan-magnific-popup' ), $this->version );
+        wp_register_style( 'dokan-geolocation', DOKAN_GEOLOCATION_ASSETS . '/css/geolocation' . $suffix . '.css', array( 'dokan-magnific-popup' ), $version );
 
         $js = DOKAN_GEOLOCATION_ASSETS . '/js/geolocation-vendor-dashboard-product-google-maps' . $suffix . '.js';
 
@@ -185,7 +178,29 @@ class Module {
             $js = DOKAN_GEOLOCATION_ASSETS . '/js/geolocation-vendor-dashboard-product-mapbox' . $suffix . '.js';
         }
 
-        wp_enqueue_script( 'dokan-geolocation', $js, array( 'jquery', 'dokan-maps' ), $this->version, true );
+        wp_register_script( 'dokan-geolocation', $js, array( 'jquery', 'dokan-maps' ), $version, true );
+    }
+
+    /**
+     * Enqueue module scripts
+     *
+     * @since 1.0.0
+     *
+     * @return void
+     */
+    public function enqueue_scripts() {
+        global $wp;
+        if (
+            is_shop()
+            || dokan_is_store_listing()
+            || ( isset( $wp->query_vars['products'] ) && isset( $_GET['action'] ) && 'edit' === sanitize_text_field( wp_unslash( $_GET['action'] ) ) ) //phpcs:ignore
+            || ( isset( $wp->query_vars['booking'] ) && 'edit' === $wp->query_vars['booking'] )
+            || ( isset( $wp->query_vars['auction'] ) && isset( $_GET['action'] ) && 'edit' === sanitize_text_field( wp_unslash( $_GET['action'] ) ) ) //phpcs:ignore
+        ) {
+            wp_enqueue_style( 'dokan-geolocation' );
+            wp_enqueue_script( 'dokan-geolocation' );
+            wp_enqueue_script( 'dokan-geo-filters-store-lists' );
+        }
     }
 
     /**

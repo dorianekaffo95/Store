@@ -82,12 +82,14 @@ class Module {
         add_action( 'widgets_init', array( $this, 'register_widgets' ) );
 
         // Loads frontend scripts and styles
+        add_action( 'init', array( $this, 'register_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
         //filters
         add_filter( 'dokan_get_all_cap', array( $this, 'add_capabilities' ), 10 );
         add_filter( 'dokan_get_dashboard_settings_nav', array( $this, 'register_dashboard_menu' ) );
         add_filter( 'dokan_query_var_filter', array( $this, 'dokan_verification_template_endpoint' ) );
+        add_filter( 'dokan_seller_address_fields', [ $this, 'required_vendor_residence_proof_field' ] );
 
         //ajax hooks
         add_action( 'wp_ajax_dokan_update_verify_info', array( $this, 'dokan_update_verify_info' ) );
@@ -100,6 +102,7 @@ class Module {
         add_action( 'wp_ajax_dokan_v_verify_sms_code', array( $this, 'dokan_v_verify_sms_code' ) );
         add_action( 'wp_ajax_dokan_update_verify_info_insert_company', array( $this, 'dokan_update_verify_info_insert_company' ) );
         add_action( 'wp_ajax_dokan_company_verification_cancel', array( $this, 'dokan_company_verification_cancel' ) );
+        add_action( 'dokan_vendor_address_verification_template', [ $this, 'added_vendor_residence_proof_template' ], 10, 2 );
 
         if ( $installed_version >= 2.4 ) {
             add_filter( 'dokan_dashboard_settings_heading_title', array( $this, 'load_verification_template_header' ), 15, 2 );
@@ -118,6 +121,30 @@ class Module {
 
         // flush rewrite rules
         add_action( 'woocommerce_flush_rewrite_rules', [ $this, 'flush_rewrite_rules' ] );
+        // display vendor verification badge
+        add_action( 'dokan_store_header_after_store_name', [ $this, 'add_vendor_verified_icon' ] );
+        add_action( 'dokan_store_list_loop_after_store_name', [ $this, 'add_vendor_verified_icon' ] );
+        add_action( 'dokan_product_single_after_store_name', [ $this, 'add_vendor_verified_icon' ] );
+    }
+
+    /**
+     * Render vendor verified icon after store name
+     *
+     * @since 3.5.2
+     *
+     * @return void
+     */
+    public function add_vendor_verified_icon( $vendor ) {
+        // check seller id, address or business has not verified
+        if ( false === strpos( get_user_meta( $vendor->get_id(), 'dokan_verification_status', true ), 'approved' ) ) {
+            return;
+        }
+
+        ?>
+            <svg class="tips" title="<?php esc_html_e( 'Verified', 'dokan' ); ?>" width="18" height="17" viewBox="0 0 18 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15.8957 6.51207C15.6765 6.3649 15.4785 6.18837 15.3074 5.98736C15.3201 5.70749 15.3763 5.43133 15.4741 5.16883C15.6579 4.54661 15.8868 3.77223 15.4457 3.16628C15.0013 2.55551 14.1896 2.53501 13.5374 2.51834C13.2631 2.5293 12.9887 2.4998 12.7229 2.43078C12.5768 2.20159 12.4652 1.95214 12.3918 1.69043C12.1742 1.07073 11.9031 0.299431 11.1772 0.0635171C10.4728 -0.165422 9.84062 0.269543 9.28322 0.652041C9.05921 0.830895 8.80772 0.97227 8.5385 1.0707C8.26914 0.972382 8.01751 0.830979 7.79348 0.652041C7.23605 0.269206 6.60371 -0.164385 5.89947 0.0635171C5.17372 0.299431 4.90273 1.07034 4.68489 1.69018C4.61161 1.95058 4.50127 2.1991 4.35726 2.42809C4.09068 2.49921 3.81487 2.52955 3.53921 2.51809C2.8871 2.53473 2.07535 2.55526 1.631 3.166C1.18985 3.77228 1.41873 4.54667 1.60254 5.16894C1.69918 5.43007 1.75594 5.70425 1.77087 5.98229C1.60044 6.18613 1.40173 6.36456 1.18077 6.5121C0.654604 6.91337 0 7.41293 0 8.18596C0 8.959 0.654604 9.45856 1.18089 9.85985C1.40008 10.007 1.59806 10.1836 1.76924 10.3846C1.75652 10.6644 1.70028 10.9406 1.60249 11.2031C1.4187 11.8253 1.18979 12.5998 1.63095 13.2056C2.0753 13.8164 2.88705 13.8369 3.53918 13.8536C3.81353 13.8427 4.08796 13.8722 4.35371 13.9412C4.49981 14.1704 4.61138 14.4198 4.6848 14.6815C4.90265 15.3013 5.17363 16.0725 5.89956 16.3085C6.02816 16.3507 6.16267 16.3721 6.29802 16.3721C6.84436 16.3721 7.34325 16.0292 7.79353 15.72C8.01754 15.5411 8.26903 15.3997 8.53828 15.3012C8.80764 15.3995 9.05927 15.5409 9.28336 15.7199C9.84076 16.1027 10.4729 16.536 11.1773 16.3084C11.9031 16.0725 12.1741 15.3016 12.3919 14.6817C12.4652 14.4213 12.5755 14.1728 12.7195 13.9438C12.9861 13.8727 13.2619 13.8424 13.5376 13.8538C14.1897 13.8372 15.0015 13.8167 15.4458 13.2059C15.887 12.5997 15.6581 11.8252 15.4743 11.203C15.3776 10.9419 15.3209 10.6677 15.3059 10.3896C15.4764 10.1858 15.6751 10.0074 15.896 9.85983C16.422 9.45856 17.0766 8.959 17.0766 8.18596C17.0766 7.41293 16.422 6.91337 15.8957 6.51207ZM11.7096 6.91023L8.15197 10.4678C7.87421 10.7457 7.42381 10.7458 7.14596 10.468C7.1459 10.468 7.14585 10.4679 7.14579 10.4678L5.36697 8.68902C5.08559 8.41471 5.07988 7.96422 5.3542 7.68285C5.62851 7.40147 6.079 7.39575 6.36037 7.67007C6.36469 7.67427 6.36895 7.67853 6.37315 7.68285L7.64888 8.95861L10.7034 5.90402C10.9778 5.62265 11.4282 5.61696 11.7096 5.89128C11.991 6.1656 11.9967 6.61608 11.7224 6.89746C11.7182 6.9018 11.7139 6.90603 11.7096 6.91023Z" fill="#2196F3"/>
+            </svg>
+        <?php
     }
 
     /**
@@ -451,13 +478,26 @@ class Module {
     public function enqueue_scripts() {
         global $wp;
 
-        wp_enqueue_style( 'dokan-verification-styles', plugins_url( 'assets/css/style.css', __FILE__ ), true, gmdate( 'Ymd' ) );
-        wp_enqueue_script( 'dokan-verification-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), $this->version, true );
+        if ( isset( $wp->query_vars['settings'] ) && 'verification' === $wp->query_vars['settings'] ) {
+            $data = [
+                'upload_title' => __( 'Upload Proof', 'dokan' ),
+                'insert_title' => __( 'Insert Proof', 'dokan' ),
+            ];
 
-        // @codingStandardsIgnoreLine
-        if ( isset( $wp->query_vars['settings'] ) == 'verification' ) {
+            wp_enqueue_style( 'dokan-verification-styles' );
+            wp_enqueue_script( 'dokan-verification-scripts' );
+            wp_localize_script( 'dokan-verification-scripts', 'verify_data', $data );
+
             wp_enqueue_script( 'wc-country-select' );
+            wp_enqueue_script( 'dokan-form-validate' );
         }
+    }
+
+    public function register_scripts() {
+        list( $suffix, $script_version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dokan-verification-styles', plugins_url( 'assets/css/style.css', __FILE__ ), true, $script_version );
+        wp_register_script( 'dokan-verification-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), array( 'jquery' ), $this->version, true );
     }
 
     /**
@@ -483,7 +523,7 @@ class Module {
     public function register_dashboard_menu( $urls ) {
         $urls['verification'] = array(
             'title'      => __( 'Verification', 'dokan' ),
-            'icon'       => '<i class="fa fa-check"></i>',
+            'icon'       => '<i class="fas fa-check"></i>',
             'url'        => dokan_get_navigation_url( 'settings/verification' ),
             'pos'        => 55,
             'permission' => 'dokan_view_store_verification_menu',
@@ -508,6 +548,21 @@ class Module {
     public function dokan_verification_template_endpoint( $query_var ) {
         $query_var[] = 'verification';
         return $query_var;
+    }
+
+    /**
+     * Required vendor residence proof field for vendor verification.
+     *
+     * @since 3.5.5
+     *
+     * @param array $fields Required verification fields
+     *
+     * @return array
+     */
+    public function required_vendor_residence_proof_field( $fields ) {
+        $fields['proof']['required'] = 1;
+
+        return $fields;
     }
 
     /** Updates photo Id for verification
@@ -537,8 +592,30 @@ class Module {
 
             dokan_verification_request_submit_email();
 
-            $msg = sprintf( __( 'Your ID verification request is Sent and %s approval', 'dokan' ), $seller_profile['dokan_verification']['info']['dokan_v_id_status'] );
+            $msg = sprintf( __( 'Your ID verification request is Sent and %s approval', 'dokan' ), self::get_translated_status( $seller_profile['dokan_verification']['info']['dokan_v_id_status'] ) );
             wp_send_json_success( $msg );
+        }
+    }
+
+    /**
+     * Get translated version of approval statuses
+     *
+     * @since 3.5.4
+     *
+     * @param $status
+     *
+     * @return string Translated Status
+     */
+    public static function get_translated_status( $status ) {
+        switch ( $status ) {
+            case 'approved':
+                return __( 'approved', 'dokan' );
+            case 'pending':
+                return __( 'pending', 'dokan' );
+            case 'rejected':
+                return __( 'rejected', 'dokan' );
+            default:
+                return $status;
         }
     }
 
@@ -602,9 +679,19 @@ class Module {
         if ( ! wp_verify_nonce( $postdata['dokan_sv_nonce'], 'dokan_sv_nonce_action' ) ) {
             wp_send_json_error( __( 'Are you cheating?', 'dokan' ) );
         }
-        $postdata['status']    = sanitize_text_field( wp_unslash( $_POST['status'] ) );
-        $postdata['seller_id'] = absint( $_POST['seller_id'] );
-        $postdata['type']      = sanitize_text_field( wp_unslash( $_POST['type'] ) );
+
+        $postdata['type']               = ! empty( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
+        $postdata['status']             = ! empty( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '';
+        $postdata['seller_id']          = ! empty( $_POST['seller_id'] ) ? absint( wp_unslash( $_POST['seller_id'] ) ) : '';
+        $postdata['street_1']           = ! empty( $postdata['street_1'] ) ? sanitize_text_field( wp_unslash( $postdata['street_1'] ) ) : '';
+        $postdata['street_2']           = ! empty( $postdata['street_2'] ) ? sanitize_text_field( wp_unslash( $postdata['street_2'] ) ) : '';
+        $postdata['store_zip']          = ! empty( $postdata['store_zip'] ) ? sanitize_text_field( wp_unslash( $postdata['store_zip'] ) ) : '';
+        $postdata['store_city']         = ! empty( $postdata['store_city'] ) ? sanitize_text_field( wp_unslash( $postdata['store_city'] ) ) : '';
+        $postdata['store_state']        = ! empty( $postdata['store_state'] ) ? sanitize_text_field( wp_unslash( $postdata['store_state'] ) ) : '';
+        $postdata['store_country']      = ! empty( $postdata['store_country'] ) ? sanitize_text_field( wp_unslash( $postdata['store_country'] ) ) : '';
+        $postdata['dokan_gravatar']     = ! empty( $postdata['dokan_gravatar'] ) ? absint( wp_unslash( $postdata['dokan_gravatar'] ) ) : '';
+        $postdata['dokan_v_id_type']    = ! empty( $postdata['dokan_v_id_type'] ) ? sanitize_text_field( wp_unslash( $postdata['dokan_v_id_type'] ) ) : '';
+        $postdata['proof_of_residence'] = ! empty( $postdata['proof_of_residence'] ) ? sanitize_text_field( wp_unslash( $postdata['proof_of_residence'] ) ) : '';
         // @codingStandardsIgnoreEnd
 
         $user_id        = $postdata['seller_id'];
@@ -620,22 +707,24 @@ class Module {
 
                     $seller_profile['dokan_verification']['info']['dokan_v_id_status'] = 'approved';
                 } elseif ( 'address' === $postdata['type'] ) {
-                    $seller_profile['dokan_verification']['verified_info']['store_address'] = array(
+                    $seller_profile['dokan_verification']['verified_info']['store_address'] = [
                         'street_1' => $postdata['street_1'],
                         'street_2' => $postdata['street_2'],
                         'city'     => $postdata['store_city'],
                         'zip'      => $postdata['store_zip'],
                         'country'  => $postdata['store_country'],
                         'state'    => $postdata['store_state'],
-                    );
-                    $seller_profile['address'] = array(
+                        'proof'    => $postdata['proof_of_residence'],
+                    ];
+                    $seller_profile['address'] = [
                         'street_1' => $postdata['street_1'],
                         'street_2' => $postdata['street_2'],
                         'city'     => $postdata['store_city'],
                         'zip'      => $postdata['store_zip'],
                         'country'  => $postdata['store_country'],
                         'state'    => $postdata['store_state'],
-                    );
+                        'proof'    => $postdata['proof_of_residence'],
+                    ];
 
                     $seller_profile['dokan_verification']['info']['store_address']['v_status'] = 'approved';
                 } elseif ( 'company_verification_files' === $postdata['type'] ) {
@@ -717,15 +806,16 @@ class Module {
         $current_user   = get_current_user_id();
         $seller_profile = dokan_get_store_info( $current_user );
 
-        $default = array(
+        $default = [
             'street_1' => '',
             'street_2' => '',
             'city'     => '',
             'zip'      => '',
             'country'  => '',
             'state'    => '',
+            'proof'    => '',
             'v_status' => 'pending',
-        );
+        ];
 
         if ( $address_field['state'] === 'N/A' ) {
             $address_field['state'] = '';
@@ -1043,5 +1133,33 @@ EOD;
         $msg = __( 'Your company verification request is cancelled', 'dokan' );
 
         wp_send_json_success( $msg );
+    }
+
+    /**
+     * Added vendor residence proof template for vendor verification.
+     *
+     * @since 3.5.5
+     *
+     * @param array $address
+     * @param array $seller_address_fields
+     *
+     * @return void
+     */
+    public function added_vendor_residence_proof_template( $address, $seller_address_fields ) {
+        global $wp;
+
+        // If this page is verification settings page then show address proof template.
+        if ( isset( $wp->query_vars['settings'] ) && $wp->query_vars['settings'] === 'verification' ) {
+            dokan_get_template_part(
+                'vendor-verification/verification-address', '', [
+                    'is_vendor_verification' => true,
+                    'address'                => $address,
+                    'seller_address_fields'  => $seller_address_fields,
+                    'btn_text'               => __( 'Upload Proof', 'dokan' ),
+                    'label'                  => __( 'Proof of Residence', 'dokan' ),
+                    'required_text'          => __( 'Vendor residence proof is required!', 'dokan' ),
+                ]
+            );
+        }
     }
 }

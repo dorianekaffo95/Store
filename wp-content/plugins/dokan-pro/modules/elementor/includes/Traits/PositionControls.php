@@ -5,7 +5,6 @@ namespace WeDevs\DokanPro\Modules\Elementor\Traits;
 use Elementor\Controls_Manager;
 
 trait PositionControls {
-
     /**
      * Add css position controls
      *
@@ -14,11 +13,13 @@ trait PositionControls {
      * @return void
      */
     protected function add_position_controls() {
-        $this->start_injection( [
-            'type' => 'section',
-            'at'   => 'start',
-            'of'   => '_section_style',
-        ] );
+        $this->start_injection(
+            [
+                'type' => 'section',
+                'at'   => 'start',
+                'of'   => '_section_style',
+            ]
+        );
 
         $this->start_controls_section(
             'section_position',

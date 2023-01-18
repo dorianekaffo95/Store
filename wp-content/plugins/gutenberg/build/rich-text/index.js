@@ -1,36 +1,36 @@
-/******/ (function() { // webpackBootstrap
+/******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
 /******/ 	
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = function(exports, definition) {
+/******/ 		__webpack_require__.d = (exports, definition) => {
 /******/ 			for(var key in definition) {
 /******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
 /******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	!function() {
-/******/ 		__webpack_require__.o = function(obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
-/******/ 	}();
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
-/******/ 	!function() {
+/******/ 	(() => {
 /******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = function(exports) {
+/******/ 		__webpack_require__.r = (exports) => {
 /******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
 /******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
 /******/ 			}
 /******/ 			Object.defineProperty(exports, '__esModule', { value: true });
 /******/ 		};
-/******/ 	}();
+/******/ 	})();
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
@@ -39,68 +39,69 @@ __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "__UNSTABLE_LINE_SEPARATOR": function() { return /* reexport */ LINE_SEPARATOR; },
-  "__experimentalRichText": function() { return /* reexport */ __experimentalRichText; },
-  "__unstableCanIndentListItems": function() { return /* reexport */ canIndentListItems; },
-  "__unstableCanOutdentListItems": function() { return /* reexport */ canOutdentListItems; },
-  "__unstableChangeListType": function() { return /* reexport */ changeListType; },
-  "__unstableCreateElement": function() { return /* reexport */ createElement; },
-  "__unstableFormatEdit": function() { return /* reexport */ FormatEdit; },
-  "__unstableIndentListItems": function() { return /* reexport */ indentListItems; },
-  "__unstableInsertLineSeparator": function() { return /* reexport */ insertLineSeparator; },
-  "__unstableIsActiveListType": function() { return /* reexport */ isActiveListType; },
-  "__unstableIsEmptyLine": function() { return /* reexport */ isEmptyLine; },
-  "__unstableIsListRootSelected": function() { return /* reexport */ isListRootSelected; },
-  "__unstableOutdentListItems": function() { return /* reexport */ outdentListItems; },
-  "__unstableRemoveLineSeparator": function() { return /* reexport */ removeLineSeparator; },
-  "__unstableToDom": function() { return /* reexport */ toDom; },
-  "__unstableUseRichText": function() { return /* reexport */ useRichText; },
-  "applyFormat": function() { return /* reexport */ applyFormat; },
-  "concat": function() { return /* reexport */ concat; },
-  "create": function() { return /* reexport */ create; },
-  "getActiveFormat": function() { return /* reexport */ getActiveFormat; },
-  "getActiveObject": function() { return /* reexport */ getActiveObject; },
-  "getTextContent": function() { return /* reexport */ getTextContent; },
-  "insert": function() { return /* reexport */ insert; },
-  "insertObject": function() { return /* reexport */ insertObject; },
-  "isCollapsed": function() { return /* reexport */ isCollapsed; },
-  "isEmpty": function() { return /* reexport */ isEmpty; },
-  "join": function() { return /* reexport */ join; },
-  "registerFormatType": function() { return /* reexport */ registerFormatType; },
-  "remove": function() { return /* reexport */ remove; },
-  "removeFormat": function() { return /* reexport */ removeFormat; },
-  "replace": function() { return /* reexport */ replace_replace; },
-  "slice": function() { return /* reexport */ slice; },
-  "split": function() { return /* reexport */ split; },
-  "store": function() { return /* reexport */ store; },
-  "toHTMLString": function() { return /* reexport */ toHTMLString; },
-  "toggleFormat": function() { return /* reexport */ toggleFormat; },
-  "unregisterFormatType": function() { return /* reexport */ unregisterFormatType; },
-  "useAnchorRef": function() { return /* reexport */ useAnchorRef; }
+  "__UNSTABLE_LINE_SEPARATOR": () => (/* reexport */ LINE_SEPARATOR),
+  "__experimentalRichText": () => (/* reexport */ __experimentalRichText),
+  "__unstableCanIndentListItems": () => (/* reexport */ canIndentListItems),
+  "__unstableCanOutdentListItems": () => (/* reexport */ canOutdentListItems),
+  "__unstableChangeListType": () => (/* reexport */ changeListType),
+  "__unstableCreateElement": () => (/* reexport */ createElement),
+  "__unstableFormatEdit": () => (/* reexport */ FormatEdit),
+  "__unstableIndentListItems": () => (/* reexport */ indentListItems),
+  "__unstableInsertLineSeparator": () => (/* reexport */ insertLineSeparator),
+  "__unstableIsActiveListType": () => (/* reexport */ isActiveListType),
+  "__unstableIsEmptyLine": () => (/* reexport */ isEmptyLine),
+  "__unstableIsListRootSelected": () => (/* reexport */ isListRootSelected),
+  "__unstableOutdentListItems": () => (/* reexport */ outdentListItems),
+  "__unstableRemoveLineSeparator": () => (/* reexport */ removeLineSeparator),
+  "__unstableToDom": () => (/* reexport */ toDom),
+  "__unstableUseRichText": () => (/* reexport */ useRichText),
+  "applyFormat": () => (/* reexport */ applyFormat),
+  "concat": () => (/* reexport */ concat),
+  "create": () => (/* reexport */ create),
+  "getActiveFormat": () => (/* reexport */ getActiveFormat),
+  "getActiveFormats": () => (/* reexport */ getActiveFormats),
+  "getActiveObject": () => (/* reexport */ getActiveObject),
+  "getTextContent": () => (/* reexport */ getTextContent),
+  "insert": () => (/* reexport */ insert),
+  "insertObject": () => (/* reexport */ insertObject),
+  "isCollapsed": () => (/* reexport */ isCollapsed),
+  "isEmpty": () => (/* reexport */ isEmpty),
+  "join": () => (/* reexport */ join),
+  "registerFormatType": () => (/* reexport */ registerFormatType),
+  "remove": () => (/* reexport */ remove),
+  "removeFormat": () => (/* reexport */ removeFormat),
+  "replace": () => (/* reexport */ replace_replace),
+  "slice": () => (/* reexport */ slice),
+  "split": () => (/* reexport */ split),
+  "store": () => (/* reexport */ store),
+  "toHTMLString": () => (/* reexport */ toHTMLString),
+  "toggleFormat": () => (/* reexport */ toggleFormat),
+  "unregisterFormatType": () => (/* reexport */ unregisterFormatType),
+  "useAnchorRef": () => (/* reexport */ useAnchorRef)
 });
 
 // NAMESPACE OBJECT: ./packages/rich-text/build-module/store/selectors.js
 var selectors_namespaceObject = {};
 __webpack_require__.r(selectors_namespaceObject);
 __webpack_require__.d(selectors_namespaceObject, {
-  "getFormatType": function() { return getFormatType; },
-  "getFormatTypeForBareElement": function() { return getFormatTypeForBareElement; },
-  "getFormatTypeForClassName": function() { return getFormatTypeForClassName; },
-  "getFormatTypes": function() { return getFormatTypes; }
+  "getFormatType": () => (getFormatType),
+  "getFormatTypeForBareElement": () => (getFormatTypeForBareElement),
+  "getFormatTypeForClassName": () => (getFormatTypeForClassName),
+  "getFormatTypes": () => (getFormatTypes)
 });
 
 // NAMESPACE OBJECT: ./packages/rich-text/build-module/store/actions.js
 var actions_namespaceObject = {};
 __webpack_require__.r(actions_namespaceObject);
 __webpack_require__.d(actions_namespaceObject, {
-  "addFormatTypes": function() { return addFormatTypes; },
-  "removeFormatTypes": function() { return removeFormatTypes; }
+  "addFormatTypes": () => (addFormatTypes),
+  "removeFormatTypes": () => (removeFormatTypes)
 });
 
 ;// CONCATENATED MODULE: external ["wp","data"]
-var external_wp_data_namespaceObject = window["wp"]["data"];
+const external_wp_data_namespaceObject = window["wp"]["data"];
 ;// CONCATENATED MODULE: external "lodash"
-var external_lodash_namespaceObject = window["lodash"];
+const external_lodash_namespaceObject = window["lodash"];
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/store/reducer.js
 /**
  * External dependencies
@@ -127,7 +128,10 @@ function formatTypes() {
   switch (action.type) {
     case 'ADD_FORMAT_TYPES':
       return { ...state,
-        ...(0,external_lodash_namespaceObject.keyBy)(action.formatTypes, 'name')
+        // Key format types by their name.
+        ...action.formatTypes.reduce((newFormatTypes, type) => ({ ...newFormatTypes,
+          [type.name]: type
+        }), {})
       };
 
     case 'REMOVE_FORMAT_TYPES':
@@ -136,38 +140,64 @@ function formatTypes() {
 
   return state;
 }
-/* harmony default export */ var reducer = ((0,external_wp_data_namespaceObject.combineReducers)({
+/* harmony default export */ const reducer = ((0,external_wp_data_namespaceObject.combineReducers)({
   formatTypes
 }));
-//# sourceMappingURL=reducer.js.map
+
 ;// CONCATENATED MODULE: ./node_modules/rememo/es/rememo.js
 
 
-var LEAF_KEY, hasWeakMap;
+/** @typedef {(...args: any[]) => *[]} GetDependants */
+
+/** @typedef {() => void} Clear */
+
+/**
+ * @typedef {{
+ *   getDependants: GetDependants,
+ *   clear: Clear
+ * }} EnhancedSelector
+ */
+
+/**
+ * Internal cache entry.
+ *
+ * @typedef CacheNode
+ *
+ * @property {?CacheNode|undefined} [prev] Previous node.
+ * @property {?CacheNode|undefined} [next] Next node.
+ * @property {*[]} args Function arguments for cache entry.
+ * @property {*} val Function result.
+ */
+
+/**
+ * @typedef Cache
+ *
+ * @property {Clear} clear Function to clear cache.
+ * @property {boolean} [isUniqueByDependants] Whether dependants are valid in
+ * considering cache uniqueness. A cache is unique if dependents are all arrays
+ * or objects.
+ * @property {CacheNode?} [head] Cache head.
+ * @property {*[]} [lastDependants] Dependants from previous invocation.
+ */
 
 /**
  * Arbitrary value used as key for referencing cache object in WeakMap tree.
  *
- * @type {Object}
+ * @type {{}}
  */
-LEAF_KEY = {};
-
-/**
- * Whether environment supports WeakMap.
- *
- * @type {boolean}
- */
-hasWeakMap = typeof WeakMap !== 'undefined';
+var LEAF_KEY = {};
 
 /**
  * Returns the first argument as the sole entry in an array.
  *
- * @param {*} value Value to return.
+ * @template T
  *
- * @return {Array} Value returned as entry in array.
+ * @param {T} value Value to return.
+ *
+ * @return {[T]} Value returned as entry in array.
  */
-function arrayOf( value ) {
-	return [ value ];
+function arrayOf(value) {
+	return [value];
 }
 
 /**
@@ -178,18 +208,19 @@ function arrayOf( value ) {
  *
  * @return {boolean} Whether value is object-like.
  */
-function isObjectLike( value ) {
-	return !! value && 'object' === typeof value;
+function isObjectLike(value) {
+	return !!value && 'object' === typeof value;
 }
 
 /**
  * Creates and returns a new cache object.
  *
- * @return {Object} Cache object.
+ * @return {Cache} Cache object.
  */
 function createCache() {
+	/** @type {Cache} */
 	var cache = {
-		clear: function() {
+		clear: function () {
 			cache.head = null;
 		},
 	};
@@ -201,21 +232,21 @@ function createCache() {
  * Returns true if entries within the two arrays are strictly equal by
  * reference from a starting index.
  *
- * @param {Array}  a         First array.
- * @param {Array}  b         Second array.
+ * @param {*[]} a First array.
+ * @param {*[]} b Second array.
  * @param {number} fromIndex Index from which to start comparison.
  *
  * @return {boolean} Whether arrays are shallowly equal.
  */
-function isShallowEqual( a, b, fromIndex ) {
+function isShallowEqual(a, b, fromIndex) {
 	var i;
 
-	if ( a.length !== b.length ) {
+	if (a.length !== b.length) {
 		return false;
 	}
 
-	for ( i = fromIndex; i < a.length; i++ ) {
-		if ( a[ i ] !== b[ i ] ) {
+	for (i = fromIndex; i < a.length; i++) {
+		if (a[i] !== b[i]) {
 			return false;
 		}
 	}
@@ -231,31 +262,18 @@ function isShallowEqual( a, b, fromIndex ) {
  * dependant references remain the same. If getDependants returns a different
  * reference(s), the cache is cleared and the selector value regenerated.
  *
- * @param {Function} selector      Selector function.
- * @param {Function} getDependants Dependant getter returning an immutable
- *                                 reference or array of reference used in
- *                                 cache bust consideration.
+ * @template {(...args: *[]) => *} S
  *
- * @return {Function} Memoized selector.
+ * @param {S} selector Selector function.
+ * @param {GetDependants=} getDependants Dependant getter returning an array of
+ * references used in cache bust consideration.
  */
-/* harmony default export */ function rememo(selector, getDependants ) {
-	var rootCache, getCache;
+/* harmony default export */ function rememo(selector, getDependants) {
+	/** @type {WeakMap<*,*>} */
+	var rootCache;
 
-	// Use object source as dependant if getter not provided
-	if ( ! getDependants ) {
-		getDependants = arrayOf;
-	}
-
-	/**
-	 * Returns the root cache. If WeakMap is supported, this is assigned to the
-	 * root WeakMap cache set, otherwise it is a shared instance of the default
-	 * cache object.
-	 *
-	 * @return {(WeakMap|Object)} Root cache object.
-	 */
-	function getRootCache() {
-		return rootCache;
-	}
+	/** @type {GetDependants} */
+	var normalizedGetDependants = getDependants ? getDependants : arrayOf;
 
 	/**
 	 * Returns the cache for a given dependants array. When possible, a WeakMap
@@ -271,85 +289,93 @@ function isShallowEqual( a, b, fromIndex ) {
 	 *
 	 * @see isObjectLike
 	 *
-	 * @param {Array} dependants Selector dependants.
+	 * @param {*[]} dependants Selector dependants.
 	 *
-	 * @return {Object} Cache object.
+	 * @return {Cache} Cache object.
 	 */
-	function getWeakMapCache( dependants ) {
+	function getCache(dependants) {
 		var caches = rootCache,
 			isUniqueByDependants = true,
-			i, dependant, map, cache;
+			i,
+			dependant,
+			map,
+			cache;
 
-		for ( i = 0; i < dependants.length; i++ ) {
-			dependant = dependants[ i ];
+		for (i = 0; i < dependants.length; i++) {
+			dependant = dependants[i];
 
 			// Can only compose WeakMap from object-like key.
-			if ( ! isObjectLike( dependant ) ) {
+			if (!isObjectLike(dependant)) {
 				isUniqueByDependants = false;
 				break;
 			}
 
 			// Does current segment of cache already have a WeakMap?
-			if ( caches.has( dependant ) ) {
+			if (caches.has(dependant)) {
 				// Traverse into nested WeakMap.
-				caches = caches.get( dependant );
+				caches = caches.get(dependant);
 			} else {
 				// Create, set, and traverse into a new one.
 				map = new WeakMap();
-				caches.set( dependant, map );
+				caches.set(dependant, map);
 				caches = map;
 			}
 		}
 
 		// We use an arbitrary (but consistent) object as key for the last item
 		// in the WeakMap to serve as our running cache.
-		if ( ! caches.has( LEAF_KEY ) ) {
+		if (!caches.has(LEAF_KEY)) {
 			cache = createCache();
 			cache.isUniqueByDependants = isUniqueByDependants;
-			caches.set( LEAF_KEY, cache );
+			caches.set(LEAF_KEY, cache);
 		}
 
-		return caches.get( LEAF_KEY );
+		return caches.get(LEAF_KEY);
 	}
-
-	// Assign cache handler by availability of WeakMap
-	getCache = hasWeakMap ? getWeakMapCache : getRootCache;
 
 	/**
 	 * Resets root memoization cache.
 	 */
 	function clear() {
-		rootCache = hasWeakMap ? new WeakMap() : createCache();
+		rootCache = new WeakMap();
 	}
 
-	// eslint-disable-next-line jsdoc/check-param-names
+	/* eslint-disable jsdoc/check-param-names */
 	/**
 	 * The augmented selector call, considering first whether dependants have
 	 * changed before passing it to underlying memoize function.
 	 *
-	 * @param {Object} source    Source object for derivation.
-	 * @param {...*}   extraArgs Additional arguments to pass to selector.
+	 * @param {*}    source    Source object for derivation.
+	 * @param {...*} extraArgs Additional arguments to pass to selector.
 	 *
 	 * @return {*} Selector result.
 	 */
-	function callSelector( /* source, ...extraArgs */ ) {
+	/* eslint-enable jsdoc/check-param-names */
+	function callSelector(/* source, ...extraArgs */) {
 		var len = arguments.length,
-			cache, node, i, args, dependants;
+			cache,
+			node,
+			i,
+			args,
+			dependants;
 
 		// Create copy of arguments (avoid leaking deoptimization).
-		args = new Array( len );
-		for ( i = 0; i < len; i++ ) {
-			args[ i ] = arguments[ i ];
+		args = new Array(len);
+		for (i = 0; i < len; i++) {
+			args[i] = arguments[i];
 		}
 
-		dependants = getDependants.apply( null, args );
-		cache = getCache( dependants );
+		dependants = normalizedGetDependants.apply(null, args);
+		cache = getCache(dependants);
 
-		// If not guaranteed uniqueness by dependants (primitive type or lack
-		// of WeakMap support), shallow compare against last dependants and, if
-		// references have changed, destroy cache to recalculate result.
-		if ( ! cache.isUniqueByDependants ) {
-			if ( cache.lastDependants && ! isShallowEqual( dependants, cache.lastDependants, 0 ) ) {
+		// If not guaranteed uniqueness by dependants (primitive type), shallow
+		// compare against last dependants and, if references have changed,
+		// destroy cache to recalculate result.
+		if (!cache.isUniqueByDependants) {
+			if (
+				cache.lastDependants &&
+				!isShallowEqual(dependants, cache.lastDependants, 0)
+			) {
 				cache.clear();
 			}
 
@@ -357,9 +383,9 @@ function isShallowEqual( a, b, fromIndex ) {
 		}
 
 		node = cache.head;
-		while ( node ) {
+		while (node) {
 			// Check whether node arguments match arguments
-			if ( ! isShallowEqual( node.args, args, 1 ) ) {
+			if (!isShallowEqual(node.args, args, 1)) {
 				node = node.next;
 				continue;
 			}
@@ -367,16 +393,16 @@ function isShallowEqual( a, b, fromIndex ) {
 			// At this point we can assume we've found a match
 
 			// Surface matched node to head if not already
-			if ( node !== cache.head ) {
+			if (node !== cache.head) {
 				// Adjust siblings to point to each other.
-				node.prev.next = node.next;
-				if ( node.next ) {
+				/** @type {CacheNode} */ (node.prev).next = node.next;
+				if (node.next) {
 					node.next.prev = node.prev;
 				}
 
 				node.next = cache.head;
 				node.prev = null;
-				cache.head.prev = node;
+				/** @type {CacheNode} */ (cache.head).prev = node;
 				cache.head = node;
 			}
 
@@ -386,20 +412,20 @@ function isShallowEqual( a, b, fromIndex ) {
 
 		// No cached value found. Continue to insertion phase:
 
-		node = {
+		node = /** @type {CacheNode} */ ({
 			// Generate the result from original function
-			val: selector.apply( null, args ),
-		};
+			val: selector.apply(null, args),
+		});
 
 		// Avoid including the source object in the cache.
-		args[ 0 ] = null;
+		args[0] = null;
 		node.args = args;
 
 		// Don't need to check whether node is already head, since it would
 		// have been returned above already if it was
 
 		// Shift existing head down list
-		if ( cache.head ) {
+		if (cache.head) {
 			cache.head.prev = node;
 			node.next = cache.head;
 		}
@@ -409,11 +435,11 @@ function isShallowEqual( a, b, fromIndex ) {
 		return node.val;
 	}
 
-	callSelector.getDependants = getDependants;
+	callSelector.getDependants = normalizedGetDependants;
 	callSelector.clear = clear;
 	clear();
 
-	return callSelector;
+	return /** @type {S & EnhancedSelector} */ (callSelector);
 }
 
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/store/selectors.js
@@ -484,7 +510,7 @@ function getFormatTypeForClassName(state, elementClassName) {
     return ` ${elementClassName} `.indexOf(` ${className} `) >= 0;
   });
 }
-//# sourceMappingURL=selectors.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/store/actions.js
 /**
  * External dependencies
@@ -519,7 +545,7 @@ function removeFormatTypes(names) {
     names: (0,external_lodash_namespaceObject.castArray)(names)
   };
 }
-//# sourceMappingURL=actions.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/store/index.js
 /**
  * WordPress dependencies
@@ -547,7 +573,7 @@ const store = (0,external_wp_data_namespaceObject.createReduxStore)(STORE_NAME, 
   actions: actions_namespaceObject
 });
 (0,external_wp_data_namespaceObject.register)(store);
-//# sourceMappingURL=index.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/is-format-equal.js
 /** @typedef {import('./create').RichTextFormat} RichTextFormat */
 
@@ -605,7 +631,7 @@ function isFormatEqual(format1, format2) {
 
   return true;
 }
-//# sourceMappingURL=is-format-equal.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/normalise-formats.js
 /**
  * Internal dependencies
@@ -643,16 +669,11 @@ function normaliseFormats(value) {
     formats: newFormats
   };
 }
-//# sourceMappingURL=normalise-formats.js.map
-;// CONCATENATED MODULE: ./packages/rich-text/build-module/apply-format.js
-/**
- * External dependencies
- */
 
+;// CONCATENATED MODULE: ./packages/rich-text/build-module/apply-format.js
 /**
  * Internal dependencies
  */
-
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
@@ -687,8 +708,13 @@ function applyFormat(value, format) {
   const newFormats = formats.slice(); // The selection is collapsed.
 
   if (startIndex === endIndex) {
-    const startFormat = (0,external_lodash_namespaceObject.find)(newFormats[startIndex], {
-      type: format.type
+    var _newFormats$startInde;
+
+    const startFormat = (_newFormats$startInde = newFormats[startIndex]) === null || _newFormats$startInde === void 0 ? void 0 : _newFormats$startInde.find(_ref => {
+      let {
+        type
+      } = _ref;
+      return type === format.type;
     }); // If the caret is at a format of the same type, expand start and end to
     // the edges of the format. This is useful to apply new attributes.
 
@@ -713,10 +739,10 @@ function applyFormat(value, format) {
 
     for (let index = startIndex; index < endIndex; index++) {
       if (newFormats[index]) {
-        newFormats[index] = newFormats[index].filter(_ref => {
+        newFormats[index] = newFormats[index].filter(_ref2 => {
           let {
             type
-          } = _ref;
+          } = _ref2;
           return type !== format.type;
         });
         const length = newFormats[index].length;
@@ -740,12 +766,15 @@ function applyFormat(value, format) {
     // Always revise active formats. This serves as a placeholder for new
     // inputs with the format so new input appears with the format applied,
     // and ensures a format of the same type uses the latest values.
-    activeFormats: [...(0,external_lodash_namespaceObject.reject)(activeFormats, {
-      type: format.type
-    }), format]
+    activeFormats: [...((activeFormats === null || activeFormats === void 0 ? void 0 : activeFormats.filter(_ref3 => {
+      let {
+        type
+      } = _ref3;
+      return type !== format.type;
+    })) || []), format]
   });
 }
-//# sourceMappingURL=apply-format.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/create-element.js
 /**
  * Parse the given HTML into a body element.
@@ -775,7 +804,7 @@ function createElement(_ref, html) {
   createElement.body.innerHTML = html;
   return createElement.body;
 }
-//# sourceMappingURL=create-element.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/special-characters.js
 /**
  * Line separator character, used for multiline text.
@@ -792,7 +821,7 @@ const OBJECT_REPLACEMENT_CHARACTER = '\ufffc';
  */
 
 const ZWNBSP = '\ufeff';
-//# sourceMappingURL=special-characters.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/create.js
 /**
  * WordPress dependencies
@@ -1112,7 +1141,7 @@ function collapseWhiteSpace(string) {
 
 
 function removeReservedCharacters(string) {
-  //with the global flag, note that we should create a new regex each time OR reset lastIndex state.
+  // with the global flag, note that we should create a new regex each time OR reset lastIndex state.
   return string.replace(new RegExp(`[${ZWNBSP}${OBJECT_REPLACEMENT_CHARACTER}]`, 'gu'), '');
 }
 /**
@@ -1392,7 +1421,7 @@ function getAttributes(_ref4) {
 
   return accumulator;
 }
-//# sourceMappingURL=create.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/concat.js
 /**
  * Internal dependencies
@@ -1433,7 +1462,7 @@ function concat() {
 
   return normaliseFormats(values.reduce(mergePair, create()));
 }
-//# sourceMappingURL=concat.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-active-formats.js
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
@@ -1481,7 +1510,7 @@ function getActiveFormats(_ref) {
 
   return formats[start] || EMPTY_ACTIVE_FORMATS;
 }
-//# sourceMappingURL=get-active-formats.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-active-format.js
 /**
  * External dependencies
@@ -1514,7 +1543,7 @@ function getActiveFormat(value, formatType) {
     type: formatType
   });
 }
-//# sourceMappingURL=get-active-format.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-active-object.js
 /**
  * Internal dependencies
@@ -1546,7 +1575,7 @@ function getActiveObject(_ref) {
 
   return replacements[start];
 }
-//# sourceMappingURL=get-active-object.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-text-content.js
 /**
  * Internal dependencies
@@ -1569,7 +1598,7 @@ function getTextContent(_ref) {
   } = _ref;
   return text.replace(new RegExp(OBJECT_REPLACEMENT_CHARACTER, 'g'), '').replace(new RegExp(LINE_SEPARATOR, 'g'), '\n');
 }
-//# sourceMappingURL=get-text-content.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-line-index.js
 /**
  * Internal dependencies
@@ -1603,7 +1632,7 @@ function getLineIndex(_ref) {
     }
   }
 }
-//# sourceMappingURL=get-line-index.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/is-list-root-selected.js
 /**
  * Internal dependencies
@@ -1629,7 +1658,7 @@ function isListRootSelected(value) {
   const replacement = replacements[lineIndex];
   return !replacement || replacement.length < 1;
 }
-//# sourceMappingURL=is-list-root-selected.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/is-active-list-type.js
 /**
  * Internal dependencies
@@ -1663,7 +1692,7 @@ function isActiveListType(value, type, rootType) {
   const lastFormat = replacement[replacement.length - 1];
   return lastFormat.type === type;
 }
-//# sourceMappingURL=is-active-list-type.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/is-collapsed.js
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
@@ -1690,7 +1719,7 @@ function isCollapsed(_ref) {
 
   return start === end;
 }
-//# sourceMappingURL=is-collapsed.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/is-empty.js
 /**
  * Internal dependencies
@@ -1747,7 +1776,7 @@ function isEmptyLine(_ref2) {
 
   return text.slice(start - 1, end + 1) === `${LINE_SEPARATOR}${LINE_SEPARATOR}`;
 }
-//# sourceMappingURL=is-empty.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/join.js
 /**
  * Internal dependencies
@@ -1789,7 +1818,7 @@ function join(values) {
     };
   }));
 }
-//# sourceMappingURL=join.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/register-format-type.js
 /**
  * WordPress dependencies
@@ -1894,16 +1923,11 @@ function registerFormatType(name, settings) {
   (0,external_wp_data_namespaceObject.dispatch)(store).addFormatTypes(settings);
   return settings;
 }
-//# sourceMappingURL=register-format-type.js.map
-;// CONCATENATED MODULE: ./packages/rich-text/build-module/remove-format.js
-/**
- * External dependencies
- */
 
+;// CONCATENATED MODULE: ./packages/rich-text/build-module/remove-format.js
 /**
  * Internal dependencies
  */
-
 
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
@@ -1931,19 +1955,28 @@ function removeFormat(value, formatType) {
   // format.
 
   if (startIndex === endIndex) {
-    const format = (0,external_lodash_namespaceObject.find)(newFormats[startIndex], {
-      type: formatType
+    var _newFormats$startInde;
+
+    const format = (_newFormats$startInde = newFormats[startIndex]) === null || _newFormats$startInde === void 0 ? void 0 : _newFormats$startInde.find(_ref => {
+      let {
+        type
+      } = _ref;
+      return type === formatType;
     });
 
     if (format) {
-      while ((0,external_lodash_namespaceObject.find)(newFormats[startIndex], format)) {
+      while ((_newFormats$startInde2 = newFormats[startIndex]) !== null && _newFormats$startInde2 !== void 0 && _newFormats$startInde2.find(newFormat => newFormat === format)) {
+        var _newFormats$startInde2;
+
         filterFormats(newFormats, startIndex, formatType);
         startIndex--;
       }
 
       endIndex++;
 
-      while ((0,external_lodash_namespaceObject.find)(newFormats[endIndex], format)) {
+      while ((_newFormats$endIndex = newFormats[endIndex]) !== null && _newFormats$endIndex !== void 0 && _newFormats$endIndex.find(newFormat => newFormat === format)) {
+        var _newFormats$endIndex;
+
         filterFormats(newFormats, endIndex, formatType);
         endIndex++;
       }
@@ -1958,17 +1991,20 @@ function removeFormat(value, formatType) {
 
   return normaliseFormats({ ...value,
     formats: newFormats,
-    activeFormats: (0,external_lodash_namespaceObject.reject)(activeFormats, {
-      type: formatType
-    })
+    activeFormats: (activeFormats === null || activeFormats === void 0 ? void 0 : activeFormats.filter(_ref2 => {
+      let {
+        type
+      } = _ref2;
+      return type !== formatType;
+    })) || []
   });
 }
 
 function filterFormats(formats, index, formatType) {
-  const newFormats = formats[index].filter(_ref => {
+  const newFormats = formats[index].filter(_ref3 => {
     let {
       type
-    } = _ref;
+    } = _ref3;
     return type !== formatType;
   });
 
@@ -1978,7 +2014,7 @@ function filterFormats(formats, index, formatType) {
     delete formats[index];
   }
 }
-//# sourceMappingURL=remove-format.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/insert.js
 /**
  * Internal dependencies
@@ -2025,7 +2061,7 @@ function insert(value, valueToInsert) {
     end: index
   });
 }
-//# sourceMappingURL=insert.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/remove.js
 /**
  * Internal dependencies
@@ -2048,7 +2084,7 @@ function insert(value, valueToInsert) {
 function remove(value, startIndex, endIndex) {
   return insert(value, create(), startIndex, endIndex);
 }
-//# sourceMappingURL=remove.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/replace.js
 /**
  * Internal dependencies
@@ -2125,7 +2161,7 @@ function replace_replace(_ref, pattern, replacement) {
     end
   });
 }
-//# sourceMappingURL=replace.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/insert-line-separator.js
 /**
  * Internal dependencies
@@ -2165,7 +2201,7 @@ function insertLineSeparator(value) {
   };
   return insert(value, valueToInsert, startIndex, endIndex);
 }
-//# sourceMappingURL=insert-line-separator.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/remove-line-separator.js
 /**
  * Internal dependencies
@@ -2227,7 +2263,7 @@ function removeLineSeparator(value) {
 
   return newValue;
 }
-//# sourceMappingURL=remove-line-separator.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/insert-object.js
 /**
  * Internal dependencies
@@ -2259,7 +2295,7 @@ function insertObject(value, formatToInsert, startIndex, endIndex) {
   };
   return insert(value, valueToInsert, startIndex, endIndex);
 }
-//# sourceMappingURL=insert-object.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/slice.js
 /** @typedef {import('./create').RichTextValue} RichTextValue */
 
@@ -2294,7 +2330,7 @@ function slice(value) {
     text: text.slice(startIndex, endIndex)
   };
 }
-//# sourceMappingURL=slice.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/split.js
 /**
  * Internal dependencies
@@ -2384,7 +2420,7 @@ function splitAtSelection(_ref2) {
   return [// Ensure newlines are trimmed.
   replace_replace(before, /\u2028+$/, ''), replace_replace(after, /^\u2028+/, '')];
 }
-//# sourceMappingURL=split.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-format-type.js
 /**
  * WordPress dependencies
@@ -2408,7 +2444,7 @@ function splitAtSelection(_ref2) {
 function get_format_type_getFormatType(name) {
   return (0,external_wp_data_namespaceObject.select)(store).getFormatType(name);
 }
-//# sourceMappingURL=get-format-type.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/to-tree.js
 /**
  * Internal dependencies
@@ -2744,7 +2780,7 @@ function toTree(_ref2) {
 
   return tree;
 }
-//# sourceMappingURL=to-tree.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/to-dom.js
 /**
  * Internal dependencies
@@ -3084,9 +3120,9 @@ function applySelection(_ref6, current) {
     }
   }
 }
-//# sourceMappingURL=to-dom.js.map
+
 ;// CONCATENATED MODULE: external ["wp","escapeHtml"]
-var external_wp_escapeHtml_namespaceObject = window["wp"]["escapeHtml"];
+const external_wp_escapeHtml_namespaceObject = window["wp"]["escapeHtml"];
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/to-html-string.js
 /**
  * WordPress dependencies
@@ -3227,11 +3263,11 @@ function createChildrenHTML() {
     return child.text === undefined ? createElementHTML(child) : (0,external_wp_escapeHtml_namespaceObject.escapeEditableHTML)(child.text);
   }).join('');
 }
-//# sourceMappingURL=to-html-string.js.map
+
 ;// CONCATENATED MODULE: external ["wp","a11y"]
-var external_wp_a11y_namespaceObject = window["wp"]["a11y"];
+const external_wp_a11y_namespaceObject = window["wp"]["a11y"];
 ;// CONCATENATED MODULE: external ["wp","i18n"]
-var external_wp_i18n_namespaceObject = window["wp"]["i18n"];
+const external_wp_i18n_namespaceObject = window["wp"]["i18n"];
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/toggle-format.js
 /**
  * WordPress dependencies
@@ -3277,7 +3313,7 @@ function toggleFormat(value, format) {
 
   return applyFormat(value, format);
 }
-//# sourceMappingURL=toggle-format.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/unregister-format-type.js
 /**
  * WordPress dependencies
@@ -3311,7 +3347,7 @@ function unregisterFormatType(name) {
   (0,external_wp_data_namespaceObject.dispatch)(store).removeFormatTypes(name);
   return oldFormat;
 }
-//# sourceMappingURL=unregister-format-type.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/can-indent-list-items.js
 /**
  * Internal dependencies
@@ -3344,7 +3380,7 @@ function canIndentListItems(value) {
 
   return formatsAtLineIndex.length <= formatsAtPreviousLineIndex.length;
 }
-//# sourceMappingURL=can-indent-list-items.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/can-outdent-list-items.js
 /**
  * Internal dependencies
@@ -3368,7 +3404,7 @@ function canOutdentListItems(value) {
   const startingLineIndex = getLineIndex(value, start);
   return replacements[startingLineIndex] !== undefined;
 }
-//# sourceMappingURL=can-outdent-list-items.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/indent-list-items.js
 /**
  * Internal dependencies
@@ -3459,7 +3495,7 @@ function indentListItems(value, rootFormat) {
     replacements: newFormats
   };
 }
-//# sourceMappingURL=indent-list-items.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-parent-line-index.js
 /**
  * Internal dependencies
@@ -3498,7 +3534,7 @@ function getParentLineIndex(_ref, lineIndex) {
     }
   }
 }
-//# sourceMappingURL=get-parent-line-index.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/get-last-child-index.js
 /**
  * Internal dependencies
@@ -3543,7 +3579,7 @@ function getLastChildIndex(_ref, lineIndex) {
 
   return childIndex;
 }
-//# sourceMappingURL=get-last-child-index.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/outdent-list-items.js
 /**
  * Internal dependencies
@@ -3602,7 +3638,7 @@ function outdentListItems(value) {
     replacements: newFormats
   };
 }
-//# sourceMappingURL=outdent-list-items.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/change-list-type.js
 /**
  * Internal dependencies
@@ -3670,9 +3706,9 @@ function changeListType(value, newFormat) {
     replacements: newReplacements
   };
 }
-//# sourceMappingURL=change-list-type.js.map
+
 ;// CONCATENATED MODULE: external ["wp","element"]
-var external_wp_element_namespaceObject = window["wp"]["element"];
+const external_wp_element_namespaceObject = window["wp"]["element"];
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-anchor-ref.js
 /**
  * WordPress dependencies
@@ -3746,9 +3782,9 @@ function useAnchorRef(_ref) {
     return element.closest(tagName + (className ? '.' + className : ''));
   }, [activeFormat, value.start, value.end, tagName, className]);
 }
-//# sourceMappingURL=use-anchor-ref.js.map
+
 ;// CONCATENATED MODULE: external ["wp","compose"]
-var external_wp_compose_namespaceObject = window["wp"]["compose"];
+const external_wp_compose_namespaceObject = window["wp"]["compose"];
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-default-style.js
 /**
  * WordPress dependencies
@@ -3789,7 +3825,7 @@ function useDefaultStyle() {
     element.style.minWidth = minWidth;
   }, []);
 }
-//# sourceMappingURL=use-default-style.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-boundary-style.js
 /**
  * WordPress dependencies
@@ -3848,7 +3884,7 @@ function useBoundaryStyle(_ref) {
   }, [activeFormats]);
   return ref;
 }
-//# sourceMappingURL=use-boundary-style.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-copy-handler.js
 /**
  * WordPress dependencies
@@ -3898,9 +3934,9 @@ function useCopyHandler(props) {
     };
   }, []);
 }
-//# sourceMappingURL=use-copy-handler.js.map
+
 ;// CONCATENATED MODULE: external ["wp","keycodes"]
-var external_wp_keycodes_namespaceObject = window["wp"]["keycodes"];
+const external_wp_keycodes_namespaceObject = window["wp"]["keycodes"];
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-format-boundaries.js
 /**
  * WordPress dependencies
@@ -4013,7 +4049,7 @@ function useFormatBoundaries(props) {
     };
   }, []);
 }
-//# sourceMappingURL=use-format-boundaries.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-select-object.js
 /**
  * WordPress dependencies
@@ -4049,7 +4085,7 @@ function useSelectObject() {
     };
   }, []);
 }
-//# sourceMappingURL=use-select-object.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-indent-list-item-on-space.js
 /**
  * WordPress dependencies
@@ -4115,7 +4151,7 @@ function useIndentListItemOnSpace(props) {
     };
   }, []);
 }
-//# sourceMappingURL=use-indent-list-item-on-space.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/update-formats.js
 /**
  * Internal dependencies
@@ -4174,7 +4210,7 @@ function updateFormats(_ref) {
 
   return value;
 }
-//# sourceMappingURL=update-formats.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-input-and-selection.js
 /**
  * WordPress dependencies
@@ -4197,6 +4233,7 @@ function updateFormats(_ref) {
 
 const INSERTION_INPUT_TYPES_TO_IGNORE = new Set(['insertParagraph', 'insertOrderedList', 'insertUnorderedList', 'insertHorizontalRule', 'insertLink']);
 const use_input_and_selection_EMPTY_ACTIVE_FORMATS = [];
+const PLACEHOLDER_ATTR_NAME = 'data-rich-text-placeholder';
 /**
  * If the selection is set on the placeholder element, collapse the selection to
  * the start (before the placeholder).
@@ -4217,7 +4254,7 @@ function fixPlaceholderSelection(defaultView) {
 
   const targetNode = anchorNode.childNodes[anchorOffset];
 
-  if (!targetNode || targetNode.nodeType !== targetNode.ELEMENT_NODE || !targetNode.getAttribute('data-rich-text-placeholder')) {
+  if (!targetNode || targetNode.nodeType !== targetNode.ELEMENT_NODE || !targetNode.hasAttribute(PLACEHOLDER_ATTR_NAME)) {
     return;
   }
 
@@ -4291,26 +4328,71 @@ function useInputAndSelection(props) {
 
 
     function handleSelectionChange(event) {
-      if (ownerDocument.activeElement !== element) {
-        return;
-      }
-
       const {
         record,
         applyRecord,
         createRecord,
         isSelected,
         onSelectionChange
-      } = propsRef.current;
-
-      if (event.type !== 'selectionchange' && !isSelected) {
-        return;
-      } // Check if the implementor disabled editing. `contentEditable`
+      } = propsRef.current; // Check if the implementor disabled editing. `contentEditable`
       // does disable input, but not text selection, so we must ignore
       // selection changes.
 
-
       if (element.contentEditable !== 'true') {
+        return;
+      } // If the selection changes where the active element is a parent of
+      // the rich text instance (writing flow), call `onSelectionChange`
+      // for the rich text instance that contains the start or end of the
+      // selection.
+
+
+      if (ownerDocument.activeElement !== element) {
+        // Only process if the active elment is contentEditable, either
+        // this rich text instance or the writing flow parent. Fixes a
+        // bug in Firefox where it strangely selects the closest
+        // contentEditable element, even though the click was outside
+        // any contentEditable element.
+        if (ownerDocument.activeElement.contentEditable !== 'true') {
+          return;
+        }
+
+        if (!ownerDocument.activeElement.contains(element)) {
+          return;
+        }
+
+        const selection = defaultView.getSelection();
+        const {
+          anchorNode,
+          focusNode
+        } = selection;
+
+        if (element.contains(anchorNode) && element !== anchorNode && element.contains(focusNode) && element !== focusNode) {
+          const {
+            start,
+            end
+          } = createRecord();
+          record.current.activeFormats = use_input_and_selection_EMPTY_ACTIVE_FORMATS;
+          onSelectionChange(start, end);
+        } else if (element.contains(anchorNode) && element !== anchorNode) {
+          const {
+            start,
+            end: offset = start
+          } = createRecord();
+          record.current.activeFormats = use_input_and_selection_EMPTY_ACTIVE_FORMATS;
+          onSelectionChange(offset);
+        } else if (element.contains(focusNode) && element !== focusNode) {
+          const {
+            start,
+            end: offset = start
+          } = createRecord();
+          record.current.activeFormats = use_input_and_selection_EMPTY_ACTIVE_FORMATS;
+          onSelectionChange(undefined, offset);
+        }
+
+        return;
+      }
+
+      if (event.type !== 'selectionchange' && !isSelected) {
         return;
       } // In case of a keyboard event, ignore selection changes during
       // composition.
@@ -4366,11 +4448,18 @@ function useInputAndSelection(props) {
     }
 
     function onCompositionStart() {
+      var _element$querySelecto;
+
       isComposing = true; // Do not update the selection when characters are being composed as
-      // this rerenders the component and might distroy internal browser
+      // this rerenders the component and might destroy internal browser
       // editing state.
 
-      ownerDocument.removeEventListener('selectionchange', handleSelectionChange);
+      ownerDocument.removeEventListener('selectionchange', handleSelectionChange); // Remove the placeholder. Since the rich text value doesn't update
+      // during composition, the placeholder doesn't get removed. There's
+      // no need to re-add it, when the value is updated on compositionend
+      // it will be re-added when the value is empty.
+
+      (_element$querySelecto = element.querySelector(`[${PLACEHOLDER_ATTR_NAME}]`)) === null || _element$querySelecto === void 0 ? void 0 : _element$querySelecto.remove();
     }
 
     function onCompositionEnd() {
@@ -4390,7 +4479,12 @@ function useInputAndSelection(props) {
         isSelected,
         onSelectionChange,
         applyRecord
-      } = propsRef.current;
+      } = propsRef.current; // When the whole editor is editable, let writing flow handle
+      // selection.
+
+      if (element.parentElement.closest('[contenteditable="true"]')) {
+        return;
+      }
 
       if (!isSelected) {
         // We know for certain that on focus, the old selection is invalid.
@@ -4413,18 +4507,12 @@ function useInputAndSelection(props) {
 
 
       rafId = defaultView.requestAnimationFrame(handleSelectionChange);
-      ownerDocument.addEventListener('selectionchange', handleSelectionChange);
-    }
-
-    function onBlur() {
-      ownerDocument.removeEventListener('selectionchange', handleSelectionChange);
     }
 
     element.addEventListener('input', onInput);
     element.addEventListener('compositionstart', onCompositionStart);
     element.addEventListener('compositionend', onCompositionEnd);
-    element.addEventListener('focus', onFocus);
-    element.addEventListener('blur', onBlur); // Selection updates must be done at these events as they
+    element.addEventListener('focus', onFocus); // Selection updates must be done at these events as they
     // happen before the `selectionchange` event. In some cases,
     // the `selectionchange` event may not even fire, for
     // example when the window receives focus again on click.
@@ -4432,12 +4520,12 @@ function useInputAndSelection(props) {
     element.addEventListener('keyup', handleSelectionChange);
     element.addEventListener('mouseup', handleSelectionChange);
     element.addEventListener('touchend', handleSelectionChange);
+    ownerDocument.addEventListener('selectionchange', handleSelectionChange);
     return () => {
       element.removeEventListener('input', onInput);
       element.removeEventListener('compositionstart', onCompositionStart);
       element.removeEventListener('compositionend', onCompositionEnd);
       element.removeEventListener('focus', onFocus);
-      element.removeEventListener('blur', onBlur);
       element.removeEventListener('keyup', handleSelectionChange);
       element.removeEventListener('mouseup', handleSelectionChange);
       element.removeEventListener('touchend', handleSelectionChange);
@@ -4446,7 +4534,7 @@ function useInputAndSelection(props) {
     };
   }, []);
 }
-//# sourceMappingURL=use-input-and-selection.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-delete.js
 /**
  * WordPress dependencies
@@ -4519,53 +4607,7 @@ function useDelete(props) {
     };
   }, []);
 }
-//# sourceMappingURL=use-delete.js.map
-;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/use-space.js
-/**
- * WordPress dependencies
- */
 
-
-/**
- * For some elements like BUTTON and SUMMARY, the space key doesn't insert a
- * space character in some browsers even though the element is editable. We have
- * to manually insert a space and prevent default behaviour.
- *
- * DO NOT limit this behaviour to specific tag names! It would mean that this
- * behaviour is not widely tested. If there's ever any problems, we should find
- * a different solution entirely or remove it entirely.
- */
-
-function useSpace() {
-  return (0,external_wp_compose_namespaceObject.useRefEffect)(element => {
-    function onKeyDown(event) {
-      // Don't insert a space if default behaviour is prevented.
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      const {
-        keyCode,
-        altKey,
-        metaKey,
-        ctrlKey
-      } = event; // Only consider the space key without modifiers pressed.
-
-      if (keyCode !== external_wp_keycodes_namespaceObject.SPACE || altKey || metaKey || ctrlKey) {
-        return;
-      }
-
-      event.target.ownerDocument.execCommand('insertText', false, ' ');
-      event.preventDefault();
-    }
-
-    element.addEventListener('keydown', onKeyDown);
-    return () => {
-      element.removeEventListener('keydown', onKeyDown);
-    };
-  }, []);
-}
-//# sourceMappingURL=use-space.js.map
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/index.js
 /**
  * WordPress dependencies
@@ -4576,7 +4618,6 @@ function useSpace() {
 /**
  * Internal dependencies
  */
-
 
 
 
@@ -4771,12 +4812,17 @@ function useRichText(_ref) {
   (0,external_wp_element_namespaceObject.useLayoutEffect)(() => {
     if (didMount.current && value !== _value.current) {
       applyFromProps();
+      forceRender();
     }
   }, [value]); // Value updates must happen synchonously to avoid overwriting newer values.
 
   (0,external_wp_element_namespaceObject.useLayoutEffect)(() => {
     if (!hadSelectionUpdate.current) {
       return;
+    }
+
+    if (ref.current.ownerDocument.activeElement !== ref.current) {
+      ref.current.focus();
     }
 
     applyFromProps();
@@ -4806,7 +4852,7 @@ function useRichText(_ref) {
     handleChange,
     isSelected,
     onSelectionChange
-  }), useSpace(), (0,external_wp_compose_namespaceObject.useRefEffect)(() => {
+  }), (0,external_wp_compose_namespaceObject.useRefEffect)(() => {
     applyFromProps();
     didMount.current = true;
   }, [placeholder, ...__unstableDependencies])]);
@@ -4817,7 +4863,7 @@ function useRichText(_ref) {
   };
 }
 function __experimentalRichText() {}
-//# sourceMappingURL=index.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/component/format-edit.js
 
 
@@ -4861,7 +4907,7 @@ function FormatEdit(_ref) {
     });
   });
 }
-//# sourceMappingURL=format-edit.js.map
+
 ;// CONCATENATED MODULE: ./packages/rich-text/build-module/index.js
 
 
@@ -4899,7 +4945,8 @@ function FormatEdit(_ref) {
 
 
 
-//# sourceMappingURL=index.js.map
+
+
 (window.wp = window.wp || {}).richText = __webpack_exports__;
 /******/ })()
 ;

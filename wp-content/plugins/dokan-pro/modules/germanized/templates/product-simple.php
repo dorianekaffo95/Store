@@ -25,11 +25,11 @@ $_unit_price_auto = get_post_meta( $post_id, '_unit_price_auto', true );
 <div class="show_if_simple show_if_external show_if_variable">
     <div id="dokan-germanized-options" class="dokan-germanized-options dokan-edit-row dokan-clearfix">
         <div class="dokan-section-heading" data-togglehandler="dokan_germanized_options">
-            <h2><i class="fa fa-list-alt" aria-hidden="true"></i> <?php esc_attr_e( 'EU Compliance Fields', 'dokan' ); ?><span class=""></h2>
+            <h2><i class="far fa-list-alt" aria-hidden="true"></i> <?php esc_attr_e( 'EU Compliance Fields', 'dokan' ); ?><span class=""></h2>
             <p class=""><?php esc_attr_e( 'Manage extra EU compliance fields for this product.', 'dokan' ); ?></p>
 
             <a href="#" class="dokan-section-toggle">
-                <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+                <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
             </a>
 
             <div class="dokan-clearfix">

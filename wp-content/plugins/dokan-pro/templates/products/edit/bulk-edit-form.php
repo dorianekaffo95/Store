@@ -3,7 +3,7 @@
  * Admin View: Bulk Edit Products
  */
 
-use WeDevs\Dokan\Walkers\TaxonomyDropdown;
+use WeDevs\Dokan\ProductCategory\Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
@@ -19,38 +19,17 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <strong class="dokan-inline-edit-section-title"><?php esc_html_e( 'Bulk Edit', 'dokan' ); ?></strong>
                         <div id="bulk-product-list" class="cat-checklist product_cat-checklist dokan-category-checklist"></div>
                     </div>
-                    <div class="dokan-w4">
+                    <div class="dokan-w8">
                         <strong class="dokan-inline-edit-section-title"><?php esc_html_e( 'Product categories', 'dokan' ); ?></strong>
-                        <div class="dokan-form-group">
                             <?php
-                            $drop_down_category = wp_dropdown_categories(
-                                apply_filters(
-                                    'dokan_product_cat_dropdown_args',
-                                    [
-                                        'show_option_none' => $is_single_category ? __( '- Select a category -', 'dokan' ) : '',
-                                        'hierarchical'     => 1,
-                                        'hide_empty'       => 0,
-                                        'name'             => $is_single_category ? 'product_cat' : 'product_cat[]',
-                                        'id'               => 'product_cat',
-                                        'taxonomy'         => 'product_cat',
-                                        'orderby'          => 'name',
-                                        'title_li'         => '',
-                                        'class'            => 'product_cat dokan-form-control dokan-select2',
-                                        'exclude'          => '',
-                                        'selected'         => $is_single_category ? dokan_posted_input( 'product_cat' ) : dokan_posted_input( 'product_cat', true ),
-                                        'echo'             => $is_single_category ? 1 : 0,
-                                        'walker'           => new TaxonomyDropdown(),
-                                    ]
-                                )
-                            );
+                            $data = Helper::get_saved_products_category();
+                            $data['from'] = 'bulk_product';
+                            $data['hide_cat_title'] = 'yes';
 
-                            if ( ! $is_single_category ) {
-                                echo str_replace( '<select', '<select data-placeholder="' . esc_attr__( 'Select product category', 'dokan' ) . '" multiple="multiple" ', $drop_down_category ); // phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped
-                            }
+                            dokan_get_template_part( 'products/dokan-category-header-ui', '', $data );
                             ?>
-                        </div>
                     </div>
-                    <div class="dokan-w4" style="padding-left: 10px">
+                    <div class="dokan-w8">
                         <div>
                             <label>
                                 <strong class="dokan-inline-edit-section-title"><?php esc_html_e( 'Status', 'dokan' ); ?></strong>
@@ -293,7 +272,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                     <div class="dokan-right inline-edit-submit-button">
                         <div class="dokan-spinner"></div>
-                        <button type="submit" class="dokan-btn dokan-btn-default dokan-btn-theme dokan-right">
+                        <button id="bulk_edit_update_btn" type="submit" class="dokan-btn dokan-btn-default dokan-btn-theme dokan-right">
                             <?php esc_html_e( 'Update', 'dokan' ); ?>
                         </button>
                         <?php

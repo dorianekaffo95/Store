@@ -49,6 +49,8 @@ class Dokan_Live_Search_Widget extends WP_Widget {
             $live_search_option_class = 'dokan-ajax-search-suggestion';
         }
 
+        wp_enqueue_style( 'dokan-ls-custom-style' );
+
         echo isset( $before_widget ) ? $before_widget : '';
 
         if ( $title ) {
@@ -83,6 +85,9 @@ class Dokan_Live_Search_Widget extends WP_Widget {
         </div>
         <?php
         echo isset( $after_widget ) ? $after_widget : '';
+
+        wp_enqueue_script( 'dokan-ls-custom-js' );
+
     }
 
     /**

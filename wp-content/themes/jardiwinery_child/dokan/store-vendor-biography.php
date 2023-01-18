@@ -30,7 +30,10 @@ get_header( 'shop' );
             <div id="comments">
             <?php do_action( 'dokan_vendor_biography_tab_before', $store_user, $store_info ); ?>
 
-            <h2 class="headline"><?php echo apply_filters( 'dokan_vendor_biography_title', __( 'Qui sommes-nous', 'dokan' ) ); ?></h2>
+            <?php
+                // Use shortcodes in form like Landing Page Template.
+                echo do_shortcode( '[ic_add_posts tag="'.$store_user->user_nicename.'"]' );
+            ?>
             </div>
         </div>
 

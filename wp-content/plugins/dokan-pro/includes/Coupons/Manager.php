@@ -117,7 +117,7 @@ class Manager {
      */
     public function is_admin_coupon_valid( $coupon, $vendors, $products, $coupon_meta_data = array() ) {
         if ( empty( $coupon ) ) {
-            return;
+            return false;
         }
 
         $coupon_data          = ! empty( $coupon_meta_data ) ? $coupon_meta_data : dokan_get_admin_coupon_meta( $coupon );

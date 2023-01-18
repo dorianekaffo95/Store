@@ -50,7 +50,7 @@ class VendorInbox {
         if ( dokan_is_seller_enabled( get_current_user_id() ) ) {
             $urls['inbox'] = array(
                 'title' => __( 'Inbox', 'dokan' ),
-                'icon'  => '<i class="fa fa-comment"></i>',
+                'icon'  => '<i class="fas fa-comment"></i>',
                 'url'   => dokan_get_navigation_url( 'inbox' ),
                 'pos'   => 195,
                 'permission' => 'dokan_view_inbox_menu',

@@ -40,6 +40,10 @@ class Hooks {
         add_filter( 'dokan_is_order_have_admin_coupon', array( $this, 'is_order_have_admin_coupon' ), 15, 4 );
         add_filter( 'woocommerce_coupon_validate_minimum_amount', array( $this, 'validate_coupon_minimum_amount' ), 10, 2 );
         add_action( 'dokan_new_product_added', array( $this, 'associate_new_product_with_vendor_coupon' ), 10, 2 );
+        add_action( 'dokan_admin_coupon_options_save', array( $this, 'attach_coupon_to_seller' ), 10, 1 );
+        add_action( 'dokan_admin_coupon_options_before_save', array( $this, 'detach_coupon_from_seller' ), 10, 2 );
+        add_action( 'delete_user', array( $this, 'handle_vendor_deletion' ), 10, 2 );
+        add_action( 'before_delete_post', array( $this, 'detach_coupon_from_seller_on_delete' ), 10, 2 );
     }
 
     /**
@@ -154,7 +158,7 @@ class Hooks {
     public function add_coupon_menu( $urls ) {
         $urls['coupons'] = array(
             'title'      => __( 'Coupons', 'dokan' ),
-            'icon'       => '<i class="fa fa-gift"></i>',
+            'icon'       => '<i class="fas fa-gift"></i>',
             'url'        => dokan_get_navigation_url( 'coupons' ),
             'pos'        => 55,
             'permission' => 'dokan_view_coupon_menu',
@@ -523,7 +527,7 @@ class Hooks {
                     'post_title'                 => $post_title,
                     'discount_type'              => $discount_type,
                     'description'                => $description,
-                    'amount'                     => strpos( $discount_type, 'percent' ) !== false ? wc_format_localized_decimal( $amount ) : wc_format_localized_price( $amount ),
+                    'amount'                     => wc_format_localized_price( $amount ),
                     'products'                   => $products,
                     'exclude_products'           => $exclude_products,
                     'product_categories'         => $product_categories,
@@ -701,7 +705,7 @@ class Hooks {
         $amount             = wc_format_decimal( sanitize_text_field( $post_data['amount'] ) );
         $usage_limit        = empty( $post_data['usage_limit'] ) ? '' : absint( $post_data['usage_limit'] );
         $usage_limit_per_user = empty( $post_data['usage_limit_per_user'] ) ? '' : absint( $post_data['usage_limit_per_user'] );
-        $expiry_date        = ! empty( $post_data['expire'] ) ? dokan_get_timestamp( sanitize_text_field( $post_data['expire'] ) ) : '';
+        $expiry_date        = ! empty( $post_data['expire'] ) ? dokan_current_datetime()->modify( sanitize_text_field( $post_data['expire'] ) . ' 00:00:00' )->getTimestamp() : '';
         $apply_before_tax   = isset( $post_data['apply_before_tax'] ) ? 'yes' : 'no';
         $exclude_sale_items = isset( $post_data['exclude_sale_items'] ) ? 'yes' : 'no';
         $show_on_store      = isset( $post_data['show_on_store'] ) ? 'yes' : 'no';
@@ -787,6 +791,221 @@ class Hooks {
                 if ( $post_id !== $query[0]->ID ) {
                     return $errors->add( 'duplicate', __( 'Coupon title already exists', 'dokan' ) );
                 }
+            }
+        }
+    }
+
+    /**
+     * Handle coupon meta related to vendor limits
+     *
+     * @since 3.7.4
+     *
+     * @param int $user_id Deleted user's id
+     * @param int|null $reassigned_user
+     *
+     * @retun void
+     */
+    public function handle_vendor_deletion( $user_id, $reassigned_user ) {
+        if ( ! dokan_is_user_seller( $user_id ) ) {
+            return;
+        }
+
+        $included_marketplace_coupons = get_user_meta( $user_id, 'included_marketplace_coupons', true ); // included_marketplace_coupons is an array saving the marketplace coupon ids that include the $user_id
+        $included_marketplace_coupons = ! empty( $included_marketplace_coupons ) ? $included_marketplace_coupons : [];
+
+        // update the included vendors meta
+        $this->update_vendor_restriction_meta_of_coupon( $included_marketplace_coupons, $user_id, $reassigned_user, 'coupons_vendors_ids' );
+
+        $excluded_marketplace_coupons = get_user_meta( $user_id, 'excluded_marketplace_coupons', true ); // excluded_marketplace_coupons is an array saving the marketplace coupon ids that exclude the $user_id
+        $excluded_marketplace_coupons = ! empty( $excluded_marketplace_coupons ) ? $excluded_marketplace_coupons : [];
+
+        // update the excluded vendors meta
+        $this->update_vendor_restriction_meta_of_coupon( $excluded_marketplace_coupons, $user_id, $reassigned_user, 'coupons_exclude_vendors_ids' );
+    }
+
+    /**
+     * Remove old vendor and Reassign new vendor
+     *
+     * @since 3.7.4
+     *
+     * @param string $vendor_ids
+     * @param int $user_id
+     * @param int|null $reassigned_user
+     *
+     * @return array
+     */
+    private function remove_and_reassign_seller( $vendor_ids, $user_id, $reassigned_user ) {
+        $vendor_ids = ! empty( $vendor_ids ) ? $vendor_ids : '';
+        $vendor_ids = array_map( 'absint', explode( ',', $vendor_ids ) );
+        // exclude the $user_id
+        $vendor_ids = array_diff( $vendor_ids, [ $user_id ] );
+
+        $new_user_assigned = false;
+
+        // handle the reassignment of the coupon to $reassigned user
+        if ( $reassigned_user ) {
+            // if $reassigned_user is already in the list nothing to do otherwise we need to add the user into the list
+            if ( ! in_array( $reassigned_user, $vendor_ids, true ) ) {
+                array_push( $vendor_ids, $reassigned_user );
+                $new_user_assigned = true;
+            }
+        }
+
+        return array( $vendor_ids, $new_user_assigned );
+    }
+
+    /**
+     * Remove coupons from vendors meta list
+     *
+     * @since 3.7.4
+     *
+     * @param array $vendors_ids
+     * @param int $coupon_id
+     *
+     * @return void
+     */
+    private function remove_coupon_id_from_vendors_meta_list( $vendors_ids, $coupon_id, $meta_key ) {
+        foreach ( $vendors_ids as $vendors_id ) {
+            $marketplace_coupons = get_user_meta( $vendors_id, $meta_key, true );
+            $marketplace_coupons = ! empty( $marketplace_coupons ) ? $marketplace_coupons : [];
+
+            if ( in_array( $coupon_id, $marketplace_coupons, true ) ) {
+                $marketplace_coupons = array_diff( $marketplace_coupons, [ $coupon_id ] ); // remove the coupon id from list
+                update_user_meta( $vendors_id, $meta_key, $marketplace_coupons ); //save the new list after deleting $coupon_id
+            }
+        }
+    }
+
+    /**
+     * Detach Coupons from user on delete coupon
+     *
+     * @since 3.7.4
+     *
+     * @param int $coupon_id
+     * @param \WP_Post $post
+     */
+    public function detach_coupon_from_seller_on_delete( $coupon_id, $post ) {
+        if ( 'shop_coupon' !== $post->post_type ) {
+            return;
+        }
+
+        $vendors_ids     = get_post_meta( $coupon_id, 'coupons_vendors_ids', true );
+        $vendors_ids     = ! empty( $vendors_ids ) ? array_map( 'intval', explode( ',', $vendors_ids ) ) : [];
+        $exclude_vendors = get_post_meta( $coupon_id, 'coupons_exclude_vendors_ids', true );
+        $exclude_vendors = ! empty( $exclude_vendors ) ? array_map( 'intval', explode( ',', $exclude_vendors ) ) : [];
+
+        // remove the coupon id from vendor's include list
+        $this->remove_coupon_id_from_vendors_meta_list( $vendors_ids, $coupon_id, 'included_marketplace_coupons' );
+
+        // remove the coupon id from vendor's exclude list
+        $this->remove_coupon_id_from_vendors_meta_list( $exclude_vendors, $coupon_id, 'excluded_marketplace_coupons' );
+    }
+
+    /**
+     * Detach Coupons from user
+     *
+     * @since 3.7.4
+     *
+     * @param int $coupon_id
+     * @param array $new_data
+     *
+     * @retun void
+     */
+    public function detach_coupon_from_seller( $coupon_id, $new_data ) {
+        $old_vendors_ids     = get_post_meta( $coupon_id, 'coupons_vendors_ids', true );
+        $old_vendors_ids     = ! empty( $old_vendors_ids ) ? array_map( 'intval', explode( ',', $old_vendors_ids ) ) : [];
+        $old_exclude_vendors = get_post_meta( $coupon_id, 'coupons_exclude_vendors_ids', true );
+        $old_exclude_vendors = ! empty( $old_exclude_vendors ) ? array_map( 'intval', explode( ',', $old_exclude_vendors ) ) : [];
+
+        $new_vendors_ids     = $new_data['coupons_vendors_ids'];
+        $new_vendors_ids     = ! empty( $new_vendors_ids ) ? array_map( 'intval', explode( ',', $new_vendors_ids ) ) : [];
+        $new_exclude_vendors = $new_data['coupons_exclude_vendors_ids'];
+        $new_exclude_vendors = ! empty( $new_exclude_vendors ) ? array_map( 'intval', explode( ',', $new_exclude_vendors ) ) : [];
+
+        // get the vendor ids that are not present in new_vendors_ids but was present in $old_vendors_ids
+        $vendor_id_diff = array_diff( $old_vendors_ids, $new_vendors_ids );
+        // remove the coupon id from include vendor list
+        $this->remove_coupon_id_from_vendors_meta_list( $vendor_id_diff, $coupon_id, 'included_marketplace_coupons' );
+
+        // get the excluded vendor ids that are not present in new_exclude_vendors but was present in $old_vendors_ids
+        $excluded_vendor_id_diff = array_diff( $old_exclude_vendors, $new_exclude_vendors );
+        // remove the coupon id from exclude vendor list
+        $this->remove_coupon_id_from_vendors_meta_list( $excluded_vendor_id_diff, $coupon_id, 'excluded_marketplace_coupons' );
+    }
+
+    /**
+     * Save marketplace coupons list as seller meta
+     *
+     * @since 3.7.4
+     *
+     * @param int $coupon_id
+     *
+     * @retun void
+     */
+    public function attach_coupon_to_seller( $coupon_id ) {
+        $vendors_ids     = get_post_meta( $coupon_id, 'coupons_vendors_ids', true );
+        $vendors_ids     = ! empty( $vendors_ids ) ? array_map( 'intval', explode( ',', $vendors_ids ) ) : [];
+        $exclude_vendors = get_post_meta( $coupon_id, 'coupons_exclude_vendors_ids', true );
+        $exclude_vendors = ! empty( $exclude_vendors ) ? array_map( 'intval', explode( ',', $exclude_vendors ) ) : [];
+
+        // add the coupon_id to vendors include coupon list
+        $this->add_coupon_id_to_vendors_meta_list( $vendors_ids, $coupon_id, 'included_marketplace_coupons' );
+
+        // add the coupon_id to vendors exclude coupon list
+        $this->add_coupon_id_to_vendors_meta_list( $exclude_vendors, $coupon_id, 'excluded_marketplace_coupons' );
+    }
+
+    /**
+     * Update vendor restriction meta for marketplace coupons
+     *
+     * @since 3.7.4
+     *
+     * @param array $coupon_ids
+     * @param int $user_id
+     * @param int $reassigned_user
+     * @param string $meta_key
+     *
+     * @return void
+     */
+    private function update_vendor_restriction_meta_of_coupon( $coupon_ids, $user_id, $reassigned_user, $meta_key ) {
+        foreach ( $coupon_ids as $coupon_id ) {
+            $wc_coupon = new \WC_Coupon( $coupon_id );
+
+            if ( empty( $wc_coupon->get_id() ) ) {
+                continue;
+            }
+
+            $vendor_ids = $wc_coupon->get_meta( $meta_key );
+            list( $vendor_ids, $user_assigned ) = $this->remove_and_reassign_seller( $vendor_ids, $user_id, $reassigned_user );
+
+            // update the meta values
+            $wc_coupon->update_meta_data( $meta_key, implode( ',', $vendor_ids ) );
+            $wc_coupon->save();
+
+            if ( $user_assigned ) {
+                $this->attach_coupon_to_seller( $wc_coupon->get_id() );
+            }
+        }
+    }
+
+    /**
+     * Add coupon id to vendors meta list
+     *
+     * @since 3.7.4
+     *
+     * @param array $vendors_ids
+     * @param int $coupon_id
+     *
+     * @return void
+     */
+    private function add_coupon_id_to_vendors_meta_list( $vendors_ids, $coupon_id, $meta_key ) {
+        foreach ( $vendors_ids as $vendors_id ) {
+            $coupons = get_user_meta( $vendors_id, $meta_key, true );
+            $coupons = ! empty( $coupons ) ? $coupons : [];
+
+            if ( ! in_array( $coupon_id, $coupons, true ) ) {
+                array_push( $coupons, $coupon_id ); //add coupon id to list
+                update_user_meta( $vendors_id, $meta_key, $coupons ); // save the new list
             }
         }
     }

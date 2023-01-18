@@ -271,21 +271,15 @@ class Dokan_RMA_Order {
      */
     public function order_item_meta( $item, $cart_item_key, $values ) {
         $_product       = $values['data'];
-        $_product_id    = ( version_compare( WC_VERSION, '3.0', '<' ) && isset( $_product->variation_id ) ) ? $_product->variation_id : $_product->get_id();
         $_product_id    = ( version_compare( WC_VERSION, '3.0', '>' ) && isset( $_product->variation_id ) ) ? $_product->get_parent_id() : $_product->get_id();
         $warranty       = $this->get_settings( $_product_id );
         $warranty_label = $warranty['label'];
 
         if ( $warranty && 'no_warranty' !== $warranty['type'] ) {
-            $item_id = $item->save();
-
-            if ( $warranty['type'] == 'addon_warranty' ) {
+            $item->add_meta_data( '_dokan_item_warranty', $warranty );
+            if ( $warranty['type'] === 'addon_warranty' ) {
                 $warranty_index = isset( $values['dokan_warranty_index'] ) ? $values['dokan_warranty_index'] : false;
-                wc_add_order_item_meta( $item_id, '_dokan_item_warranty_selected', $warranty_index );
-            }
-
-            if ( 'no_warranty' !== $warranty['type'] ) {
-                wc_add_order_item_meta( $item_id, '_dokan_item_warranty', $warranty );
+                $item->add_meta_data( '_dokan_item_warranty_selected', $warranty_index );
             }
         }
     }

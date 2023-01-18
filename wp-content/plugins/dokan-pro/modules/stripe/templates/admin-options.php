@@ -5,7 +5,7 @@
     echo wp_kses(
         sprintf(
             __( 'Set your authorize redirect uri <code>%s</code> in your Stripe <a href="%s" target="_blank">application settings</a> for Redirects.', 'dokan' ),
-            dokan_get_navigation_url( 'settings/payment' ),
+            dokan_get_navigation_url( 'settings/payment-manage-dokan-stripe-connect' ),
             'https://dashboard.stripe.com/account/applications/settings'
         ),
         [

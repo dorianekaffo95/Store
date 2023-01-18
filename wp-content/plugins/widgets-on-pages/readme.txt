@@ -3,8 +3,8 @@ Contributors: toddhalfpenny
 Donate link: https://datamad.co.uk/donate/
 Tags: widgets, widgets in page, widgets in post, sidebar, pages, post, shortcode, inline, widgetise, widgetize, theme
 Requires at least: 2.8
-Tested up to: 5.6
-Stable tag: 1.5
+Tested up to: 5.9.1
+Stable tag: 1.6
 
 The easiest and highest rated way to Add Widgets or Sidebars to Posts and Pages using Visual editor, shortcodes or template tags.
 
@@ -99,6 +99,10 @@ This is a new feature, and is handled differently for various themes. Although t
 
 
 == Changelog ==
+
+= 1.6 =
+
+1. Dependancy library update - security fix
 
 = 1.5 =
 

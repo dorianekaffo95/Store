@@ -53,7 +53,7 @@ class Vendor {
 
         $urls['delivery-time'] = array(
             'title'      => __( 'Delivery Time', 'dokan' ),
-            'icon'       => '<i class="fa fa-clock-o"></i>',
+            'icon'       => '<i class="far fa-clock"></i>',
             'url'        => dokan_get_navigation_url( 'settings/delivery-time' ),
             'pos'        => 60,
         );
@@ -73,7 +73,7 @@ class Vendor {
     public function register_delivery_calender_menu( $urls ) {
         $urls['delivery-time-dashboard'] = array(
             'title'      => __( 'Delivery Time', 'dokan' ),
-            'icon'       => '<i class="fa fa-clock-o"></i>',
+            'icon'       => '<i class="far fa-clock"></i>',
             'url'        => dokan_get_navigation_url( 'delivery-time-dashboard' ),
             'pos'        => 60,
         );
@@ -91,10 +91,14 @@ class Vendor {
 
         if ( dokan_is_seller_dashboard() && isset( $wp->query_vars['delivery-time-dashboard'] ) ) {
             wp_enqueue_script( 'dokan-delivery-time-fullcalender-script' );
+            wp_enqueue_script( 'dokan-delivery-time-fullcalender-local' );
             wp_enqueue_style( 'dokan-delivery-time-fullcalender-style' );
 
             wp_enqueue_script( 'dokan-delivery-time-vendor-script' );
             wp_enqueue_style( 'dokan-delivery-time-vendor-style' );
+
+            wp_enqueue_script( 'dokan-chart' );
+            wp_enqueue_style( 'dokan-timepicker' );
         }
 
         if ( dokan_is_seller_dashboard() && isset( $wp->query_vars['orders'] ) ) {

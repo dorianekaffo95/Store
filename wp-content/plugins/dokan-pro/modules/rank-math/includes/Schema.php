@@ -47,22 +47,11 @@ class Schema extends Admin {
         Helper::add_json( 'schemas', $this->get_schema_data( $this->get_post_id() ) );
         Helper::add_json( 'customSchemaImage', esc_url( rank_math()->plugin_url() . 'includes/modules/schema/assets/img/custom-schema-builder.jpg' ) );
 
-        wp_enqueue_style(
-            'rank-math-schema',
-            rank_math()->plugin_url() . 'includes/modules/schema/assets/css/schema.css',
-            array( 'wp-components', 'rank-math-post-metabox' ),
-            rank_math()->version
-        );
+        wp_enqueue_style( 'rank-math-schema' );
 
         $this->enqueue_translation();
 
-        wp_enqueue_script(
-            'rank-math-schema',
-            rank_math()->plugin_url() . 'includes/modules/schema/assets/js/schema-gutenberg.js',
-            array( 'rank-math-metabox' ),
-            rank_math()->version,
-            true
-        );
+        wp_enqueue_script( 'rank-math-schema' );
     }
 
     /**

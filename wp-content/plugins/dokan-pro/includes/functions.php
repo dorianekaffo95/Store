@@ -26,6 +26,17 @@ if ( ! function_exists( 'dokan_get_profile_progressbar' ) ) {
         $progress_vals = isset( $profile_info['profile_completion']['progress_vals'] ) ? $profile_info['profile_completion']['progress_vals'] : 0;
         $progress      = $progress > 100 ? 100 : $progress;
 
+        $is_closed_by_user = isset( $profile_info['profile_completion']['closed_by_user'] ) ? $profile_info['profile_completion']['closed_by_user'] : false;
+
+        if ( $progress >= 100 && $is_closed_by_user ) {
+            return '';
+        }
+
+        if ( $is_closed_by_user ) {
+            $profile_info['profile_completion']['closed_by_user'] = false;
+            update_user_meta( get_current_user_id(), 'dokan_profile_settings', $profile_info );
+        }
+
         if ( strpos( $next_todo, '-' ) !== false ) {
             $next_todo     = substr( $next_todo, strpos( $next_todo, '-' ) + 1 );
             $progress_vals = isset( $profile_info['profile_completion']['progress_vals'] ) ? $profile_info['profile_completion']['progress_vals'] : 0;
@@ -61,55 +72,73 @@ if ( ! function_exists( 'dokan_get_profile_progressbar' ) ) {
  * @return string
  */
 function dokan_progressbar_translated_string( $string = '', $value = 15, $progress = 0 ) {
-    if ( 100 === absint( $progress ) ) {
-        return __( 'Congratulation, your profile is fully completed', 'dokan' );
-    }
+    $translated_string = '';
+    if ( 100 === absint( $progress ) ) :
+        $translated_string = __( 'Congratulation, your profile is fully completed', 'dokan' );
+    else :
+        switch ( $string ) {
+            case 'profile_picture_val':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add Profile Picture to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-    switch ( $string ) {
-        case 'profile_picture_val':
-            return sprintf( __( 'Add Profile Picture to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
-            break;
+            case 'phone_val':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add Phone to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'phone_val':
-            return sprintf( __( 'Add Phone to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
-            break;
+            case 'banner_val':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add Banner to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'banner_val':
-            return sprintf( __( 'Add Banner to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
-            break;
+            case 'store_name_val':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add Store Name to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'store_name_val':
-            return sprintf( __( 'Add Store Name to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
-            break;
+            case 'address_val':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add address to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'address_val':
-            return sprintf( __( 'Add address to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
-            break;
+            case 'payment_method_val':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add a Payment method to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'payment_method_val':
-            return sprintf( __( 'Add a Payment method to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
-            break;
+            case 'map_val':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add Map location to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'map_val':
-            return sprintf( __( 'Add Map location to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
-            break;
+            case 'fb':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add facebook to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'fb':
-            return sprintf( __( 'Add facebook to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+            case 'twitter':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add Twitter to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'twitter':
-            return sprintf( __( 'Add Twitter to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+            case 'youtube':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add Youtube to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'youtube':
-            return sprintf( __( 'Add Youtube to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+            case 'linkedin':
+                // translators: %s%% is the progressbar progress value
+                $translated_string = sprintf( __( 'Add LinkedIn to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+                break;
 
-        case 'linkedin':
-            return sprintf( __( 'Add LinkedIn to gain %s%% progress', 'dokan' ), number_format_i18n( $value ) );
+            default:
+                $translated_string = __( 'Start with adding a Banner to gain profile progress', 'dokan' );
+                break;
+        }
+    endif;
 
-        default:
-            return sprintf( __( 'Start with adding a Banner to gain profile progress', 'dokan' ) );
-            break;
-    }
+    return apply_filters( 'dokan_progressbar_translated_string', $translated_string, $string, $value, $progress );
 }
 
 /**
@@ -1176,4 +1205,30 @@ function dokan_get_random_string( $length = 8 ) {
     }
     // builtin method failed, try manual method
     return substr( str_shuffle( str_repeat( '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', wp_rand( 1, 10 ) ) ), 1, $length );
+}
+
+/**
+ * Disable entire Dokan withdraw mechanism.
+ *
+ * @param bool $is_disabled
+ *
+ * @return bool
+ */
+function dokan_withdraw_disable_withdraw_operation( $is_disabled ) {
+    return 'on' === dokan_get_option( 'hide_withdraw_option', 'dokan_withdraw', 'off' );
+}
+add_filter( 'dokan_withdraw_disable', 'dokan_withdraw_disable_withdraw_operation', 3 );
+
+/**
+ * Get script suffic and version for dokan
+ *
+ * @since DOKAN_PRO
+ *
+ * @return array first element is script file suffix and second element is script file version
+ */
+function dokan_get_script_suffix_and_version() {
+    $suffix         = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+    $script_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : DOKAN_PRO_PLUGIN_VERSION;
+
+    return [ $suffix, $script_version ];
 }

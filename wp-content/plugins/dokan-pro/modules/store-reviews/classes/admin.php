@@ -16,6 +16,7 @@ class DSR_Admin {
         add_action( 'dokan_admin_menu', array( $this, 'load_store_review_menu' ) );
         add_filter( 'dokan-admin-routes', array( $this, 'vue_admin_routes' ) );
         add_action( 'dokan-vue-admin-scripts', array( $this, 'vue_admin_enqueue_scripts' ) );
+        add_action( 'init', array( $this, 'register_scripts' ) );
     }
 
     /**
@@ -70,6 +71,18 @@ class DSR_Admin {
     }
 
     /**
+     * Register Scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style( 'dsr-admin-css', DOKAN_SELLER_RATINGS_PLUGIN_ASSEST . '/css/admin' . $suffix . '.css', false, $version );
+        wp_register_script( 'dsr-admin', DOKAN_SELLER_RATINGS_PLUGIN_ASSEST . '/js/admin' . $suffix . '.js', array( 'jquery', 'dokan-vue-vendor', 'dokan-vue-bootstrap' ), $version, true );
+    }
+
+    /**
      * Load admin vue scripts
      *
      * @since 1.0.0
@@ -77,11 +90,8 @@ class DSR_Admin {
      * @return void
      */
     public function vue_admin_enqueue_scripts() {
-        // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
-        wp_enqueue_style( 'dsr-admin-css', DOKAN_SELLER_RATINGS_PLUGIN_ASSEST . '/css/admin' . $suffix . '.css', false, time() );
-        wp_enqueue_script( 'dsr-admin', DOKAN_SELLER_RATINGS_PLUGIN_ASSEST . '/js/admin' . $suffix . '.js', array( 'jquery', 'dokan-vue-vendor', 'dokan-vue-bootstrap' ), false, true );
+        wp_enqueue_style( 'dsr-admin-css' );
+        wp_enqueue_script( 'dsr-admin' );
     }
 }
 

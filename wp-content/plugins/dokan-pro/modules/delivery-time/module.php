@@ -11,6 +11,7 @@ use WeDevs\DokanPro\Modules\DeliveryTime\StorePickup\StoreSettings;
 
 /**
  * Class Module
+ *
  * @package WeDevs\DokanPro\DeliveryTime
  */
 class Module {
@@ -31,7 +32,7 @@ class Module {
         add_action( 'dokan_activated_module_delivery_time', [ $this, 'activate' ] );
         add_filter( 'dokan_set_template_path', [ $this, 'load_templates' ], 10, 3 );
         add_action( 'wp_enqueue_scripts', [ $this, 'register_frontend_scripts' ] );
-        add_action( 'admin_enqueue_scripts', [ $this, 'register_admin_scripts' ] );
+        add_action( 'init', [ $this, 'register_admin_scripts' ] );
 
         // flush rewrite rules
         add_action( 'woocommerce_flush_rewrite_rules', [ $this, 'flush_rewrite_rules' ] );
@@ -114,6 +115,7 @@ class Module {
         if ( isset( $args['is_delivery_time'] ) && $args['is_delivery_time'] ) {
             return DOKAN_DELIVERY_TEMPLATE_DIR;
         }
+
         return $template_path;
     }
 
@@ -157,21 +159,30 @@ class Module {
      */
     public function register_frontend_scripts() {
         // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+        $suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
         $version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : DOKAN_PRO_PLUGIN_VERSION;
 
         wp_register_script( 'dokan-delivery-time-main-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/js/script-main' . $suffix . '.js', [ 'jquery' ], $version, true );
         wp_register_script( 'dokan-delivery-time-vendor-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/js/script-vendor' . $suffix . '.js', [ 'jquery' ], $version, true );
 
-        wp_register_script( 'dokan-delivery-time-flatpickr-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/flatpickr.min.js', false, $version, true );
-        wp_register_style( 'dokan-delivery-time-flatpickr-style', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/flatpickr.min.css', false, $version, 'all' );
+        wp_register_script( 'dokan-delivery-time-flatpickr-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/flatpickr.min.js', [], $version, true );
+        wp_register_style( 'dokan-delivery-time-flatpickr-style', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/flatpickr.min.css', [], $version, 'all' );
 
-        wp_register_script( 'dokan-delivery-time-fullcalender-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/fullcalender.min.js', false, $version, true );
-        wp_register_style( 'dokan-delivery-time-fullcalender-style', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/fullcalender.min.css', false, $version, 'all' );
+        wp_register_script( 'dokan-delivery-time-fullcalender-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/fullcalender.min.js', [], $version, true );
+        wp_register_script( 'dokan-delivery-time-fullcalender-local', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/fullcalender.locales-all.min.js', [ 'dokan-delivery-time-fullcalender-script' ], $version, true );
+        wp_register_style( 'dokan-delivery-time-fullcalender-style', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/vendor/fullcalender.min.css', [], $version, 'all' );
 
-        wp_register_style( 'dokan-delivery-time-vendor-style', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/css/script-style' . $suffix . '.css', false, $version, 'all' );
+        wp_register_style( 'dokan-delivery-time-vendor-style', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/css/script-style' . $suffix . '.css', [], $version, 'all' );
 
         wp_register_script( 'dokan-store-location-pickup-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/js/script-store-location-pickup' . $suffix . '.js', [ 'jquery' ], $version, true );
+
+        $local           = strtolower( str_replace( '_', '-', get_locale() ) );
+        $localize_script = [
+            'code'   => $local,
+            'code_1' => substr( $local, 0, 2 ),
+        ];
+
+        wp_localize_script( 'dokan-delivery-time-fullcalender-script', 'dokan_full_calendar_i18n', $localize_script );
     }
 
     /**
@@ -183,7 +194,7 @@ class Module {
      */
     public function register_admin_scripts() {
         // Use minified libraries if SCRIPT_DEBUG is turned off
-        $suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+        $suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
         $version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : DOKAN_PRO_PLUGIN_VERSION;
 
         wp_register_script( 'dokan-delivery-time-admin-script', DOKAN_DELIVERY_TIME_ASSETS_DIR . '/js/script-admin' . $suffix . '.js', [ 'jquery', 'jquery-ui-datepicker' ], $version, true );

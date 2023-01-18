@@ -69,19 +69,7 @@ class SortableList extends Control_Repeater {
      * @return void
      */
     public function enqueue() {
-        wp_enqueue_style(
-            'dokan-elementor-control-sortable-list',
-            DOKAN_ELEMENTOR_ASSETS . '/css/dokan-elementor-control-sortable-list.css',
-            [],
-            DOKAN_ELEMENTOR_VERSION
-        );
-
-        wp_enqueue_script(
-            'dokan-elementor-control-sortable-list',
-            DOKAN_ELEMENTOR_ASSETS . '/js/dokan-elementor-control-sortable-list.js',
-            [ 'elementor-editor' ],
-            DOKAN_ELEMENTOR_VERSION,
-            true
-        );
+        wp_enqueue_style( 'dokan-elementor-control-sortable-list' );
+        wp_enqueue_script( 'dokan-elementor-control-sortable-list' );
     }
 }

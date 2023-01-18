@@ -27,19 +27,31 @@ class Upgrades {
         ],
         '3.1.1' => [
             'upgrader' => Upgraders\V_3_1_1::class,
-            'require'  => null,
+            'require'  => '3.0.14',
         ],
         '3.2.0' => [
             'upgrader' => Upgraders\V_3_2_0::class,
-            'require'  => null,
+            'require'  => '3.2.0',
         ],
         '3.2.4' => [
             'upgrader' => Upgraders\V_3_2_4::class,
-            'require'  => null,
+            'require'  => '3.2.6',
         ],
         '3.3.7' => [
             'upgrader' => Upgraders\V_3_3_7::class,
+            'require'  => '3.2.13',
+        ],
+        '3.5.2' => [
+            'upgrader' => Upgraders\V_3_5_2::class,
             'require'  => null,
+        ],
+        '3.7.0' => [
+            'upgrader' => Upgraders\V_3_7_0::class,
+            'require'  => '3.6.0',
+        ],
+        '3.7.4' => [
+            'upgrader' => Upgraders\V_3_7_4::class,
+            'require'  => '3.6.4',
         ],
     ];
 

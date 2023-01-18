@@ -37,7 +37,7 @@
             </button>
 
             <button type="button" class="dokan-w4 dokan-btn dokan-btn-theme dokan-hide" id="dokan-report-abuse-form-working-btn">
-                <i class="fa fa-refresh fa-spin"></i>&nbsp;&nbsp;<?php esc_html_e( 'Reporting', 'dokan-lite' ); ?>...
+                <i class="fas fa-sync-alt fa-spin"></i>&nbsp;&nbsp;<?php esc_html_e( 'Reporting', 'dokan-lite' ); ?>...
             </button>
         </div>
     </fieldset>

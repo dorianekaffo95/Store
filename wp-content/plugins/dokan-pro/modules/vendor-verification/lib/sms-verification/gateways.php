@@ -37,7 +37,7 @@ class WeDevs_Dokan_SMS_Gateways {
      */
     public function get_gateways() {
         $gateways = [
-            'nexmo'  => [ 'label' => 'Nexmo' ],
+            'nexmo'  => [ 'label' => 'Vonage' ],
             'twilio' => [ 'label' => 'Twilio' ],
         ];
 

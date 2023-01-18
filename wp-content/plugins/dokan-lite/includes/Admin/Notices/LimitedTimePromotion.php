@@ -25,7 +25,7 @@ class LimitedTimePromotion {
      * LimitedTimePromotion constructor
      */
     public function __construct() {
-        add_action( 'admin_notices', [ $this, 'show_promotions' ] );
+        add_action( 'admin_notices', [ $this, 'render_promo_notices_html' ] );
         add_action( 'wp_ajax_dokan_dismiss_limited_time_promotional_notice', [ $this, 'dismiss_limited_time_promo' ] );
     }
 
@@ -34,7 +34,7 @@ class LimitedTimePromotion {
      *
      * @return void
      */
-    public function show_promotions() {
+    public function render_promo_notices_html() {
         echo '<div id="dokan-promo-notices"></div>';
     }
 
@@ -52,7 +52,7 @@ class LimitedTimePromotion {
 
         $key = isset( $_POST['key'] ) ? sanitize_text_field( wp_unslash( $_POST['key'] ) ) : '';
 
-        if ( ! empty( $key ) && ! empty( sanitize_text_field( wp_unslash( $_POST['dokan_limited_time_promotion_dismissed'] ) ) ) ) {
+        if ( ! empty( $key ) ) {
             $already_displayed_promo   = get_option( $this->promo_option_key, [] );
             $already_displayed_promo[] = $key;
 

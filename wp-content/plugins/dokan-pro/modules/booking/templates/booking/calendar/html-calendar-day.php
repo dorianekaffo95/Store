@@ -63,8 +63,8 @@
 			<ul class="hours">
                 <?php for ( $i = 0; $i < 24; $i ++ ) : ?>
                     <li>
-                        <label>
-                            <?php echo esc_html( date_i18n( 'ga', strtotime( "midnight +{$i} hour" ) ) ); ?>
+                        <label data-hour="<?php echo esc_attr( dokan_current_datetime()->modify( "midnight +$i hour" )->format( 'ga' ) ); ?>">
+                            <?php echo esc_html( dokan_format_date( "midnight +$i hour", 'ga' ) ); ?>
                         </label>
                     </li>
                 <?php endfor; ?>

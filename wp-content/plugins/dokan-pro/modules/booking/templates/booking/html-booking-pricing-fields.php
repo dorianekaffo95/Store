@@ -164,6 +164,7 @@
 				<option <?php selected( $pricing['base_modifier'], 'minus' ); ?> value="minus">-</option>
 				<option <?php selected( $pricing['base_modifier'], 'times' ); ?> value="times">&times;</option>
 				<option <?php selected( $pricing['base_modifier'], 'divide' ); ?> value="divide">&divide;</option>
+				<option <?php selected( $pricing['base_modifier'], 'equals' ); ?> value="equals">=</option>
 			</select>
 		</div>
             <input class="dokan-form-control" type="number" step="0.01" name="wc_booking_pricing_base_cost[]" min="0" value="<?php if ( ! empty( $pricing['base_cost'] ) ) echo $pricing['base_cost']; ?>" placeholder="0" />
@@ -176,6 +177,7 @@
 				<option <?php selected( $pricing['modifier'], 'minus' ); ?> value="minus">-</option>
 				<option <?php selected( $pricing['modifier'], 'times' ); ?> value="times">&times;</option>
 				<option <?php selected( $pricing['modifier'], 'divide' ); ?> value="divide">&divide;</option>
+				<option <?php selected( $pricing['modifier'], 'equals' ); ?> value="equals">=</option>
 			</select>
 		</div>
             <input class="dokan-form-control" type="number" step="0.01" name="wc_booking_pricing_cost[]" min="0" value="<?php if ( ! empty( $pricing['cost'] ) ) echo $pricing['cost']; ?>" placeholder="0" />

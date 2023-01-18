@@ -11,7 +11,7 @@
 ?>
  <div class="dashboard-widget dokan-announcement-widget">
     <div class="widget-title">
-        <i class="fa fa-bullhorn" aria-hidden="true"></i> <?php _e( 'Latest Announcement', 'dokan' ); ?>
+        <i class="fas fa-bullhorn" aria-hidden="true"></i> <?php _e( 'Latest Announcement', 'dokan' ); ?>
 
         <span class="pull-right">
             <a href="<?php echo $announcement_url; ?>"><?php _e( 'See All', 'dokan' ); ?></a>
@@ -43,7 +43,7 @@
     <?php else: ?>
         <div class="dokan-no-announcement">
             <div class="annoument-no-wrapper">
-                <i class="fa fa-bell dokan-announcement-icon"></i>
+                <i class="fas fa-bell dokan-announcement-icon"></i>
                 <p><?php _e( 'No announcement found', 'dokan' ) ?></p>
             </div>
         </div>

@@ -78,12 +78,15 @@ class ShippingStatus {
      * @return array
      */
     public function render_shipping_status_section( $sections ) {
-        $sections[] = array(
-            'id'    => 'dokan_shipping_status_setting',
-            'title' => __( 'Shipping Status', 'dokan' ),
-            'icon'  => 'dashicons-admin-site-alt2',
-            'desc'    => __( 'Select multiples shipping providers.', 'dokan' ),
-        );
+        $sections[] = [
+            'id'                   => 'dokan_shipping_status_setting',
+            'title'                => __( 'Shipping Status', 'dokan' ),
+            'icon_url'             => DOKAN_PRO_PLUGIN_ASSEST . '/images/admin-settings-icons/shipping.svg',
+            'description'          => __( 'Manage Shipping Status', 'dokan' ),
+            'document_link'        => 'https://wedevs.com/docs/dokan/settings/dokan-shipping-status/',
+            'settings_title'       => __( 'Shipping Status Settings', 'dokan' ),
+            'settings_description' => __( 'You can configure settings to allow customers to track their products.', 'dokan' ),
+        ];
 
         return $sections;
     }
@@ -97,8 +100,9 @@ class ShippingStatus {
      */
     public function render_shipping_status_settings( $fields ) {
         $shipment_warning = array();
+        $selling_type     = dokan_pro()->digital_product->get_selling_product_type();
 
-        if ( 'sell_digital' === dokan_pro()->digital_product->get_selling_product_type() ) {
+        if ( 'sell_digital' === $selling_type ) {
             $shipment_warning['digital_warning'] = array(
                 'name'  => 'digital_warning',
                 'label' => __( 'Warning!', 'dokan' ),
@@ -116,14 +120,14 @@ class ShippingStatus {
             );
         }
 
-        $fields['dokan_shipping_status_setting'] = array(
-            'enabled' => array(
+        $fields['dokan_shipping_status_setting'] = [
+            'enabled' => [
                 'name'  => 'enabled',
                 'label' => __( 'Allow Shipment Tracking', 'dokan' ),
-                'type'  => 'checkbox',
+                'type'  => 'switcher',
                 'desc'  => __( 'Allow shipment tracking service for vendors', 'dokan' ),
-            ),
-            'shipping_status_provider' => array(
+            ],
+            'shipping_status_provider' => [
                 'name'    => 'shipping_status_provider',
                 'label'   => __( 'Shipping Providers', 'dokan' ),
                 'desc'    => __( 'Select multiples shipping providers.', 'dokan' ),
@@ -131,14 +135,14 @@ class ShippingStatus {
                 'default' => dokan_get_shipping_tracking_default_providers_list(),
                 'options' => dokan_get_shipping_tracking_providers_list(),
                 'tooltip' => __( 'Choose the 3rd party shipping providers.', 'dokan' ),
-            ),
-            'shipping_status_list' => array(
-                'name'    => 'shipping_status_list',
-                'label'   => __( 'Shipping Status', 'dokan' ),
-                'type'    => 'repeatable',
-                'desc'    => __( 'Add Custom Shipping Status', 'dokan' ),
-            ),
-        );
+            ],
+            'shipping_status_list' => [
+                'name'  => 'shipping_status_list',
+                'label' => __( 'Shipping Status', 'dokan' ),
+                'type'  => 'repeatable',
+                'desc'  => __( 'Add custom shipping status', 'dokan' ),
+            ],
+        ];
 
         $fields['dokan_shipping_status_setting'] = array_merge( $shipment_warning, $fields['dokan_shipping_status_setting'] );
 
@@ -316,7 +320,7 @@ class ShippingStatus {
 
         if ( $shipment_id ) {
             dokan_shipment_cache_clear_group( $post_id );
-            do_action( 'dokan_order_shipping_status_tracking_new_added', $post_id, $tracking_info, $user_id );
+            do_action( 'dokan_order_shipping_status_tracking_new_added', $post_id, $tracking_info, $user_id, $shipment_id );
         } else {
             die( -1 );
         }

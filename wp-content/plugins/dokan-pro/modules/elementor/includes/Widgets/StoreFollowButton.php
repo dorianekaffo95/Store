@@ -4,6 +4,7 @@ namespace WeDevs\DokanPro\Modules\Elementor\Widgets;
 
 use WeDevs\DokanPro\Modules\Elementor\Abstracts\DokanButton;
 use Elementor\Controls_Manager;
+use Elementor\Widget_Base;
 
 class StoreFollowButton extends DokanButton {
 
@@ -60,8 +61,8 @@ class StoreFollowButton extends DokanButton {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->update_control(
             'text',
@@ -142,11 +143,13 @@ class StoreFollowButton extends DokanButton {
      * Render button widget text.
      *
      * @since 1.5.0
+     *
+     * @param \Elementor\Widget_Base|null $instance
      * @access protected
      */
-    protected function render_text() {
+    protected function render_text( Widget_Base $instance = null ) {
         if ( ! dokan_is_store_page() ) {
-            parent::render_text();
+            parent::render_text( $instance );
             return;
         }
 

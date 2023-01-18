@@ -31,7 +31,7 @@ table.shipping-zone-table tbody tr:hover .row-actions {
   !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/less-loader/dist/cjs.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/frontend/components/Zone.vue?vue&type=style&index=0&lang=less& ***!
   \*********************************************************************************************************************************************************************************************************************************************************************************/
 .zone-component a.limit-location-link label.switch {
-  top: 9px;
+  top: 4px;
   margin-right: 5px;
 }
 .zone-component .dokan-text-right {

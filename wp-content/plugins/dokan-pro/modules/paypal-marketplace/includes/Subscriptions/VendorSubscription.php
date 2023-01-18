@@ -134,20 +134,31 @@ class VendorSubscription {
      * @return mixed
      */
     public function maybe_empty_cart( $valid, $product_id, $quantity ) {
+        if ( ! SubscriptionHelper::is_subscription_product( $product_id ) ) {
+            return $valid;
+        }
+
+        // check if user has active subscription pack
         $vendor_id           = dokan_get_current_user_id();
         $vendor_subscription = dokan()->vendor->get( $vendor_id )->subscription;
 
-        if ( SubscriptionHelper::is_subscription_product( $product_id ) && $vendor_subscription instanceof SubscriptionPack && $vendor_subscription->has_subscription() ) {
-            WC()->cart->empty_cart();
-
-            wc_add_notice( __( 'You are already under a subscription plan. You need to cancel it first.', 'dokan' ) );
-
-            $page_url = dokan_get_navigation_url( 'subscription' );
-            wp_safe_redirect( add_query_arg( [ 'already-has-subscription' => 'true' ], $page_url ) );
-            exit;
+        if ( ! $vendor_subscription instanceof SubscriptionPack || ! $vendor_subscription->has_subscription() ) {
+            return $valid;
         }
 
-        return $valid;
+        // get current users subscription order
+        $subscription_order = SubscriptionHelper::get_subscription_order( $vendor_id );
+        if ( ! $subscription_order || $subscription_order->get_payment_method() !== Helper::get_gateway_id() ) {
+            return $valid;
+        }
+
+        WC()->cart->empty_cart();
+
+        wc_add_notice( __( 'You are already under a subscription plan. You need to cancel it first.', 'dokan' ) );
+
+        $page_url = dokan_get_navigation_url( 'subscription' );
+        wp_safe_redirect( add_query_arg( [ 'already-has-subscription' => 'true' ], $page_url ) );
+        exit;
     }
 
     /**

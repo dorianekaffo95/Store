@@ -28,8 +28,21 @@ abstract class DokanButton extends Widget_Button {
      *
      * @return void
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
+
+        // Set default colors.
+        $btn_text           = '#fff';
+        $btn_primary        = '#f05025';
+        $btn_primary_border = '#DA502B';
+
+        // If colors module activated then get admin settings color.
+        if ( dokan_pro()->module->is_active( 'color_scheme_customizer' ) ) {
+            $colors             = dokan_get_option( 'store_color_pallete', 'dokan_colors', [] );
+            $btn_text           = ! empty( $colors['btn_text'] ) ? $colors['btn_text'] : $btn_text;
+            $btn_primary        = ! empty( $colors['btn_primary'] ) ? $colors['btn_primary'] : $btn_primary;
+            $btn_primary_border = ! empty( $colors['btn_primary_border'] ) ? $colors['btn_primary_border'] : $btn_primary_border;
+        }
 
         $this->update_control(
             'icon_align',
@@ -41,21 +54,21 @@ abstract class DokanButton extends Widget_Button {
         $this->update_control(
             'button_text_color',
             [
-                'default' => dokan_get_option( 'btn_text', 'dokan_colors', '#ffffff' ),
+                'default' => $btn_text,
             ]
         );
 
         $this->update_control(
             'background_color',
             [
-                'default' => dokan_get_option( 'btn_primary', 'dokan_colors', '#f05025' ),
+                'default' => $btn_primary,
             ]
         );
 
         $this->update_control(
             'border_color',
             [
-                'default' => dokan_get_option( 'btn_primary_border', 'dokan_colors', '#f05025' ),
+                'default' => $btn_primary_border,
             ]
         );
 
@@ -78,7 +91,7 @@ abstract class DokanButton extends Widget_Button {
      *
      * @since 2.9.11
      *
-     * @return void
+     * @return string
      */
     protected function get_html_wrapper_class() {
         return parent::get_html_wrapper_class() . ' ' . $this->get_button_wrapper_class() . ' elementor-widget-' . parent::get_name();

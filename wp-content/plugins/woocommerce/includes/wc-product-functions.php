@@ -392,7 +392,7 @@ function wc_get_formatted_variation( $variation, $flat = false, $include_names =
 			// If this is a term slug, get the term's nice name.
 			if ( taxonomy_exists( $name ) ) {
 				$term = get_term_by( 'slug', $value, $name );
-				if ( ! is_wp_error( $term ) && ! empty( $term->name ) ) {
+				if ( ! is_wp_error( $term ) && $term && null !== $term->name && '' !== $term->name ) {
 					$value = $term->name;
 				}
 			}
@@ -1085,10 +1085,10 @@ function wc_get_price_excluding_tax( $product, $args = array() ) {
 	if ( $product->is_taxable() && wc_prices_include_tax() ) {
 		$order       = ArrayUtil::get_value_or_default( $args, 'order' );
 		$customer_id = $order ? $order->get_customer_id() : 0;
-		if ( apply_filters( 'woocommerce_adjust_non_base_location_prices', true ) || ! $customer_id ) {
+		if ( apply_filters( 'woocommerce_adjust_non_base_location_prices', true ) ) {
 			$tax_rates = WC_Tax::get_base_tax_rates( $product->get_tax_class( 'unfiltered' ) );
 		} else {
-			$customer  = wc_get_container()->get( LegacyProxy::class )->get_instance_of( WC_Customer::class, $customer_id );
+			$customer  = $customer_id ? wc_get_container()->get( LegacyProxy::class )->get_instance_of( WC_Customer::class, $customer_id ) : null;
 			$tax_rates = WC_Tax::get_rates( $product->get_tax_class(), $customer );
 		}
 		$remove_taxes = WC_Tax::calc_tax( $line_price, $tax_rates, true );

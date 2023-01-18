@@ -14,6 +14,15 @@ final class Module {
     public $version = '2.9.11';
 
     /**
+     * Module Dependencies
+     *
+     * @since 3.7.4
+     *
+     * @var bool $missing_dependencies
+     */
+    protected $missing_dependencies = true;
+
+    /**
      * Exec after first instance has been created
      *
      * @since 2.9.11
@@ -21,8 +30,33 @@ final class Module {
      * @return void
      */
     public function __construct() {
-        add_filter( 'dokan_admin_notices', [ $this, 'admin_notices' ] );
-        add_action( 'elementor_pro/init', [ $this, 'init' ] );
+        $this->define_constants();
+        add_action( 'plugins_loaded', [ $this, 'init' ], 99 );
+        add_action( 'init', [ $this, 'register_scripts' ] );
+    }
+
+    /**
+     * Register scripts
+     *
+     * @since 3.7.4
+     */
+    public function register_scripts() {
+        list( $suffix, $version ) = dokan_get_script_suffix_and_version();
+
+        wp_register_style(
+            'dokan-elementor-control-sortable-list',
+            DOKAN_ELEMENTOR_ASSETS . '/css/dokan-elementor-control-sortable-list.css',
+            [],
+            $version
+        );
+
+        wp_register_script(
+            'dokan-elementor-control-sortable-list',
+            DOKAN_ELEMENTOR_ASSETS . '/js/dokan-elementor-control-sortable-list.js',
+            [ 'elementor-editor' ],
+            $version,
+            true
+        );
     }
 
     /**
@@ -33,8 +67,24 @@ final class Module {
      * @return void
      */
     public function init() {
-        $this->define_constants();
-        $this->instances();
+        $dependency = new DependencyNotice();
+
+        $this->missing_dependencies = $dependency->is_missing_dependency();
+        // Check if dependencies are not missing.
+        if ( ! $this->missing_dependencies ) {
+            $this->instances();
+        }
+    }
+
+    /**
+     * This method will check if Elementor dependencies is missing
+     *
+     * @since 3.7.4
+     *
+     * @return bool
+     */
+    public function missing_dependencies() {
+        return $this->missing_dependencies;
     }
 
     /**
@@ -68,43 +118,6 @@ final class Module {
     }
 
     /**
-     * Show admin notices
-     *
-     * @since 2.9.11
-     *
-     * @param array $notices
-     *
-     * @return array
-     */
-    public function admin_notices( $notices ) {
-        $notice = '';
-
-        if ( ! class_exists( '\Elementor\Plugin' ) || ! class_exists( '\ElementorPro\Plugin' ) ) {
-            // translators: %2: elementor plugin name
-            $notice = sprintf( __( 'Dokan Elementor module requires both %1$s and %2$s to be activated', 'dokan' ), '<a href="https://wordpress.org/plugins/elementor/" target="_blank">Elementor</a>', '<a href="https://elementor.com/pro/" target="_blank">Elementor Pro</a>' );
-        }
-
-        if ( defined( 'ELEMENTOR_VERSION' ) && version_compare( ELEMENTOR_VERSION, '2.5.15', '<' ) ) {
-            // translators: %s: elementor requires version
-            $notice = sprintf( __( 'Dokan Elementor module requires at least %s.', 'dokan' ), '<strong>Elementor v2.5.15</strong>' );
-        } elseif ( defined( 'ELEMENTOR_PRO_VERSION' ) && version_compare( ELEMENTOR_PRO_VERSION, '2.5.3', '<' ) ) {
-            // translators: %s: elementor pro requires version
-            $notice = sprintf( __( 'Dokan Elementor module requires at least %s.', 'dokan' ), '<strong>Elementor Pro v2.5.3</strong>' );
-        }
-
-        if ( $notice ) {
-            $notices[] = [
-                'type'        => 'alert',
-                'title'       => __( 'Dokan Elementor module is almost ready!', 'dokan' ),
-                'description' => $notice,
-                'priority'    => 10,
-            ];
-        }
-
-        return $notices;
-    }
-
-    /**
      * Elementor\Plugin instance
      *
      * @since 2.9.11
@@ -123,17 +136,17 @@ final class Module {
      * @return bool
      */
     public function is_edit_or_preview_mode() {
-        $is_edit_mode    = $this->elementor()->editor->is_edit_mode();
-        $is_preview_mode = $this->elementor()->preview->is_preview_mode();
-
-        $get_data = wp_unslash( $_REQUEST ); // phpcs:ignore
+        $is_edit_mode    = $this->elementor() ? $this->elementor()->editor->is_edit_mode() : null;
+        $is_preview_mode = $this->elementor() ? $this->elementor()->preview->is_preview_mode() : null;
 
         if ( empty( $is_edit_mode ) && empty( $is_preview_mode ) ) {
-            if ( ! empty( $get_data['action'] ) && ! empty( $get_data['editor_post_id'] ) ) {
+            // @codingStandardsIgnoreStart
+            if ( ! empty( $_REQUEST['action'] ) && ! empty( $_REQUEST['editor_post_id'] ) ) {
                 $is_edit_mode = true;
-            } elseif ( ! empty( $get_data['preview'] ) && $get_data['preview'] && ! empty( $get_data['theme_template_id'] ) ) {
+            } elseif ( ! empty( $_REQUEST['preview'] ) && ! empty( $_REQUEST['theme_template_id'] ) ) {
                 $is_preview_mode = true;
             }
+            // @codingStandardsIgnoreEnd
         }
 
         if ( $is_edit_mode || $is_preview_mode ) {
@@ -167,13 +180,13 @@ final class Module {
      */
     public function get_social_networks_map() {
         $map = [
-            'fb'        => 'fa fa-facebook',
-            'twitter'   => 'fa fa-twitter',
-            'pinterest' => 'fa fa-pinterest',
-            'linkedin'  => 'fa fa-linkedin',
-            'youtube'   => 'fa fa-youtube',
-            'instagram' => 'fa fa-instagram',
-            'flickr'    => 'fa fa-flickr',
+            'fb'        => 'fab fa-facebook',
+            'twitter'   => 'fab fa-twitter',
+            'pinterest' => 'fab fa-pinterest',
+            'linkedin'  => 'fab fa-linkedin',
+            'youtube'   => 'fab fa-youtube',
+            'instagram' => 'fab fa-instagram',
+            'flickr'    => 'fab fa-flickr',
         ];
 
         return apply_filters( 'dokan_elementor_social_network_map', $map );

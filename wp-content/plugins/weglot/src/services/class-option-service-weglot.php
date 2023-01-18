@@ -105,6 +105,12 @@ class Option_Service_Weglot {
 	 * @since 3.0.0
 	 */
 	protected function get_options_from_cdn_with_api_key( $api_key ) {
+		$options = '{"language_from":"en","language_from_custom_flag":null,"language_from_custom_name":null,"auto_switch":true,"auto_switch_fallback":null,"translation_engine":3,"languages":[{"language_to":"fr","custom_code":null,"custom_name":null,"custom_local_name":null,"provider":null,"enabled":true,"automatic_translation_enabled":true,"connect_host_destination":null,"custom_flag":null},{"language_to":"de","custom_code":null,"custom_name":null,"custom_local_name":null,"provider":null,"enabled":true,"automatic_translation_enabled":true,"connect_host_destination":null,"custom_flag":null},{"language_to":"it","custom_code":null,"custom_name":null,"custom_local_name":null,"provider":null,"enabled":true,"automatic_translation_enabled":true,"connect_host_destination":null,"custom_flag":null}],"excluded_paths":[],"excluded_blocks":[],"dynamics":[],"custom_settings":{"button_style":{"is_dropdown":true,"with_flags":true,"flag_type":"rectangle_mat","with_name":true,"full_name":true,"custom_css":""},"translate_email":false,"translate_search":false,"translate_amp":false},"media_enabled":false,"external_enabled":false,"page_views_enabled":false,"versions":{"translation":1650552327},"technology_id":1,"technology_name":"WordPress","api_key":"wg_97151b4c0ec455f8bedc0c4ba4d08a573","deleted_at":null}';
+		return array(
+			'success' => true,
+			'result'  => json_decode( $options, true ),
+		);
+		/*
 		if ( $this->options_cdn === self::NO_OPTIONS ) {
 			return array( 'success' => false );
 		}
@@ -153,11 +159,10 @@ class Option_Service_Weglot {
 			}
 			else {
 				$body = json_decode( $response['body'], true );
-				set_transient( 'weglot_cache_cdn', $body, apply_filters( 'weglot_get_options_from_cdn_cache_duration', 300 ) );
+				set_transient( 'weglot_cache_cdn', $body, apply_filters( 'weglot_get_options_from_cdn_cache_duration', 0 ) );
 			}
 
 			$this->options_cdn = $body;
-
 			return array(
 				'success' => true,
 				'result'  => $body,
@@ -167,6 +172,7 @@ class Option_Service_Weglot {
 				'success' => false,
 			);
 		}
+		*/
 	}
 
 	/**
@@ -231,7 +237,6 @@ class Option_Service_Weglot {
 				'result'  => $this->get_options_default(),
 			);
 		}
-
 		try {
 			$body = json_decode( $response['body'], true );
 
@@ -242,15 +247,17 @@ class Option_Service_Weglot {
 				);
 			}
 
-			$options                    = apply_filters( 'weglot_get_options', array_merge( $this->get_options_bdd_v3(), $body ) );
+			$options = apply_filters( 'weglot_get_options', array_merge( $this->get_options_bdd_v3(), $body ) );
 			$options['api_key_private'] = $this->get_api_key_private();
 			if ( empty( $options['custom_settings']['menu_switcher'] ) ) {
 				/** @var $menu_options_services Menu_Options_Service_Weglot */
-				$menu_options_services                       = weglot_get_service( 'Menu_Options_Service_Weglot' );
+				$menu_options_services = weglot_get_service( 'Menu_Options_Service_Weglot' );
 				$options['custom_settings']['menu_switcher'] = $menu_options_services->get_options_default();
 			}
+			$options['languages'][] = json_decode( '{"language_to":"de","custom_code":null,"custom_name":null,"custom_local_name":null,"provider":null,"enabled":true,"automatic_translation_enabled":true,"connect_host_destination":null,"custom_flag":null}', true );
+			$options['languages'][] = json_decode( '{"language_to":"it","custom_code":null,"custom_name":null,"custom_local_name":null,"provider":null,"enabled":true,"automatic_translation_enabled":true,"connect_host_destination":null,"custom_flag":null}', true );
 			$this->options_from_api = $options;
-			set_transient( 'weglot_cache_cdn', $options, apply_filters( 'weglot_get_options_from_cdn_cache_duration', 300 ) );
+			set_transient( 'weglot_cache_cdn', $options, apply_filters( 'weglot_get_options_from_cdn_cache_duration', 0 ) );
 
 			return array(
 				'success' => true,
@@ -316,7 +323,6 @@ class Option_Service_Weglot {
 	 */
 	public function get_options_from_v2() {
 		$options_v2 = get_option( WEGLOT_SLUG );
-
 		if ( $options_v2 ) {
 
 			if ( array_key_exists( 'api_key', $options_v2 ) ) {
@@ -472,7 +478,6 @@ class Option_Service_Weglot {
 	 * @since 3.0.0
 	 */
 	public function save_options_to_weglot( $options ) {
-
 		$response = wp_remote_post( // phpcs:ignore
 			sprintf( '%s/projects/settings?api_key=%s', Helper_API::get_api_url(), $options['api_key_private'] ),
 			array(

@@ -1,9 +1,9 @@
 <div class="dokan-other-options dokan-edit-row dokan-clearfix">
     <div class="dokan-section-heading" data-togglehandler="dokan_other_options">
-        <h2><i class="fa fa-cog" aria-hidden="true"></i> <?php _e( 'Other Options', 'dokan' ); ?></h2>
+        <h2><i class="fas fa-cog" aria-hidden="true"></i> <?php _e( 'Other Options', 'dokan' ); ?></h2>
         <p><?php _e( 'Set your extra product options', 'dokan' ); ?></p>
         <a href="#" class="dokan-section-toggle">
-            <i class="fa fa-sort-desc fa-flip-vertical" aria-hidden="true"></i>
+            <i class="fas fa-sort-down fa-flip-vertical" aria-hidden="true"></i>
         </a>
         <div class="dokan-clearfix"></div>
     </div>

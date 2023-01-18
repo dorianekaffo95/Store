@@ -24,6 +24,8 @@
 	</tr>
 </table>
 
+<?php do_action( 'wpo_wcpdf_before_document_label', $this->get_type(), $this->order ); ?>
+
 <h1 class="document-type-label">
 	<?php if ( $this->has_header_logo() ) echo $this->get_title(); ?>
 </h1>
@@ -66,10 +68,12 @@
 					<th><?php _e( 'Order Date:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
 					<td><?php $this->order_date(); ?></td>
 				</tr>
+				<?php if ( $shipping_method = $this->get_shipping_method() ) : ?>
 				<tr class="shipping-method">
 					<th><?php _e( 'Shipping Method:', 'woocommerce-pdf-invoices-packing-slips' ); ?></th>
-					<td><?php $this->shipping_method(); ?></td>
+					<td><?php echo $shipping_method; ?></td>
 				</tr>
+				<?php endif; ?>
 				<?php do_action( 'wpo_wcpdf_after_order_data', $this->get_type(), $this->order ); ?>
 			</table>			
 		</td>

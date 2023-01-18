@@ -45,7 +45,7 @@ class Validation {
         if ( ! class_exists( 'WC_Subscriptions' ) ) {
             return $valid;
         }
-        
+
         $is_subscription            = WC_Subscriptions_Product::is_subscription( $product_id );
         $cart_contains_subscription = WC_Subscriptions_Cart::cart_contains_subscription();
 
@@ -68,10 +68,11 @@ class Validation {
             wc_add_notice( __( 'A subscription has been removed from your cart. Products and subscriptions can not be purchased at the same time.', 'dokan' ), 'notice' );
 
             // Redirect to cart page to remove subscription & notify shopper
-            if ( WC_Subscriptions::is_woocommerce_pre( '3.0.8' ) ) {
-                add_filter( 'add_to_cart_fragments', 'WC_Subscriptions::redirect_ajax_add_to_cart' );
+            $add_to_cart_redirect = version_compare( WC_Subscriptions::$version, '4.0.0', '>=' ) ? 'WC_Subscriptions_Cart_Validator::add_to_cart_ajax_redirect' : 'WC_Subscriptions::redirect_ajax_add_to_cart';
+            if ( version_compare( WC_VERSION, '3.0.8', '<' ) ) {
+                add_filter( 'add_to_cart_fragments', $add_to_cart_redirect );
             } else {
-                add_filter( 'woocommerce_add_to_cart_fragments', 'WC_Subscriptions::redirect_ajax_add_to_cart' );
+                add_filter( 'woocommerce_add_to_cart_fragments', $add_to_cart_redirect );
             }
         }
 

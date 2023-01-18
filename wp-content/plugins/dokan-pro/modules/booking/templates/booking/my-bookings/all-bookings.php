@@ -33,7 +33,7 @@ if ( false === $query ) {
 }
 
 $bookings = $query->posts;
-$counts   = dokan_pro()->module->booking::get_booking_status_counts_by( $seller_id );
+$counts   = Dokan_WC_Booking_Helper::get_booking_status_counts_by( $seller_id );
 
 $bookings_url         = dokan_get_navigation_url( 'booking/my-bookings' );
 $booking_products_url = dokan_get_navigation_url( 'booking/edit' );

@@ -69,7 +69,7 @@ class Review {
 
         $urls['reviews'] = array(
             'title'      => __( 'Reviews', 'dokan' ),
-            'icon'       => '<i class="fa fa-comments-o"></i>',
+            'icon'       => '<i class="far fa-comments"></i>',
             'url'        => dokan_get_navigation_url( 'reviews' ),
             'pos'        => 65,
             'permission' => 'dokan_view_review_menu'

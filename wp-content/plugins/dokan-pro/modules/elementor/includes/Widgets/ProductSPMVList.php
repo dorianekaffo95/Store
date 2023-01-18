@@ -47,7 +47,7 @@ class ProductSPMVList extends Widget_Base {
      * @return array
      */
     public function get_categories() {
-        return [ 'dokan-product-elements-single' ];
+        return [ 'woocommerce-elements-single' ];
     }
 
     /**
@@ -69,8 +69,8 @@ class ProductSPMVList extends Widget_Base {
      * @since 3.3.0
      * @access protected
      */
-    protected function _register_controls() {
-        parent::_register_controls();
+    protected function register_controls() {
+        parent::register_controls();
 
         $this->start_controls_section(
             'section_title',
@@ -180,10 +180,10 @@ class ProductSPMVList extends Widget_Base {
                             </div>
                             <div class="table-cell action-area">
                                 <a href="<?php echo dokan_get_store_url( $post_author_id ); ?>" class="dokan-btn tips link" title="<?php esc_html_e( 'View Store', 'dokan' ); ?>">
-                                    <i class="fa fa-external-link"></i>
+                                    <i class="fas fa-external-link-alt"></i>
                                 </a>
                                 <a href="<?php echo $product_obj->get_permalink(); ?>" class="dokan-btn tips view" title="<?php esc_html_e( 'View Product', 'dokan' ); ?>">
-                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                    <i class="far fa-eye" aria-hidden="true"></i>
                                 </a>
                                 <?php if ( 'simple' === $product_obj->get_type() ) : ?>
                                     <?php
@@ -195,11 +195,11 @@ class ProductSPMVList extends Widget_Base {
                                         esc_attr( $product_obj->get_sku() ),
                                         'dokan-btn tips cart',
                                         __( 'Add to cart', 'dokan' ),
-                                        '<i class="fa fa-shopping-cart"></i>'
+                                        '<i class="fas fa-shopping-cart"></i>'
                                     );
                                     ?>
                                 <?php elseif ( 'variable' === $product_obj->get_type() ) : ?>
-                                    <a href="<?php echo $product_obj->get_permalink(); ?>" class="dokan-btn tips bars" title="<?php esc_html_e( 'Select Options', 'dokan' ); ?>"><i class="fa fa-bars"></i></a>
+                                    <a href="<?php echo $product_obj->get_permalink(); ?>" class="dokan-btn tips bars" title="<?php esc_html_e( 'Select Options', 'dokan' ); ?>"><i class="fas fa-bars"></i></a>
                                 <?php endif ?>
                             </div>
                         </div>
@@ -352,7 +352,7 @@ class ProductSPMVList extends Widget_Base {
      *
      * @param integer $product_id
      *
-     * @return void
+     * @return bool
      */
     public function get_other_reseller_vendors( $product_id ) {
         global $wpdb;

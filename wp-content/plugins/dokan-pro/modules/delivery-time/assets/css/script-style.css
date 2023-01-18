@@ -97,15 +97,19 @@ Dokan delivery time vendor styles
   color: #6d6d6d;
   border: 1px solid #d6d6d6;
 }
-.fc .fc-button-primary:hover {
-  background-color: #f05025;
-  border: 1px solid #d6d6d6;
-  color: white;
-}
 .fc .fc-button-primary:disabled {
   background-color: #f3f3f3;
   color: #a7a7a7;
   border: 1px solid #a7a7a7;
+}
+.fc .fc-view-harness .fc-col-header-cell a,
+.fc .fc-view-harness .fc-scroller-harness .fc-daygrid-day-number,
+.fc .fc-view-harness .fc-scroller-harness .fc-daygrid-event {
+  color: #6d6d6d;
+  transition: 0.2s linear;
+}
+.fc .fc-view-harness .fc-scroller-harness .fc-daygrid-event:hover {
+  color: #000;
 }
 .fc-col-header {
   margin-bottom: 0px;

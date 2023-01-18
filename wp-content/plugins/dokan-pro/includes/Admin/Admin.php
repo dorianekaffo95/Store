@@ -46,6 +46,11 @@ class Admin {
 
         add_action( 'dokan_seller_meta_fields', array( $this, 'add_admin_user_withdraw_threshold_options' ), 9 );
         add_action( 'dokan_process_seller_meta_fields', array( $this, 'save_admin_user_withdraw_threshold_option' ) );
+
+        add_action( 'wp_trash_post', array( $this, 'dokan_page_trash_handler' ) );
+        add_action( 'untrash_post', array( $this, 'dokan_page_untrash_handler' ), 10, 2 );
+        add_action( 'delete_post', array( $this, 'dokan_page_delete_handler' ) );
+        add_action( 'trash_to_draft', array( $this, 'dokan_draft_to_publish' ) );
     }
 
     /**
@@ -95,7 +100,7 @@ class Admin {
     public function setup_wizard_save_step_setup_selling( $options, $post_data ) {
         check_admin_referer( 'dokan-setup' );
 
-        $options['additional_fee'] = isset( $post_data['dokan_admin_additional_fee'] ) && $post_data['dokan_admin_additional_fee'] != '' ? wc_format_decimal( $post_data['dokan_admin_additional_fee'] ) : '';
+        $options['additional_fee'] = isset( $post_data['dokan_admin_additional_fee'] ) && $post_data['dokan_admin_additional_fee'] !== '' ? wc_format_decimal( $post_data['dokan_admin_additional_fee'] ) : '';
 
         update_option( 'dokan_selling', $options );
     }
@@ -162,17 +167,17 @@ class Admin {
         $settings_fields['enable_tc_on_reg'] = [
             'name'    => 'enable_tc_on_reg',
             'label'   => __( 'Enable Terms and Condition', 'dokan' ),
-            'desc'    => __( 'Enable Terms and Condition check on registration form', 'dokan' ),
-            'type'    => 'checkbox',
+            'desc'    => __( 'Enable the terms & conditions checkbox on vendor registration form.', 'dokan' ),
+            'type'    => 'switcher',
             'default' => 'on',
         ];
         $settings_fields['enable_single_seller_mode'] = [
             'name'    => 'enable_single_seller_mode',
             'label'   => __( 'Enable Single Seller Mode', 'dokan' ),
             'desc'    => __( 'Enable single seller mode', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
             'default' => 'off',
-            'tooltip' => __( 'Enable this to restrict customer from adding more than one vendor\'s product in the cart.', 'dokan' ),
+            'tooltip' => __( 'Restrict customers from buying from multiple vendors at a time.', 'dokan' ),
         ];
 
         return $settings_fields;
@@ -188,32 +193,32 @@ class Admin {
      * @return array
      */
     public function add_settings_selling_option_vendor_capability( $settings_fields ) {
-        $settings_fields['product_status'] = array(
+        $settings_fields['product_status'] = [
             'name'    => 'product_status',
             'label'   => __( 'New Product Status', 'dokan' ),
             'desc'    => __( 'Product status when a vendor creates a product', 'dokan' ),
-            'type'    => 'select',
+            'type'    => 'radio',
             'default' => 'pending',
-            'options' => array(
+            'tooltip' => __( 'Default product status for newly added products by vendor.', 'dokan' ),
+            'options' => [
                 'publish' => __( 'Published', 'dokan' ),
                 'pending' => __( 'Pending Review', 'dokan' ),
-            ),
-            'tooltip' => __( 'Default product status for newly added products by vendor.', 'dokan' ),
-        );
+            ],
+        ];
 
         $settings_fields['vendor_duplicate_product'] = array(
             'name'    => 'vendor_duplicate_product',
-            'label'   => __( 'Duplicate product', 'dokan' ),
+            'label'   => __( 'Duplicate Product', 'dokan' ),
             'desc'    => __( 'Allow vendor to duplicate their product', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
             'default' => 'on',
         );
 
         $settings_fields['edited_product_status'] = array(
             'name'    => 'edited_product_status',
             'label'   => __( 'Edited Product Status', 'dokan' ),
-            'desc'    => __( 'Set Product status as pending review when a vendor edits or updates a product', 'dokan' ),
-            'type'    => 'checkbox',
+            'desc'    => __( 'Set product status as pending review when a vendor edits or updates a product', 'dokan' ),
+            'type'    => 'switcher',
             'default' => 'off',
             'tooltip' => __( 'If checked admin will review, edited or updated products by vendor before publishing.', 'dokan' ),
         );
@@ -222,27 +227,27 @@ class Admin {
             'name'    => 'product_add_mail',
             'label'   => __( 'Product Mail Notification', 'dokan' ),
             'desc'    => __( 'Email notification on new product submission', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
             'default' => 'on',
         );
 
         $settings_fields['product_category_style'] = array(
             'name'    => 'product_category_style',
             'label'   => __( 'Product Category Selection', 'dokan' ),
-            'desc'    => __( 'Select a category type for Products', 'dokan' ),
-            'type'    => 'select',
+            'desc'    => __( 'Select a category type for products', 'dokan' ),
+            'type'    => 'radio',
             'default' => 'single',
-            'options' => array(
+            'options' => [
                 'single'   => __( 'Single', 'dokan' ),
                 'multiple' => __( 'Multiple', 'dokan' ),
-            ),
+            ],
         );
 
         $settings_fields['product_vendors_can_create_tags'] = array(
             'name'    => 'product_vendors_can_create_tags',
             'label'   => __( 'Vendors Can Create Tags', 'dokan' ),
             'desc'    => __( 'Allow vendors to create new product tags from vendor dashboard.', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
             'default' => 'off',
         );
 
@@ -251,30 +256,30 @@ class Admin {
             'label'   => __( 'Discount Editing', 'dokan' ),
             'desc'    => __( 'Vendor can add order and product discount', 'dokan' ),
             'type'    => 'multicheck',
-            'default' => array(
-                'product-discount' => __( 'Allow vendor to add discount on product', 'dokan' ),
-                'order-discount' => __( 'Allow vendor to add discount on order', 'dokan' ),
-            ),
-            'options' => array(
-                'product-discount' => __( 'Allow vendor to add discount on product', 'dokan' ),
-                'order-discount' => __( 'Allow vendor to add discount on order', 'dokan' ),
-            ),
+            'default' => [
+                'order-discount'   => __( 'Order Discount', 'dokan' ),
+                'product-discount' => __( 'Product Discount', 'dokan' ),
+            ],
+            'options' => [
+                'order-discount'   => __( 'Order Discount', 'dokan' ),
+                'product-discount' => __( 'Product Discount', 'dokan' ),
+            ],
         );
 
-        $settings_fields['hide_customer_info'] = array(
+        $settings_fields['hide_customer_info'] = [
             'name'    => 'hide_customer_info',
-            'label'   => __( 'Hide Customer info', 'dokan' ),
+            'label'   => __( 'Hide Customer Info', 'dokan' ),
             'desc'    => __( 'Hide customer information from order details of vendors', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
             'default' => 'off',
             'tooltip' => __( 'It will hide customer information from the "General Details" section of the single order details page.', 'dokan' ),
-        );
+        ];
 
         $settings_fields['seller_review_manage'] = array(
             'name'    => 'seller_review_manage',
             'label'   => __( 'Vendor Product Review', 'dokan' ),
             'desc'    => __( 'Vendor can change product review status from vendor dashboard', 'dokan' ),
-            'type'    => 'checkbox',
+            'type'    => 'switcher',
             'default' => 'on',
         );
 
@@ -311,20 +316,20 @@ class Admin {
      */
     public function load_settings_sections_fields( $settings_fields, $dokan_settings ) {
         $appearence_settings = array(
-            'store_banner_width' => array(
+            'store_banner_width' => [
                 'name'    => 'store_banner_width',
-                'label'   => __( 'Store Banner width', 'dokan' ),
+                'label'   => __( 'Store Banner Width', 'dokan' ),
                 'type'    => 'text',
                 'default' => 625,
                 'tooltip' => __( 'Choose the width for your Vendor\'s banner image to be displayed on Vendor store page.', 'dokan' ),
-            ),
-            'store_banner_height' => array(
+            ],
+            'store_banner_height' => [
                 'name'    => 'store_banner_height',
-                'label'   => __( 'Store Banner height', 'dokan' ),
+                'label'   => __( 'Store Banner Height', 'dokan' ),
                 'type'    => 'text',
                 'default' => 300,
                 'tooltip' => __( 'Choose the height for your Vendor\'s banner image which is displayed on Vendor store page', 'dokan' ),
-            ),
+            ],
         );
 
         $settings_fields = $dokan_settings->add_settings_after(
@@ -348,7 +353,7 @@ class Admin {
                 'label'   => __( 'Hide Withdraw Option', 'dokan' ),
                 'desc'    => __( 'Hide withdraw option (when vendor is getting commission automatically) ', 'dokan' ),
                 'default' => 'off',
-                'type'    => 'checkbox',
+                'type'    => 'switcher',
             ),
         );
 
@@ -377,22 +382,22 @@ class Admin {
                 'type'    => 'combine',
                 'fields'  => [
                     'percent_fee' => [
-                        'name'    => 'admin_percentage',
-                        'label'   => __( 'Percent Fee', 'dokan' ),
-                        'default' => '10',
-                        'type'    => 'text',
-                        'desc'    => __( 'Amount you will get from sales in percentage (10%)', 'dokan' ),
-                        'required' => 'yes',
+                        'name'                       => 'admin_percentage',
+                        'label'                      => __( 'Percent Fee', 'dokan' ),
+                        'default'                    => '10',
+                        'type'                       => 'text',
+                        'desc'                       => __( 'Amount you will get from sales in percentage (10%)', 'dokan' ),
+                        'required'                   => 'yes',
                         'sanitize_callback'          => 'wc_format_decimal',
                         'response_sanitize_callback' => 'wc_format_decimal',
                     ],
                     'fixed_fee' => [
-                        'name'    => 'additional_fee',
-                        'label'   => __( 'Fixed Fee', 'dokan' ),
-                        'default' => '10',
-                        'type'    => 'text',
-                        'desc'    => __( 'Amount you will get from sales in flat rate(+5)', 'dokan' ),
-                        'required' => 'yes',
+                        'name'                       => 'additional_fee',
+                        'label'                      => __( 'Fixed Fee', 'dokan' ),
+                        'default'                    => '10',
+                        'type'                       => 'text',
+                        'desc'                       => __( 'Amount you will get from sales in flat rate(+5)', 'dokan' ),
+                        'required'                   => 'yes',
                         'sanitize_callback'          => 'wc_format_decimal',
                         'response_sanitize_callback' => 'wc_format_localized_price',
                     ],
@@ -401,7 +406,7 @@ class Admin {
                 'step'    => 'any',
                 'desc'    => __( 'Amount you will get from sales in both percentage and fixed fee', 'dokan' ),
                 'condition' => [
-                    'type' => 'show',
+                    'type'  => 'show',
                     'logic' => [
                         'commission_type' => [ 'combine' ],
                     ],
@@ -564,7 +569,14 @@ class Admin {
         $dokan_pages = array();
 
         if ( ! $page_created ) {
+            $old_pages = get_option( 'dokan_pages', [] );
+
             foreach ( $pages as $page ) {
+                if ( in_array( $page['page_id'], array_keys( $old_pages ), true ) ) {
+                    $dokan_pages[ $page['page_id'] ] = $old_pages[ $page['page_id'] ];
+                    continue;
+                }
+
                 $page_id = wp_insert_post(
                     array(
                         'post_title'     => $page['post_title'],
@@ -962,6 +974,199 @@ class Admin {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Update 'dokan_pages' and 'dokan_pages_created' options when pages are trashed
+     *
+     * @since 3.5.2
+     *
+     * @param $page_id
+     *
+     * @return void
+     */
+    public function dokan_page_trash_handler( $page_id ) {
+        if ( 'page' !== get_post_type( $page_id ) ) {
+            return;
+        }
+
+        $page_id = (int) $page_id;
+
+        $selected_slug = $this->update_dokan_page_options( $page_id );
+
+        if ( empty( $selected_slug ) ) {
+            return;
+        }
+
+        //track trashed pages to handle untrash later
+        $dokan_trashed_pages = get_option( 'dokan_trashed_pages', [] );
+
+        if ( ! isset( $dokan_trashed_pages[ $selected_slug ] ) ) {
+            $dokan_trashed_pages[ $selected_slug ] = [];
+        }
+
+        $dokan_trashed_pages[ $selected_slug ][] = $page_id;
+        update_option( 'dokan_trashed_pages', $dokan_trashed_pages );
+    }
+
+    /**
+     * Handle dokan untrash page
+     *
+     * @since 3.5.2
+     *
+     * @param $page_id
+     * @param $previous_status
+     *
+     * @return void
+     */
+    public function dokan_page_untrash_handler( $page_id, $previous_status ) {
+        if ( 'page' !== get_post_type( $page_id ) ) {
+            return;
+        }
+
+        $page_id = (int) $page_id;
+
+        $selected_slug = $this->update_dokan_trashed_page_options( $page_id );
+
+        if ( empty( $selected_slug ) ) {
+            return;
+        }
+
+        //check if a similar page already exists in published pages
+        $dokan_pages = get_option( 'dokan_pages', [] );
+        if ( ! isset( $dokan_pages[ $selected_slug ] ) ) {//a similar page already doesn't exist, then we make use the restored page
+            $dokan_pages[ $selected_slug ] = $page_id;
+            update_option( 'dokan_pages', $dokan_pages );
+
+            if ( 3 === count( array_keys( $dokan_pages ) ) ) { //if all the three pages(dashboard, my-order, store-list) are restored
+                update_option( 'dokan_pages_created', true );
+            }
+
+            //to use later in dokan_draft_to_publish method
+            update_option( 'dokan_page_to_publish', $page_id . ',' . $previous_status );
+        }
+    }
+
+    /**
+     * To Restore a dokan page in its previous status, say publish
+     *
+     * @since 3.5.2
+     *
+     * @param $page
+     */
+    public function dokan_draft_to_publish( $page ) {
+        $option   = get_option( 'dokan_page_to_publish', '' );
+        $splitted = explode( ',', $option );
+
+        if (
+            2 !== count( $splitted ) ||
+            $page->ID !== (int) $splitted[0] ||
+            ! in_array( $splitted[1], array_keys( get_post_statuses() ), true )
+        ) {
+            return;
+        }
+
+        wp_update_post(
+            [
+                'ID'          => $page->ID,
+                'post_status' => $splitted[1],
+            ]
+        );
+
+        update_option( 'dokan_page_to_publish', '' );
+    }
+
+    /**
+     * Handle deletion of a dokan page
+     *
+     * @since 3.5.2
+     *
+     * @param $page_id
+     *
+     * @return void
+     */
+    public function dokan_page_delete_handler( $page_id ) {
+        if ( 'page' !== get_post_type( $page_id ) ) {
+            return;
+        }
+
+        $page_id = (int) $page_id;
+
+        if ( 'trash' === get_post_status( $page_id ) ) {
+            $this->update_dokan_trashed_page_options( $page_id );
+        } else {
+            $this->update_dokan_page_options( $page_id );
+        }
+    }
+
+    /**
+     * Update the associated options
+     *
+     * @since 3.5.2
+     *
+     * @param int $page_id
+     *
+     * @return string
+     */
+    private function update_dokan_page_options( $page_id ) {
+        $dokan_pages   = get_option( 'dokan_pages', [] );
+        $selected_slug = '';
+
+        foreach ( $dokan_pages as $slug => $id ) {
+            if ( (int) $id === $page_id ) {
+                $selected_slug = $slug;
+                break;
+            }
+        }
+
+        if ( empty( $selected_slug ) ) {
+            return $selected_slug;
+        }
+
+        unset( $dokan_pages[ $selected_slug ] );
+        update_option( 'dokan_pages_created', false );
+        update_option( 'dokan_pages', $dokan_pages );
+
+        return $selected_slug;
+    }
+
+    /**
+     * Update dokan trashed pages option
+     *
+     * @since 3.5.2
+     *
+     * @param int $page_id
+     *
+     * @return string
+     */
+    private function update_dokan_trashed_page_options( $page_id ) {
+        $dokan_trashed_pages = get_option( 'dokan_trashed_pages', [] );
+
+        $selected_slug = '';
+
+        foreach ( $dokan_trashed_pages as $slug => $ids ) {
+            $int_ids = array_map( 'intval', $ids );
+            if ( in_array( $page_id, $int_ids, true ) ) {
+                $selected_slug = $slug;
+                break;
+            }
+        }
+
+        if ( empty( $selected_slug ) ) {
+            return $selected_slug;
+        }
+
+        $int_ids = array_filter(
+            $dokan_trashed_pages[ $selected_slug ],
+            function ( $id ) use ( $page_id ) {
+                return (int) $id !== $page_id;
+            }
+        );
+
+        $dokan_trashed_pages[ $selected_slug ] = $int_ids;
+        update_option( 'dokan_trashed_pages', $dokan_trashed_pages );
+
+        return $selected_slug;
     }
 }
 // End of WeDevs\DokanPro\Admin\Admin class;

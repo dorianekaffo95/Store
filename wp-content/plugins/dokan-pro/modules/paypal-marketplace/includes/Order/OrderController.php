@@ -29,6 +29,7 @@ class OrderController {
     public function __construct() {
         add_action( 'wp_ajax_dokan_paypal_create_order', [ $this, 'create_order' ] );
         add_action( 'wp_ajax_dokan_paypal_capture_payment', [ $this, 'capture_payment' ] );
+        add_action( 'wp_ajax_nopriv_dokan_paypal_capture_payment', [ $this, 'capture_payment' ] );
         add_action( 'woocommerce_order_status_changed', [ $this, 'order_status_changed' ], 10, 3 );
         add_action( 'dokan_paypal_mp_daily_schedule', [ $this, 'disburse_delayed_payment' ] );
     }
@@ -44,7 +45,7 @@ class OrderController {
         $order_id = $this->do_validation();
 
         /**
-         * @uses \WeDevs\DokanPro\Modules\PayPalMarketplace\PaymentMethods\PayPal::process_payment()
+         * @var $dokan_paypal \WeDevs\DokanPro\Modules\PayPalMarketplace\PaymentMethods\PayPal
          */
         $dokan_paypal    = dokan_pro()->module->paypal_marketplace->gateway_paypal;
         $process_payment = $dokan_paypal->process_payment( $order_id );
@@ -141,7 +142,7 @@ class OrderController {
             wp_send_json_error(
                 [
                     'type'    => 'paypal_capture_payment',
-                    'message' => __( 'Error in capturing payment: ', 'dokan' ) . Helper::get_error_message( $capture_payment ),
+                    'message' => $capture_payment->get_error_message(),
                 ]
             );
         }
