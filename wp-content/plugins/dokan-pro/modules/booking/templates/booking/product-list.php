@@ -184,7 +184,7 @@ do_action( 'dokan_before_listing_product' );
                             </td>
 
                             <td class="post-status" data-title="<?php esc_attr_e( 'Status', 'dokan' ); ?>">
-                                <label class="dokan-label <?php echo $post->post_status; ?>"><?php echo dokan_get_post_status( $post->post_status ); ?></label>
+                            <label class="dokan-label <?php echo esc_attr( dokan_get_post_status_label_class( $post->post_status ) ); ?>"><?php echo esc_html( dokan_get_post_status( $post->post_status ) ); ?></label>
                             </td>
 
                             <td data-title="<?php esc_attr_e( 'SKU', 'dokan' ); ?>">

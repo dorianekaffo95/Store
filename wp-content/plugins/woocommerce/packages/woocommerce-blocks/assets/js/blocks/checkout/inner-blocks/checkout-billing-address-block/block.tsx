@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useMemo, useEffect, Fragment } from '@wordpress/element';
+import { useMemo, useEffect, Fragment, useState } from '@wordpress/element';
 import {
 	useCheckoutAddress,
 	useStoreEvents,
@@ -37,17 +37,37 @@ const Block = ( {
 		defaultAddressFields,
 		billingAddress,
 		setBillingAddress,
+		setShippingAddress,
 		setBillingPhone,
+		setShippingPhone,
+		forcedBillingAddress,
 	} = useCheckoutAddress();
 	const { dispatchCheckoutEvent } = useStoreEvents();
 	const { isEditor } = useEditorContext();
-
 	// Clears data if fields are hidden.
 	useEffect( () => {
 		if ( ! showPhoneField ) {
 			setBillingPhone( '' );
 		}
 	}, [ showPhoneField, setBillingPhone ] );
+
+	const [ addressesSynced, setAddressesSynced ] = useState( false );
+
+	// Syncs shipping address with billing address if "Force shipping to the customer billing address" is enabled.
+	useEffect( () => {
+		if ( addressesSynced ) {
+			return;
+		}
+		if ( forcedBillingAddress ) {
+			setShippingAddress( billingAddress );
+		}
+		setAddressesSynced( true );
+	}, [
+		addressesSynced,
+		setShippingAddress,
+		billingAddress,
+		forcedBillingAddress,
+	] );
 
 	const addressFieldsConfig = useMemo( () => {
 		return {
@@ -74,6 +94,10 @@ const Block = ( {
 				type="billing"
 				onChange={ ( values: Partial< BillingAddress > ) => {
 					setBillingAddress( values );
+					if ( forcedBillingAddress ) {
+						setShippingAddress( values );
+						dispatchCheckoutEvent( 'set-shipping-address' );
+					}
 					dispatchCheckoutEvent( 'set-billing-address' );
 				} }
 				values={ billingAddress }
@@ -93,6 +117,12 @@ const Block = ( {
 						dispatchCheckoutEvent( 'set-phone-number', {
 							step: 'billing',
 						} );
+						if ( forcedBillingAddress ) {
+							setShippingPhone( value );
+							dispatchCheckoutEvent( 'set-phone-number', {
+								step: 'shipping',
+							} );
+						}
 					} }
 				/>
 			) }

@@ -752,7 +752,7 @@ class Helper {
      * @param  object $prepared_source The source that should be verified.
      * @throws DokanException     An exception if the source ID is missing.
      */
-    public function check_source( $prepared_source ) {
+    public static function check_source( $prepared_source ) {
         if ( empty( $prepared_source->source ) ) {
             $localized_message = __( 'Checking Payment Source: Payment processing failed. Please retry.', 'dokan' );
             throw new DokanException( print_r( $prepared_source, true ), $localized_message );

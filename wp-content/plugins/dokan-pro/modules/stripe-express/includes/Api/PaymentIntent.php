@@ -25,17 +25,18 @@ class PaymentIntent extends Api {
      *
      * @param array $args
      *
-     * @return mixed
+     * @return \Stripe\PaymentIntent
      * @throws DokanException
      */
     public static function create( $args ) {
-        $defaults = [
-            'amount'               => 0,
-            'currency'             => strtolower( get_woocommerce_currency() ),
-            'payment_method_types' => [ 'card' ],
-        ];
-
-        $args = wp_parse_args( $args, $defaults );
+        $args = wp_parse_args(
+            $args,
+            [
+                'amount'               => 0,
+                'currency'             => strtolower( get_woocommerce_currency() ),
+                'payment_method_types' => [ 'card' ],
+            ]
+        );
 
         if ( (int) $args['amount'] <= 0 ) {
             throw new DokanException( 'dokan-stripe-express-payment-intent-error', __( 'Could not create payment intent. Error: Amount cannot be negative.', 'dokan' ) );
@@ -59,7 +60,7 @@ class PaymentIntent extends Api {
      * @param string $intent_id
      * @param array $data
      *
-     * @return object
+     * @return \Stripe\PaymentIntent
      * @throws DokanException
      */
     public static function update( $intent_id, $data ) {
@@ -80,7 +81,7 @@ class PaymentIntent extends Api {
      * @param string $intent_id
      * @param array  $args      (optional)
      *
-     * @return object|false
+     * @return \Stripe\PaymentIntent|false
      */
     public static function get( $intent_id, $args = [] ) {
         try {

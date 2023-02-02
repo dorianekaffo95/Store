@@ -59,7 +59,7 @@ class Dokan_Seller_Vacation_Store_Settings {
         list( $suffix, $version ) = dokan_get_script_suffix_and_version();
 
         wp_register_style( 'dokan-seller-vacation', DOKAN_SELLER_VACATION_ASSETS . '/css/dokan-seller-vacation.css', array(), $version );
-        wp_register_script( 'dokan-seller-vacation', DOKAN_SELLER_VACATION_ASSETS . '/js/dokan-seller-vacation.js', array( 'jquery', 'jquery-ui-datepicker', 'dokan-moment' ), $version, true );
+        wp_register_script( 'dokan-seller-vacation', DOKAN_SELLER_VACATION_ASSETS . '/js/dokan-seller-vacation.js', array( 'jquery', 'jquery-ui-datepicker', 'moment' ), $version, true );
     }
 
     /**

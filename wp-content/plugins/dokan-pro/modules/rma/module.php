@@ -2,6 +2,9 @@
 
 namespace WeDevs\DokanPro\Modules\RMA;
 
+use WeDevs\DokanPro\Modules\RMA\RmaCache;
+use WeDevs\DokanPro\Modules\RMA\BlockData;
+
 class Module {
 
     /**
@@ -57,7 +60,6 @@ class Module {
             require_once DOKAN_RMA_INC_DIR . '/class-admin.php';
         }
 
-        require_once DOKAN_RMA_INC_DIR . '/RmaCache.php';
         require_once DOKAN_RMA_INC_DIR . '/class-trait-rma.php';
         require_once DOKAN_RMA_INC_DIR . '/class-ajax.php';
         require_once DOKAN_RMA_INC_DIR . '/class-vendor.php';
@@ -85,6 +87,7 @@ class Module {
         }
 
         new RmaCache();
+        new BlockData();
         new \Dokan_RMA_Ajax();
         new \Dokan_RMA_Vendor();
         new \Dokan_RMA_Frontend();
@@ -205,7 +208,7 @@ class Module {
             );
 
             wp_enqueue_style( 'dokan-magnific-popup' );
-            wp_enqueue_script( 'dokan-popup' );
+            wp_enqueue_script( 'dokan-magnific-popup' );
         }
 
         if ( is_account_page() ) {

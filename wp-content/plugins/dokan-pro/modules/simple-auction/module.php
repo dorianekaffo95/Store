@@ -3,7 +3,6 @@
 namespace WeDevs\DokanPro\Modules\Auction;
 
 use WP_User;
-use WeDevs\Dokan\ProductCategory\Categories;
 use WeDevs\Dokan\ProductCategory\Helper as CategoryHelper;
 
 /**
@@ -39,6 +38,11 @@ class Module {
         if ( ! defined( 'DOKAN_AUCTION_DIR' ) ) {
             define( 'DOKAN_AUCTION_DIR', dirname( __FILE__ ) );
         }
+
+        // flush rewrite rules
+        add_action( 'woocommerce_flush_rewrite_rules', [ $this, 'flush_rewrite_rules' ] );
+        // flush rewrite rules after wooCommerce simple auction plugin is installed
+        add_action( 'activated_plugin', [ $this, 'after_plugins_activated' ] );
 
         include_once DOKAN_AUCTION_DIR . '/includes/DependencyNotice.php';
 
@@ -86,11 +90,7 @@ class Module {
         add_filter( 'dokan_get_edit_product_url', [ $this, 'modify_edit_product_url' ], 10, 2 );
         add_filter( 'dokan_email_list', array( $this, 'set_email_template_directory' ) );
 
-        // flush rewrite rules
-        add_action( 'woocommerce_flush_rewrite_rules', [ $this, 'flush_rewrite_rules' ] );
-
-        add_action( 'dokan_edit_auction_product_content_before', array( $this, 'load_add_category_modal' ), 10 );
-        add_action( 'dokan_new_product_before_product_area', array( $this, 'load_add_category_modal' ), 10 );
+        add_action( 'wp_footer', [ $this, 'load_add_category_modal' ], 10 );
     }
 
     /**
@@ -126,6 +126,20 @@ class Module {
     }
 
     /**
+     * @param $plugin
+     *
+     * @return void
+     */
+    public function after_plugins_activated( $plugin ) {
+        if ( 'woocommerce-simple-auctions/woocommerce-simple-auctions.php' !== $plugin ) {
+            return;
+        }
+
+        // flush rewrite rules
+        $this->flush_rewrite_rules();
+    }
+
+    /**
      * Flush rewrite rules
      *
      * @since 3.3.1
@@ -133,8 +147,11 @@ class Module {
      * @return void
      */
     public function flush_rewrite_rules() {
-        add_filter( 'dokan_query_var_filter', array( $this, 'add_dokan_auction_endpoint' ) );
-        dokan()->rewrite->register_rule();
+        if ( function_exists( 'dokan' ) ) {
+            add_filter( 'dokan_query_var_filter', array( $this, 'add_dokan_auction_endpoint' ) );
+            dokan()->rewrite->register_rule();
+        }
+
         flush_rewrite_rules( true );
     }
 
@@ -254,22 +271,7 @@ class Module {
 
         // Multi-step category box scripts.
         if ( ( dokan_is_seller_dashboard() && isset( $wp->query_vars['new-auction-product'] ) ) || ( dokan_is_seller_dashboard() && isset( $wp->query_vars['auction'] ) ) ) { // phpcs:ignore
-            wp_enqueue_style( 'dokan-product-category-ui-css' );
-            wp_enqueue_script( 'product-category-ui' );
-
-            $categories = new Categories();
-            $all_categories = $categories->get();
-
-            $data = [
-                'categories' => $all_categories,
-                'is_single'  => CategoryHelper::product_category_selection_is_single(),
-                'i18n'       => [
-                    'select_a_category'  => __( 'Select a category', 'dokan' ),
-                    'duplicate_category' => __( 'This category has already been selected', 'dokan' ),
-                ],
-            ];
-
-            wp_localize_script( 'product-category-ui', 'dokan_product_category_data', $data );
+            CategoryHelper::enqueue_and_localize_dokan_multistep_category();
         }
     }
 
@@ -389,11 +391,9 @@ class Module {
      * @param array $query_var
      */
     public function add_dokan_auction_endpoint( $query_var ) {
-        if ( ! dokan_is_seller_auction_disabled( get_current_user_id() ) ) {
-            $query_var[] = 'auction';
-            $query_var[] = 'new-auction-product';
-            $query_var[] = 'auction-activity';
-        }
+        $query_var[] = 'auction';
+        $query_var[] = 'new-auction-product';
+        $query_var[] = 'auction-activity';
 
         return $query_var;
     }

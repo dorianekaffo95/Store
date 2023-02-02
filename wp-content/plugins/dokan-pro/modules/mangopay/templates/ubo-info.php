@@ -1,7 +1,7 @@
 <?php // phpcs:disable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase ?>
 
 <?php if ( count( $ubo_declarations ) > 0 ) : ?>
-<table class="ubo_table_list_declarations">
+<table class="ubo_table_list_declarations has-background">
     <thead class="ubo_thead_list_declarations">
         <tr>
             <td></td>
@@ -9,7 +9,7 @@
             <td><?php esc_html_e( 'Status', 'dokan' ); ?></td>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="ubo-element-list-body">
     <?php foreach ( $ubo_declarations as $ubo_declaration ) : ?>
         <tr>
             <td>
@@ -41,10 +41,10 @@
             </td>
         </tr>
         <?php if ( count( $ubo_declaration->Ubos ) > 0 ) : ?>
-        <tr class="ubo_tr_list_elements" id="tr_ubo_<?php echo esc_attr( $ubo_declaration->Id ); ?>" style="display:none;">
+        <tr class="ubo_tr_list_elements hidden" id="tr_ubo_<?php echo esc_attr( $ubo_declaration->Id ); ?>">
             <td></td>
             <td colspan="4">
-                <table class="ubo_table_list_elements">
+                <table class="ubo_table_list_elements has-background">
                     <thead class="ubo_thead_list_elements">
                         <tr>
                             <td><?php esc_html_e( 'First Name', 'dokan' ); ?></td>
@@ -96,7 +96,7 @@
     <?php if ( $created_ubo_button ) : ?>
     <div id="ubo_create_div">
         <input type="button"
-            class="btn btn-inverse btn-small"
+            class="btn btn-inverse btn-small dokan-mp-btn-submit"
             style="float:none;"
             id="ubo_add_button"
             value="<?php esc_attr_e( 'Add UBO', 'dokan' ); ?>">
@@ -105,7 +105,7 @@
     <?php if ( $ubo_exists ) : ?>
     <div id="ubo_askvalidation_div">
         <input type="button"
-            class="btn btn-inverse btn-small"
+            class="btn btn-inverse btn-small dokan-mp-btn-submit"
             style="float:none;"
             id="ubo_askvalidation_button"
             value="<?php esc_attr_e( 'Ask for validation', 'dokan' ); ?>">

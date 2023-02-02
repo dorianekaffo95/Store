@@ -29,6 +29,7 @@ class ProductStatusChanger {
         add_action( 'dokan_bulk_product_status_change', [ $this, 'publish_products' ], 10, 2 );
         add_action( 'dokan_product_listing_filter_from_end', [ $this, 'product_filter_form' ] );
         add_filter( 'dokan_pre_product_listing_args', [ $this, 'filter_products' ], 15, 2 );
+        add_filter( 'dokan_rest_pre_product_listing_args', [ $this, 'filter_products_for_api' ], 15, 2 );
         add_action( 'dokan_vendor_purchased_subscription', [ $this, 'change_product_status' ] );
     }
 
@@ -112,12 +113,12 @@ class ProductStatusChanger {
      *
      * @return void
      */
-    public function product_filter_form( $get_data ) {
+    public function product_filter_form( $get_data = [] ) {
         if ( $this->maybe_hide_the_form() ) {
             return;
         }
 
-        $selected = ! empty( $get_data['filter_by_other'] ) ? $get_data['filter_by_other'] : '';
+        $selected = ! empty( $_REQUEST['filter_by_other'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['filter_by_other'] ) ) : '';
         $filters  = apply_filters( 'dokan_get_other_product_filters', [
             'featured'     => __( 'Featured', 'dokan' ),
             'top_rated'    => __( 'Top Rated', 'dokan' ),
@@ -147,58 +148,38 @@ class ProductStatusChanger {
      *
      * @return array
      */
-    public function filter_products( $args, $get_data ) {
-        if ( ! isset( $get_data['filter_by_other'] ) ) {
+    public function filter_products( $args, $get_data = [] ) {
+        if ( ! isset( $_GET['_product_listing_filter_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_product_listing_filter_nonce'] ) ), 'product_listing_filter' ) ) {
             return $args;
         }
 
-        if ( 'best_selling' === $get_data['filter_by_other'] ) {
-            $args['orderby']  = 'meta_value_num';
-            $args['meta_key'] = 'total_sales';
-
-            $this->set_default_tax_query( $args );
+        if ( ! isset( $_GET['filter_by_other'] ) ) {
+            return $args;
         }
 
-        if ( 'top_rated' === $get_data['filter_by_other'] ) {
-            $this->set_default_tax_query( $args );
+        $filter_by_other = sanitize_text_field( wp_unslash( $_GET['filter_by_other'] ) );
 
-            add_filter( 'posts_clauses', [ 'WC_Shortcodes', 'order_by_rating_post_clauses' ] );
-        }
-
-        if ( 'featured' === $get_data['filter_by_other'] ) {
-            $this->set_default_tax_query( $args );
-
-            $product_visibility_term_ids = wc_get_product_visibility_term_ids();
-            $args['tax_query'][]         = [
-                'taxonomy' => 'product_visibility',
-                'field'    => 'term_taxonomy_id',
-                'terms'    => $product_visibility_term_ids['featured'],
-            ];
-        }
-
-        return $args;
+        return Helper::filter_products_by_filter_by_other_helper( $args, $filter_by_other );
     }
 
     /**
-     * Set default tax query
+     * Prepares filter_by_other data to filter products for Product V2 api.
      *
-     * @since 2.9.13
+     * @since 3.7.13
      *
-     * @param array $args
+     * @param array           $args
+     * @param WP_REST_Request $request
      *
-     * @return array
+     * @return array $args
      */
-    public function set_default_tax_query( $args ) {
-        $product_visibility_term_ids = wc_get_product_visibility_term_ids();
+    public function filter_products_for_api( $args, $request ) {
+        if ( ! $request->get_param( 'filter_by_other' ) ) {
+            return $args;
+        }
 
-        $args['tax_query'][] = [
-            'taxonomy' => 'product_visibility',
-            'field'    => 'term_taxonomy_id',
-            'terms'    => is_search() ? $product_visibility_term_ids['exclude-from-search'] : $product_visibility_term_ids['exclude-from-catalog'],
-            'operator' => 'NOT IN',
-        ];
+        $filter_by_other = $request->get_param( 'filter_by_other' );
 
-        return $args;
+        return Helper::filter_products_by_filter_by_other_helper( $args, $filter_by_other );
     }
 
     /**

@@ -4,10 +4,324 @@
  */
 $changelog = [
     [
+        'version'  => 'Version 3.7.10',
+        'released' => '2023-01-26',
+        'changes'  => [
+            'New' => [
+                [
+                    'title'       => 'Extended REST API support for Dokan',
+                    'description' => '-- https://example.com/wp-json/dokan/v1/orders?after=2022-10-01&before=2022-10-30
+-- https://example.com/wp-json/dokan/v1/vendor-dashboard/
+-- https://example.com/wp-json/dokan/v1/vendor-dashboard/sales?from=2021-08-02T04:13:05Z&to=2021-12-02T04:13:05Z
+-- https://example.com/wp-json/dokan/v1/vendor-dashboard/orders
+-- https://example.com/wp-json/dokan/v1/vendor-dashboard/products
+-- https://example.com/wp-json/dokan/v1/vendor-dashboard/profile
+-- https://example.com/wp-json/dokan/v1/vendor-dashboard/preferences
+-- https://example.com/wp-json/dokan/v2/orders/{order_id}/downloads
+-- https://example.com/wp-json/dokan/v2/orders/
+-- https://example.com/wp-json/dokan//v2/orders/bulk-actions
+-- https://example.com/wp-json/dokan/v1/products/attributes/edit-product/{id}
+-- https://example.com/wp-json/dokan/v1/products/attributes/set-default/{id}
+-- https://example.com/wp-json/dokan/v1/blocks/products/{id}
+-- https://example.com/wp-json/dokan/v2/settings
+-- https://example.com/wp-json/dokan/v2/settings/{group_id}/{id}
+-- https://example.com/wp-json/dokan/v2/settings/{group_id}/{parent_id}/{id}
+-- https://example.com/wp-json/dokan/v2/withdraw/settings
+-- https://example.com/wp-json/dokan/v2/withdraw/summary
+-- https://example.com/wp-json/dokan/v2/products  (new param added: author, post_status, date, product_cat, product_type, stock_status, filter_by_other)
+-- https://example.com/wp-json/dokan/v2/products/filter-by-data'
+                    ,
+                ]
+            ],
+            'Fix' => [
+                [
+                    'title'       => 'Multiple store category modal wasn’t working for some theme',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Recreate reverse withdrawal payment product if no product found with stored product id',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.9',
+        'released' => '2023-01-10',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => 'Last-page and first-page pagination icon inconsistency under single store page product listing.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Adjusted store banner image stretching issue under store list page',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'Vendor email address is not showing up on the store header',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.8',
+        'released' => '2022-12-26',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => 'Single Store Page store header menu and search fields style break on mobile devices',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Vendor dashboard total sales wasn’t displaying decimal values',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Set user role as seller while creating vendor from api call',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'order note date issue under vendor dashboard order details page',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.7',
+        'released' => '2022-11-30',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => 'Added  date filter - `after/before` for Order REST API',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Added `dokan_bank_payment_fields_placeholders` Filter to change the label and placeholder of bank payment fields',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Updated UI/UX of vendor dashboard submenu',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Added section, sub-section label, description search under Dokan admin settings',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.6',
+        'released' => '2022-11-14',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => 'Fixed a sql security issue while searching for products via ajax from vendor dashboard',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.5',
+        'released' => '2022-11-03',
+        'changes'  => [
+            'New'    => [
+                [
+                    'title'       => 'Added a new hook named dokan_store_product_search_results to filter out store product search results closes.',
+                    'description' => '',
+                ],
+            ],
+            'Update' => [
+                [
+                    'title'       => 'Sort product categories under the vendor dashboard alphabetically.',
+                    'description' => '',
+                ],
+            ],
+            'Fix'    => [
+                [
+                    'title'       => 'SweetAlert library is conflicting with the WooCommerce Conversion Tracking plugin',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[BestSellingProductWidget] Products are being shown on the widget even when the catalog visibility is set to hidden.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorDashboardProducts] Products of different statuses are not displayed in the appropriate tab from the vendor dashboard.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ProductCategoryWidget] Sub Category dropdown on the Dokan Product Category widget doesn\'t work',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[AdminProduct] When editing a product in the WordPress backend, the vendor select dropdown doesn\'t contain any data.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed a fatal error on the report page if the same day is selected for both the start and end date to generate reports',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSoreSettings] Store settings update button wasn\'t working if the Dokan Pro plugin isn\'t activated.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Store filtering using category was not working',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.3',
+        'released' => '2022-10-27',
+        'changes'  => [
+            'New' => [
+                [
+                    'title'       => 'Fixed a fatal error due to a function moved from dokan pro',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.2',
+        'released' => '2022-10-27',
+        'changes'  => [
+            'New' => [
+                [
+                    'title'       => 'Added a new filter hooked named `dokan_rest_api_store_collection_params` for StoreController request parameters',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Introduced `dokanVendorFilterSectionStart` and `DokanGetVendorArgs` js filter hooks',
+                    'description' => '',
+                ],
+            ],
+            'Fix' => [
+                [
+                    'title'       => '[AdminCommission] - Percentage Commission does not support "comma" as decimal separator under Dokan admin settings `Selling Options` page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Products] Product author is assigned to the shop manager when the shop manager publishes a product drafted by the admin.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Spaces between paragraphs are too large under the store terms and condition page.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.1',
+        'released' => '2022-10-11',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => '[VariableProduct] Fixed variable product\'s variation image uploading height size overlapping on price field.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ProductSearch] Fixed product search of the product listing page of the vendor dashboard is not working.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[OrderEmail] Fixed multiple emails are sent to the customer when a parent order\'s status is changed to processing from failed payment.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '**fix:** Removed unwanted popup code from the SweetAlert library',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed the vendor dashboard adds new products\' discount prices set to 0 by default.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed vendor order page not showing line item qty and totals',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.0',
+        'released' => '2022-09-27',
+        'changes'  => [
+            'New'    => [
+                [
+                    'title'       => 'Added `dokan_selected_multistep_category` js hook after a category has been selected',
+                    'description' => '',
+                ],
+            ],
+            'Update' => [
+                [
+                    'title'       => 'Fixed some security issues',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Performance enhancement for dokan',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Updated some JS libraries',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Vendor dashboard `add-product-single.php` file is renamed to `edit-product-single.php`',
+                    'description' => '',
+                ],
+            ],
+            'Fix'    => [
+                [
+                    'title'       => 'Select2 spacing issue CSS fix',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed vendor single store page profile picture CSS issue',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed vendor product page extra table field issue',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed admin dashboard vendor details page: social profile Twitter icon is not showing issue',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed multiple sub-categories of the same parent category is assigned to a product, they are not saved issue',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Store settings]: Not being able to add "+" or "-" sign to the phone number filed of the store on Firefox web browser.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Bank withdrawal method required field updated, Added a new filter hook `dokan_bank_payment_required_fields` so that site owner can manage required fields as they pleased',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Category-based commission is not working when a category has child categories.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
         'version'  => 'Version 3.6.5',
         'released' => '2022-08-25',
         'changes'  => [
-            'Fix'         => [
+            'Fix' => [
                 [
                     'title'       => '[WPML] Added WPML support for the multistep product category.',
                     'description' => '',

@@ -27,6 +27,8 @@
                         </ul>
                     </div>
                 <?php endif; ?>
+
+                <?php wp_nonce_field( 'dokan_store_lists_filter_nonce', '_store_filter_nonce', false ); ?>
             </div>
         </div>
 

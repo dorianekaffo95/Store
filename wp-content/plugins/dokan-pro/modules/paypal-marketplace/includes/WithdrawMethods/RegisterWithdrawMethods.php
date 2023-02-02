@@ -163,7 +163,7 @@ class RegisterWithdrawMethods {
         $dokan_settings = get_user_meta( $user_id, 'dokan_profile_settings', true );
 
         //get paypal product type based on seller country
-        $product_type = Helper::get_product_type( $dokan_settings['address']['country'] );
+        $product_type = apply_filters( 'dokan_paypal_marketplace_product_type', Helper::get_product_type( $dokan_settings['address']['country'] ) );
 
         if ( ! $product_type ) {
             wp_send_json_error(
@@ -396,6 +396,10 @@ class RegisterWithdrawMethods {
         }
 
         if ( ! Helper::display_announcement_to_non_connected_sellers() ) {
+            return;
+        }
+
+        if ( ! dokan_is_withdraw_method_enabled( 'dokan-paypal-marketplace' ) ) {
             return;
         }
 

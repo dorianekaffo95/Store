@@ -19,30 +19,32 @@ use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 class Account extends Api {
 
     /**
-     * Error code if provided account id is invalid.
-     *
-     * @since 3.6.1
-     */
-    const ACCOUNT_INVALID = 'account_invalid';
-
-    /**
      * Retrieves a client.
      *
      * @since 3.6.1
      *
-     * @param int|string $account_id
-     * @param array $args
+     * @param int|string          $account_id
+     * @param array<string,mixed> $args
      *
-     * @return object
+     * @return \Stripe\Account
      * @throws DokanException
      */
     public static function get( $account_id, array $args = [] ) {
         try {
             return static::api()->accounts->retrieve( $account_id, $args );
-        } catch ( Exception $e ) {
-            Helper::log( sprintf( 'Could not retrieve account: %s', $e->getMessage() ) );
+        } catch ( \Stripe\Exception\ApiErrorException $e ) {
+            /* translators: error message */
+            $message = sprintf( __( 'Stripe API error on fetching account: %s', 'dokan' ), $e->getMessage() );
+            Helper::log( $message, 'Account' );
+
             $error_code = ! empty( $e->getError()->code ) ? $e->getError()->code : $e->getCode();
             throw new DokanException( $error_code, $e->getMessage() );
+        } catch ( Exception $e ) {
+            /* translators: error message */
+            $message = sprintf( __( 'Could not retrieve account: %s', 'dokan' ), $e->getMessage() );
+            Helper::log( $message, 'Account' );
+
+            throw new DokanException( 'account-retrieve-error', $message );
         }
     }
 
@@ -51,15 +53,15 @@ class Account extends Api {
      *
      * @since 3.6.1
      *
-     * @param array $args
+     * @param array<string,mixed> $args
      *
-     * @return array|false
+     * @return \Stripe\Account[]|false
      */
     public static function all( array $args = [] ) {
         try {
             return static::api()->accounts->all( $args );
         } catch ( Exception $e ) {
-            Helper::log( sprintf( 'Could not retrieve all accounts.', $e->getMessage() ) );
+            Helper::log( 'Could not retrieve all accounts: ' . $e->getMessage(), 'Account' );
             return false;
         }
     }
@@ -69,9 +71,9 @@ class Account extends Api {
      *
      * @since 3.6.1
      *
-     * @param array $args
+     * @param array<string,mixed> $args
      *
-     * @return object
+     * @return \Stripe\Account
      * @throws DokanException
      */
     public static function create( array $args = [] ) {
@@ -97,9 +99,10 @@ class Account extends Api {
             $args = wp_parse_args( $args, $defaults );
             return static::api()->accounts->create( $args );
         } catch ( Exception $e ) {
-            Helper::log( sprintf( 'Could not create account: %s', $e->getMessage() ) );
             /* translators: error message */
-            throw new DokanException( 'dokan-stripe-express-account-create-error', sprintf( __( '%s', 'dokan' ), $e->getMessage() ) ); // phpcs:ignore WordPress.WP.I18n.NoEmptyStrings
+            $message = sprintf( __( 'Could not create account. Error: %s', 'dokan' ), $e->getMessage() );
+            Helper::log( $message, 'Account' );
+            throw new DokanException( 'dokan-stripe-express-account-create-error', $message );
         }
     }
 
@@ -111,16 +114,17 @@ class Account extends Api {
      * @param string $account_id
      * @param array  $data
      *
-     * @return object
+     * @return \Stripe\Account
      * @throws DokanException
      */
     public static function update( $account_id, array $data = [] ) {
         try {
             return static::api()->accounts->update( $account_id, $data );
         } catch ( Exception $e ) {
-            Helper::log( sprintf( 'Could not update account: %1$s. Error: %2$s', $account_id, $e->getMessage() ) );
-            /* translators: error message */
-            throw new DokanException( 'dokan-stripe-express-account-create-error', sprintf( __( '%s', 'dokan' ), $e->getMessage() ) ); // phpcs:ignore WordPress.WP.I18n.NoEmptyStrings
+            /* translators: 1) account id, 2) error message */
+            $message = sprintf( __( 'Could not update account: %1$s. Error: %2$s', 'dokan' ), $account_id, $e->getMessage() );
+            Helper::log( $message, 'Account', 'error' );
+            throw new DokanException( 'dokan-stripe-express-account-create-error', $message );
         }
     }
 
@@ -129,10 +133,10 @@ class Account extends Api {
      *
      * @since 3.6.1
      *
-     * @param int|string $account_id
-     * @param array $args
+     * @param int|string          $account_id
+     * @param array<string,mixed> $args
      *
-     * @return mixed
+     * @return \Stripe\AccountLink
      * @throws DokanException
      */
     public static function create_onboarding_link( $account_id, array $args = [] ) {
@@ -146,10 +150,10 @@ class Account extends Api {
         try {
             return static::api()->accountLinks->create( $args );
         } catch ( Exception $e ) {
-            $message = sprintf( 'Could not create client account link: %s', $e->getMessage() );
-            Helper::log( $message, 'Account', 'error' );
             /* translators: error message */
-            throw new DokanException( 'dokan-stripe-express-account-onboarding-error', sprintf( __( '%s', 'dokan' ), $message ) ); // phpcs:ignore WordPress.WP.I18n.NoEmptyStrings
+            $message = sprintf( __( 'Could not create client account link: %s', 'dokan' ), $e->getMessage() );
+            Helper::log( $message, 'Account', 'error' );
+            throw new DokanException( 'dokan-stripe-express-account-onboarding-error', $message );
         }
     }
 
@@ -158,10 +162,10 @@ class Account extends Api {
      *
      * @since 3.6.1
      *
-     * @param string $account_id
-     * @param array  $args
+     * @param string              $account_id
+     * @param array<string,mixed> $args
      *
-     * @return object
+     * @return \Stripe\LoginLink
      * @throws DokanException
      */
     public static function create_login_link( $account_id, $args = [] ) {
@@ -169,13 +173,29 @@ class Account extends Api {
             return static::api()->accounts->createLoginLink( $account_id, $args );
         } catch ( Exception $e ) {
             $message = sprintf(
-                'Could not create login link for account: %1$s. Error: %2$s',
+                /* translators: 1) account id, 2) error message */
+                __( 'Could not create login link for account: %1$s. Error: %2$s', 'dokan' ),
                 $account_id,
                 $e->getMessage()
             );
             Helper::log( $message, 'Account', 'error' );
-            /* translators: error message */
-            throw new DokanException( 'dokan-stripe-express-login-link-create-error', sprintf( __( '%s', 'dokan' ), $message ) ); // phpcs:ignore WordPress.WP.I18n.NoEmptyStrings
+            throw new DokanException( 'dokan-stripe-express-login-link-create-error', $message );
+        }
+    }
+
+    /**
+     * Retrieve balance data.
+     *
+     * @since 3.7.8
+     *
+     * @return \Stripe\Balance|false
+     */
+    public static function get_balance() {
+        try {
+            return static::api()->balance->retrieve();
+        } catch ( Exception $e ) {
+            Helper::log( sprintf( 'Could not retrieve balance. Error: %s', $e->getMessage() ), 'Balance' );
+            return false;
         }
     }
 }

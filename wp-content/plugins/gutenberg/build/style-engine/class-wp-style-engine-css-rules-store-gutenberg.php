@@ -12,7 +12,7 @@ if ( class_exists( 'WP_Style_Engine_CSS_Rules_Store_Gutenberg' ) ) {
 }
 
 /**
- * Holds, sanitizes, processes and prints CSS declarations for the style engine.
+ * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
  *
  * @access private
  */
@@ -42,13 +42,16 @@ class WP_Style_Engine_CSS_Rules_Store_Gutenberg {
 	protected $rules = array();
 
 	/**
-	 * Get an instance of the store.
+	 * Gets an instance of the store.
 	 *
 	 * @param string $store_name The name of the store.
 	 *
-	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg
+	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg|void
 	 */
 	public static function get_store( $store_name = 'default' ) {
+		if ( ! is_string( $store_name ) || empty( $store_name ) ) {
+			return;
+		}
 		if ( ! isset( static::$stores[ $store_name ] ) ) {
 			static::$stores[ $store_name ] = new static();
 			// Set the store name.
@@ -58,7 +61,7 @@ class WP_Style_Engine_CSS_Rules_Store_Gutenberg {
 	}
 
 	/**
-	 * Get an array of all available stores.
+	 * Gets an array of all available stores.
 	 *
 	 * @return WP_Style_Engine_CSS_Rules_Store_Gutenberg[]
 	 */
@@ -76,7 +79,7 @@ class WP_Style_Engine_CSS_Rules_Store_Gutenberg {
 	}
 
 	/**
-	 * Set the store name.
+	 * Sets the store name.
 	 *
 	 * @param string $name The store name.
 	 *
@@ -87,7 +90,7 @@ class WP_Style_Engine_CSS_Rules_Store_Gutenberg {
 	}
 
 	/**
-	 * Get the store name.
+	 * Gets the store name.
 	 *
 	 * @return string
 	 */
@@ -96,7 +99,7 @@ class WP_Style_Engine_CSS_Rules_Store_Gutenberg {
 	}
 
 	/**
-	 * Get an array of all rules.
+	 * Gets an array of all rules.
 	 *
 	 * @return WP_Style_Engine_CSS_Rule_Gutenberg[]
 	 */
@@ -105,12 +108,12 @@ class WP_Style_Engine_CSS_Rules_Store_Gutenberg {
 	}
 
 	/**
-	 * Get a WP_Style_Engine_CSS_Rule_Gutenberg object by its selector.
+	 * Gets a WP_Style_Engine_CSS_Rule_Gutenberg object by its selector.
 	 * If the rule does not exist, it will be created.
 	 *
 	 * @param string $selector The CSS selector.
 	 *
-	 * @return WP_Style_Engine_CSS_Rule_Gutenberg|null Returns a WP_Style_Engine_CSS_Rule_Gutenberg object, or null if the selector is empty.
+	 * @return WP_Style_Engine_CSS_Rule_Gutenberg|void Returns a WP_Style_Engine_CSS_Rule_Gutenberg object, or null if the selector is empty.
 	 */
 	public function add_rule( $selector ) {
 		$selector = trim( $selector );
@@ -129,7 +132,7 @@ class WP_Style_Engine_CSS_Rules_Store_Gutenberg {
 	}
 
 	/**
-	 * Remove a selector from the store.
+	 * Removes a selector from the store.
 	 *
 	 * @param string $selector The CSS selector.
 	 *

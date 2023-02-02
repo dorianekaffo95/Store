@@ -7,6 +7,11 @@ class PayInRecurringRegistration extends Libraries\Dto
     /**
      * @var string
      */
+    public $Id;
+
+    /**
+     * @var string
+     */
     public $AuthorId;
 
     /**
@@ -83,4 +88,18 @@ class PayInRecurringRegistration extends Libraries\Dto
      * @var string
      */
     public $Status;
+
+    /**
+     * @var int
+     */
+    public $FreeCycles;
+
+    /**
+     * Get array with read-only properties
+     * @return array
+     */
+    public function GetReadOnlyProperties()
+    {
+        return [ 'Id' ];
+    }
 }

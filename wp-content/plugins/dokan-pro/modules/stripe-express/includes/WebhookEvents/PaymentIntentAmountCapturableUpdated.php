@@ -4,7 +4,6 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\WebhookEvents;
 
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
-use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Order;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Payment;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
@@ -19,30 +18,18 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 class PaymentIntentAmountCapturableUpdated extends WebhookEvent {
 
     /**
-     * Class constructor.
-     *
-     * @since 3.6.1
-     *
-     * @param object $event
-     */
-    public function __construct( $event ) {
-        $this->set( $event );
-    }
-
-    /**
      * Handles the event.
      *
      * @since 3.6.1
      *
-     * @param object $intent
-     *
      * @return void
      */
-    public function handle( $intent ) {
-        $order = Order::get_order_by_intent_id( $intent->id );
+    public function handle() {
+        $intent = $this->get_payload();
+        $order  = Order::get_order_by_intent_id( $intent->id );
 
         if ( ! $order ) {
-            Helper::log( 'Could not find order via intent ID: ' . $intent->id );
+            $this->log( 'Could not find order via intent ID: ' . $intent->id );
             return;
         }
 
@@ -50,17 +37,17 @@ class PaymentIntentAmountCapturableUpdated extends WebhookEvent {
             return;
         }
 
-        if ( Order::lock_processing( $order, $intent ) ) {
+        if ( Order::lock_processing( $order->get_id(), 'intent', $intent->id ) ) {
             return;
         }
 
-        $charge = end( $intent->charges->data );
-
-        do_action( 'dokan_stripe_express_process_payment', $charge, $order );
-
         // Process valid response.
-        Payment::process_response( $charge, $order );
+        $response = Payment::get_latest_charge_from_intent( $intent );
+        if ( ! $response ) {
+            $response = $intent;
+        }
 
-        Order::unlock_processing( $order );
+        Payment::process_response( $response, $order );
+        Order::unlock_processing( $order->get_id() );
     }
 }

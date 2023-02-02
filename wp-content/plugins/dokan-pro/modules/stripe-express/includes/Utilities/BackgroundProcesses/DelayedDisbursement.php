@@ -114,8 +114,13 @@ class DelayedDisbursement extends WC_Background_Process {
             return false;
         }
 
-        // check payment gateway used was dokan paypal marketplace
+        // check payment gateway used was stripe express
         if ( $order->get_payment_method() !== Helper::get_gateway_id() ) {
+            return false;
+        }
+
+        // Don't proceed if it's a suborder
+        if ( ! empty( $order->get_parent_id() ) ) {
             return false;
         }
 

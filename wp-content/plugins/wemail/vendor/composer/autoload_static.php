@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3
+class ComposerStaticInit5b390931ee64e0a0807c42da7ce30c5d
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -182,6 +182,7 @@ class ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\CategoryResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/CategoryResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderItemResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/OrderItemResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/OrderResource.php',
+        'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderResourceV3' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/OrderResourceV3.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\ProductResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/EDD/ProductResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\CategoryResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/WooCommerce/CategoryResource.php',
         'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\OrderItemResource' => __DIR__ . '/../..' . '/includes/Rest/Resources/Ecommerce/WooCommerce/OrderItemResource.php',
@@ -206,9 +207,9 @@ class ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit9c7fb81040ea4a17efc77f4fcd9faba3::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit5b390931ee64e0a0807c42da7ce30c5d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit5b390931ee64e0a0807c42da7ce30c5d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit5b390931ee64e0a0807c42da7ce30c5d::$classMap;
 
         }, null, ClassLoader::class);
     }

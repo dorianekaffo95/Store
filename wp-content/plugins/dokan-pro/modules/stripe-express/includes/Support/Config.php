@@ -14,6 +14,8 @@ use WeDevs\DokanPro\Modules\StripeExpress\Support\Settings;
  * Configuration handler class
  *
  * @since 3.6.1
+ *
+ * @package WeDevs\DokanPro\Modules\StripeExpress\Support
  */
 class Config {
 
@@ -47,7 +49,7 @@ class Config {
     private $api_configured = false;
 
     /**
-     * Publishable key for Mangopay account
+     * Publishable key for Stripe account
      *
      * @since 3.6.1
      *
@@ -81,6 +83,24 @@ class Config {
      * @var string
      */
     private $api_error = '';
+
+    /**
+     * App name for Stripe.
+     *
+     * @since 3.7.8
+     *
+     * @var string
+     */
+    private $app_name = 'Dokan Stripe Express';
+
+    /**
+     * App URL for Stripe.
+     *
+     * @since 3.7.8
+     *
+     * @var string
+     */
+    private $app_url = 'https://wedevs.com/dokan/modules/stripe-express/';
 
     /**
      * The reference to Singleton instance of this class
@@ -178,7 +198,7 @@ class Config {
     }
 
     /**
-     * Sets API configuration for MangoPay
+     * Sets API configuration for Stripe
      *
      * @since 3.6.1
      *
@@ -186,7 +206,7 @@ class Config {
      */
     private function set_api() {
         Stripe::setApiVersion( Helper::get_api_version() );
-        Stripe::setAppInfo( $this->app_name, DOKAN_PRO_PLUGIN_VERSION, $this->app_url, $this->partner_id );
+        Stripe::setAppInfo( $this->app_name, DOKAN_PRO_PLUGIN_VERSION, $this->app_url );
 
         if ( ! $this->is_live_mode() ) {
             Stripe::setVerifySslCerts( false );
@@ -246,7 +266,7 @@ class Config {
     }
 
     /**
-     * To check if the Mangopay API is running in production or sandbox environment
+     * To check if the Stripe express API is running in production or sandbox environment
      *
      * @since 3.6.1
      *

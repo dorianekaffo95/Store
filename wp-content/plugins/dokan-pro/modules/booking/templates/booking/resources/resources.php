@@ -179,18 +179,23 @@ global $post;
             ( function ( $ ) {
 
                 $( document ).ready( function () {
-                    $('.dokan-dashboard-header').on('click', '.dokan-btn', async function(){
-                      add_resource_name = await dokan_sweetalert( wc_bookings_writepanel_js_params.i18n_new_resource_name, { 
-                            action      : 'prompt', 
-                            input       : 'text',  
-                        } );
+                    $('.dokan-dashboard-header').on('click', '.dokan-btn', async function() {
+                      add_resource_name = await dokan_sweetalert( wc_bookings_writepanel_js_params.i18n_new_resource_name, {
+                        action: 'prompt',
+                        input : 'text',
+                    } );
 
-                      var data = {
-                         action:            'add_new_resource',
-                         add_resource_name: add_resource_name.value,
-                     };
+                    if ( ! add_resource_name.isConfirmed || ! add_resource_name.value ) {
+                        return;
+                    }
 
-                     $.post( dokan.ajaxurl, data, function( response ) {
+                    var data = {
+                        action           : 'add_new_resource',
+                        add_resource_name: add_resource_name.value,
+                        _wpnonce         : '<?php echo wp_create_nonce( 'dokan-booking-resource-nonce' ); ?>'
+                    };
+
+                    $.post( dokan.ajaxurl, data, function( response ) {
                         if ( response.error ) {
                             alert( response.error );
                         } else if( response.success ) {

@@ -2,6 +2,10 @@
 
 namespace WeDevs\DokanPro\Modules\MangoPay\Frontend;
 
+defined( 'ABSPATH' ) || exit; // Exit if called directly
+
+use WeDevs\DokanPro\Modules\MangoPay\Support\Helper;
+
 /**
  * Class for handling frontend assets
  *
@@ -26,13 +30,18 @@ class Assets {
      * @return void
      */
     public function register_scripts() {
-        $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+        $suffix  = '.min';
+        $version = DOKAN_PRO_PLUGIN_VERSION;
+        if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+            $suffix  = '';
+            $version = time();
+        }
 
         wp_register_script(
             'dokan-mangopay-kit',
             DOKAN_MANGOPAY_ASSETS . "vendor/mangopay-kit{$suffix}.js",
             array( 'jquery' ),
-            DOKAN_PRO_PLUGIN_VERSION,
+            $version,
             true
         );
 
@@ -40,7 +49,7 @@ class Assets {
             'dokan-mangopay-checkout',
             DOKAN_MANGOPAY_ASSETS . "js/checkout{$suffix}.js",
             array( 'dokan-mangopay-kit' ),
-            DOKAN_PRO_PLUGIN_VERSION,
+            $version,
             true
         );
 
@@ -48,14 +57,14 @@ class Assets {
             'dokan-mangopay-checkout',
             DOKAN_MANGOPAY_ASSETS . "css/checkout{$suffix}.css",
             array(),
-            DOKAN_PRO_PLUGIN_VERSION
+            $version
         );
 
         wp_register_script(
             'dokan-mangopay-vendor',
             DOKAN_MANGOPAY_ASSETS . "js/vendor{$suffix}.js",
             array( 'jquery' ),
-            DOKAN_PRO_PLUGIN_VERSION,
+            $version,
             true
         );
 
@@ -63,20 +72,28 @@ class Assets {
             'dokan-mangopay-vendor',
             DOKAN_MANGOPAY_ASSETS . "css/vendor{$suffix}.css",
             array(),
-            DOKAN_PRO_PLUGIN_VERSION
+            $version
         );
 
         wp_localize_script( 'dokan-mangopay-checkout', 'dokanMangopay', array(
             'regErrors'   => $this->card_registration_errors(),
             'ajaxurl'     => admin_url( 'admin-ajax.php' ),
-            'emptyFields' => __( 'Please fill all the fields' ),
+            'emptyFields' => esc_html__( 'Please fill all the fields' ),
             'nonce'       => wp_create_nonce( 'dokan_mangopay_checkout_nonce' ),
         ) );
 
         wp_localize_script( 'dokan-mangopay-vendor', 'dokanMangopay', array(
-            'ajaxurl'     => admin_url( 'admin-ajax.php' ),
-            'processing'  => __( 'Processing', 'dokan' ),
-            'makeActive'  => __( 'Make Active', 'dokan' ),
+            'ajaxurl'      => admin_url( 'admin-ajax.php' ),
+            'signUpFields' => Helper::get_signup_fields( get_current_user_id() ),
+            'message'      => [
+                'emptyReqFields' => esc_html__( 'Please fill all the *Required fields!' ),
+            ],
+            'i18n'         => [
+                'stateSelector' => esc_html__( 'Select a state...', 'dokan' ),
+                'optional'      => esc_html__( 'Optional', 'dokan' ),
+                'processing'    => esc_html__( 'Processing', 'dokan' ),
+                'makeActive'    => esc_html__( 'Make Active', 'dokan' ),
+            ],
         ) );
     }
 

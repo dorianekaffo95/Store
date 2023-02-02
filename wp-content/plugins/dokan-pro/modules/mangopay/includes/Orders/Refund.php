@@ -67,7 +67,8 @@ class Refund {
 
         // Check if refund is approvable
         if ( ! dokan_pro()->refund->is_approvable( $refund->get_order_id() ) ) {
-            return Helper::log( sprintf( '%1$s: This refund is not eligible to be approved. Refund ID: %2$s. Order ID: %3$s', Helper::get_gateway_title(), $refund->get_id(), $refund->get_order_id() ) );
+            Helper::log( sprintf( '%1$s: This refund is not eligible to be approved. Refund ID: %2$s. Order ID: %3$s', Helper::get_gateway_title(), $refund->get_id(), $refund->get_order_id() ) );
+            return;
         }
 
         $order = wc_get_order( $refund->get_order_id() );

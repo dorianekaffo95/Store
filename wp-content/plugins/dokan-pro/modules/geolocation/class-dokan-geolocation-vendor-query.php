@@ -87,11 +87,19 @@ class Dokan_Geolocation_Vendor_Query {
             }
         }
 
+        if ( ! isset( $_GET['_store_filter_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_store_filter_nonce'] ) ), 'dokan_store_lists_filter_nonce' ) ) {
+            return;
+        }
+
         $this->user_query = $user_query;
 
-        $this->latitude  = isset( $_GET['latitude'] ) ? $_GET['latitude'] : null;
-        $this->longitude = isset( $_GET['longitude'] ) ? $_GET['longitude'] : null;
-        $this->distance  = isset( $_GET['distance'] ) ? $_GET['distance'] : 0;
+        $this->latitude  = isset( $_GET['latitude'] ) ? sanitize_text_field( wp_unslash( $_GET['latitude'] ) ) : null;
+        $this->longitude = isset( $_GET['longitude'] ) ? sanitize_text_field( wp_unslash( $_GET['longitude'] ) ) : null;
+        $this->distance  = isset( $_GET['distance'] ) ? sanitize_text_field( wp_unslash( $_GET['distance'] ) ) : 0;
+
+        if ( empty( $this->latitude ) || empty( $this->longitude ) ) {
+            return;
+        }
 
         $this->filter_query_fields();
         $this->filter_query_from();

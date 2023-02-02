@@ -71,7 +71,8 @@ class PayInRefundSucceeded extends WebhookEvent {
         $order 	  = new WC_Order( $order_id );
 
         if ( ! $order ) {
-            return Helper::log( "Invalid order: $order_id" );
+            Helper::log( "Invalid order: $order_id" );
+            return;
         }
 
         if ( 'refunded' === $order->get_status() ) {

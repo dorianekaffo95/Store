@@ -6,7 +6,6 @@ defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use Exception;
 use WeDevs\Dokan\Exceptions\DokanException;
-use Stripe\PaymentMethod as StripePaymentMethod;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Api;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 
@@ -26,7 +25,7 @@ class PaymentMethod extends Api {
      *
      * @param array $args
      *
-     * @return object
+     * @return \Stripe\PaymentMethod
      * @throws DokanException
      */
     public static function create( $args ) {
@@ -51,7 +50,7 @@ class PaymentMethod extends Api {
      * @param string $method_id
      * @param array $data
      *
-     * @return object
+     * @return \Stripe\PaymentMethod
      * @throws DokanException
      */
     public static function update( $method_id, $data ) {
@@ -68,14 +67,16 @@ class PaymentMethod extends Api {
      * Retrieves a payment method.
      *
      * @since 3.6.1
+     * @since 3.7.8 Added additional `$args` parameter.
      *
      * @param string $method_id
+     * @param array  $args      (Optional)
      *
-     * @return object|false
+     * @return \Stripe\PaymentMethod|false
      */
-    public static function get( $method_id ) {
+    public static function get( $method_id, $args = [] ) {
         try {
-            return static::api()->paymentMethods->retrieve( $method_id );
+            return static::api()->paymentMethods->retrieve( $method_id, $args );
         } catch ( Exception $e ) {
             Helper::log( sprintf( 'Could not retrieve payment method for id: %1$s. Error: %2$s', $method_id, $e->getMessage() ), 'Payment Method' );
             return false;
@@ -90,7 +91,7 @@ class PaymentMethod extends Api {
      * @param string $customer_id
      * @param array $args
      *
-     * @return array
+     * @return \Stripe\PaymentMethod[]
      */
     public static function get_by_customer( $customer_id, $args ) {
         $defaults = [
@@ -119,7 +120,7 @@ class PaymentMethod extends Api {
      * @param string $payment_method_id
      * @param string $customer_id
      *
-     * @return object
+     * @return \Stripe\PaymentMethod
      * @throws DokanException
      */
     public static function attach( $payment_method_id, $customer_id ) {
@@ -142,7 +143,7 @@ class PaymentMethod extends Api {
      *
      * @param string $payment_method_id
      *
-     * @return object
+     * @return \Stripe\PaymentMethod
      * @throws DokanException
      */
     public static function detach( $payment_method_id ) {
@@ -156,24 +157,5 @@ class PaymentMethod extends Api {
                 sprintf( __( 'Could not detach payment method. Error: %s', 'dokan' ), $e->getMessage() )
             );
         }
-    }
-
-    /**
-     * Prepares payment method data.
-     *
-     * @since 3.6.1
-     *
-     * @param StripePaymentMethod $payment_method
-     *
-     * @return object
-     */
-    public static function prepare( StripePaymentMethod $payment_method ) {
-        return (object) [
-            'customer'              => $payment_method->customer,
-            'source'                => null,
-            'source_object'         => null,
-            'payment_method'        => $payment_method->id,
-            'payment_method_object' => $payment_method,
-        ];
     }
 }

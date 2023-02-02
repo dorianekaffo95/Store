@@ -6,12 +6,10 @@ defined( 'ABSPATH' ) || exit;
 
 use Exception;
 use Stripe\Event;
-use WeDevs\Dokan\Exceptions\DokanException;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Settings;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Factories\WebhookEvents;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Webhook as WebhookProcessor;
-use WeDevs\DokanPro\Modules\StripeExpress\Api\WebhookEndpoint as WebhookEndpoint;
 
 /**
  * Class to handle Webhook operations.
@@ -38,7 +36,7 @@ class Webhook {
      */
     public function __construct() {
         $this->webhook_secret = Settings::get_webhook_secret();
-        $this->hooks();
+        add_action( 'init', [ $this, 'hooks' ] );
 
         /*
          * Get/set the time we began monitoring the health of webhooks by fetching it.
@@ -55,8 +53,8 @@ class Webhook {
      *
      * @return void
      */
-    private function hooks() {
-        add_action( 'woocommerce_api_' . WebhookEndpoint::prefix(), [ $this, 'handle_events' ] );
+    public function hooks() {
+        add_action( 'woocommerce_api_' . WebhookProcessor::prefix(), [ $this, 'handle_events' ] );
     }
 
     /**
@@ -67,6 +65,10 @@ class Webhook {
      * @return void
      */
     public function handle_events() {
+        if ( ! Helper::is_gateway_ready() ) {
+            return;
+        }
+
         if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || 'POST' !== $_SERVER['REQUEST_METHOD'] ) {
             return;
         }
@@ -81,7 +83,7 @@ class Webhook {
                 json_decode( $request_body, true )
             );
 
-            WebhookEvents::handle( $event->type, $event->data->object );
+            WebhookEvents::handle( $event );
             WebhookProcessor::set_last_success_time( $event->created );
             status_header( 200 );
             exit;
@@ -99,36 +101,7 @@ class Webhook {
      * @return boolean
      */
     public function register() {
-        if ( ! Helper::is_api_ready() ) {
-            return false;
-        }
-
-        try {
-            $endpoints = WebhookEndpoint::all();
-            if ( empty( $endpoints ) ) {
-                WebhookEndpoint::create();
-                return WebhookProcessor::delete_key();
-            }
-
-            $endpoint_updated = false;
-            foreach ( $endpoints as $endpoint ) {
-                if ( $endpoint->url === WebhookEndpoint::generate_url() ) {
-                    WebhookEndpoint::update( $endpoint->id );
-                    $endpoint_updated = true;
-                } else {
-                    WebhookEndpoint::delete( $endpoint->id );
-                }
-            }
-
-            if ( ! $endpoint_updated ) {
-                WebhookProcessor::delete_key();
-                WebhookEndpoint::create();
-            }
-
-            return true;
-        } catch ( DokanException $e ) {
-            return false;
-        }
+        return WebhookProcessor::create();
     }
 
     /**
@@ -139,28 +112,7 @@ class Webhook {
      * @return boolean
      */
     public function deregister() {
-        if ( ! Helper::is_api_ready() ) {
-            return false;
-        }
-
-        try {
-            $endpoints = WebhookEndpoint::all();
-            if ( empty( $endpoints ) ) {
-                return false;
-            }
-
-            foreach ( $endpoints as $endpoint ) {
-                if ( $endpoint->url === WebhookEndpoint::generate_url() ) {
-                    WebhookEndpoint::delete( $endpoint->id );
-                    WebhookProcessor::delete_key();
-                    return true;
-                }
-            }
-
-            return true;
-        } catch ( DokanException $e ) {
-            return false;
-        }
+        return WebhookProcessor::delete();
     }
 
     /**

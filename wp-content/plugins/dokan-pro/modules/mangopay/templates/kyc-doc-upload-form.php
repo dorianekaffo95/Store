@@ -37,12 +37,14 @@
                 <div id="dokan-kyc-inputs"></div>
             </div>
             <p>
-                <input type="submit" value="<?php esc_attr_e( 'Submit', 'dokan' ); ?>" class="kyc_submit" id="dokan-mangopay-submit-kyc">
-                <input type="submit" value="<?php esc_attr_e( 'Submitting', 'dokan' ); ?>..." class="kyc_submit" id="dokan-mangopay-submit-kyc-disabled" disabled style="display: none;">
+                <input type="submit" value="<?php esc_attr_e( 'Submit', 'dokan' ); ?>" class="kyc_submit dokan-mp-btn-submit" id="dokan-mangopay-submit-kyc">
+                <input type="submit" value="<?php esc_attr_e( 'Submitting', 'dokan' ); ?>..." class="kyc_submit dokan-mp-btn-submit" id="dokan-mangopay-submit-kyc-disabled" disabled style="display: none;">
             </p>
         </div>
+    </div>
 
-        <?php if ( $ubo_applicable ) : ?>
+    <?php if ( $ubo_applicable ) : ?>
+    <div class="dokan-mangopay-ubo-block">
         <h3 clas="ubo_title_h">
             <?php esc_html_e( 'UBO Declaration', 'dokan' ); ?>
         </h3>
@@ -54,6 +56,6 @@
         <div id="ubo_data" data-mpid="<?php echo esc_attr( $existing_account_id ); ?>">
             <?php esc_html_e( 'Loading', 'dokan' ); ?>...
         </div>
-        <?php endif; ?>
     </div>
+    <?php endif; ?>
 </div>

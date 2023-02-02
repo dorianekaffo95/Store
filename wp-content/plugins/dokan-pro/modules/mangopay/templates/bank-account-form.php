@@ -3,10 +3,11 @@
         <?php do_action( 'dokan_mangopay_bank_account_list', $user_id ); ?>
     </div>
 
-    <input type="submit"
-            value="<?php esc_attr_e( 'Add New', 'dokan' ); ?>"
-            class="dokan-mp-bank-account"
-            id="dokan-mp-bank-account-add-new">
+    <button type="submit"
+        class="button dokan-mp-bank-account dokan-mp-btn-submit"
+        id="dokan-mp-bank-account-add-new">
+        <?php esc_attr_e( 'Add New', 'dokan' ); ?>
+    </button>
 
     <div class="bank-account-fields hidden" id="dokan-mp-bank-account-fields">
         <div id="dokan-mangopay-bank-account-notice" class="dokan-alert"></div>
@@ -61,13 +62,13 @@
 
         <input type="submit"
             value="<?php esc_attr_e( 'Submit', 'dokan' ); ?>"
-            class="dokan-mp-bank-account"
+            class="dokan-mp-bank-account dokan-mp-btn-submit"
             id="dokan-mp-bank-account-create">
 
         <input type="submit"
             value="<?php esc_attr_e( 'Submitting', 'dokan' ); ?>..."
             class="dokan-mp-bank-account"
-            id="dokan-mp-bank-account-creating"
+            id="dokan-mp-bank-account-creating dokan-mp-btn-submit"
             disabled="disabled"
             style="display: none;">
 

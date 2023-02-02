@@ -6,13 +6,16 @@ defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use Exception;
 use MangoPay\Sorting;
+use MangoPay\KycLevel;
 use MangoPay\Pagination;
 use MangoPay\KycDocument;
 use MangoPay\SortDirection;
 use MangoPay\KycDocumentType;
+use MangoPay\LegalPersonType;
 use MangoPay\KycDocumentStatus;
 use WeDevs\DokanPro\Modules\MangoPay\Support\Helper;
 use WeDevs\DokanPro\Modules\MangoPay\Support\Processor;
+use MangoPay\KycDocumentRefusedReasonType as RefuseReason;
 
 /**
  * Class to process KYC operations
@@ -193,7 +196,7 @@ class Kyc extends Processor {
         }
 
         // we are light or there is one not set we kill it
-        if ( ! isset( $user->KYCLevel ) || 'LIGHT' === $user->KYCLevel ) {
+        if ( ! isset( $user->KYCLevel ) || KycLevel::Light === $user->KYCLevel ) {
             return false;
         }
 
@@ -206,7 +209,7 @@ class Kyc extends Processor {
         foreach ( $required_docs as $doc_type => $doc ) {
             $found = false;
             foreach ( $submitted_docs as $doc ) {
-                if ( $doc_type === $doc->Type && 'VALIDATED' === $doc->Status ) {
+                if ( $doc_type === $doc->Type && KycDocumentStatus::Validated === $doc->Status ) {
                     $found = true;
                     break;
                 }
@@ -233,7 +236,7 @@ class Kyc extends Processor {
      */
     public static function get_doc_types( \MangoPay\User $user ) {
         // Default for everyone
-        $required_docs = array( KycDocumentType::IdentityProof => __( 'Identity proof', 'dokan' ) );
+        $required_docs = [ KycDocumentType::IdentityProof => __( 'Identity Proof', 'dokan' ) ];
 
         // If not legal person type, we need no further execution
         if ( 'LEGAL' !== $user->PersonType ) {
@@ -241,14 +244,16 @@ class Kyc extends Processor {
         }
 
         // Mandatory for all legal user
-        $required_docs[ KycDocumentType::RegistrationProof ] = __( 'Registration proof', 'dokan' );
+        $required_docs[ KycDocumentType::RegistrationProof ] = __( 'Registration Proof', 'dokan' );
 
-        if ( empty( $user->LegalPersonType ) ) {
+        if ( empty( $user->LegalPersonType ) || LegalPersonType::Soletrader === $user->LegalPersonType ) {
             return $required_docs;
         }
 
-        if ( 'BUSINESS' === $user->LegalPersonType || 'ORGANIZATION' === $user->LegalPersonType ) {
-            $required_docs[ KycDocumentType::ArticlesOfAssociation ] = __( 'Articles of association', 'dokan' );
+        $required_docs[ KycDocumentType::ArticlesOfAssociation ] = __( 'Articles of Association', 'dokan' );
+
+        if ( LegalPersonType::Business === $user->LegalPersonType && KycLevel::Regular !== $user->KYCLevel ) {
+            $required_docs[ KycDocumentType::ShareholderDeclaration ] = __( 'Shareholder Declaration', 'dokan' );
         }
 
         return $required_docs;
@@ -263,21 +268,38 @@ class Kyc extends Processor {
      */
     public static function get_refused_reasons() {
         return array(
-            'DOCUMENT_UNREADABLE'                => __( 'Document unreadable', 'dokan' ),
-            'DOCUMENT_NOT_ACCEPTED'              => __( 'Document not acceptable', 'dokan' ),
-            'DOCUMENT_HAS_EXPIRED'               => __( 'Document has expired', 'dokan' ),
-            'DOCUMENT_INCOMPLETE'                => __( 'Document incomplete', 'dokan' ),
-            'DOCUMENT_MISSING'                   => __( 'Document missing', 'dokan' ),
-            'DOCUMENT_DO_NOT_MATCH_USER_DATA'    => __( 'Document does not match user data', 'dokan' ),
-            'DOCUMENT_DO_NOT_MATCH_ACCOUNT_DATA' => __( 'Document does not match account data', 'dokan' ),
-            'SPECIFIC_CASE'                      => __( 'Specific case, please contact us', 'dokan' ),
-            'DOCUMENT_FALSIFIED'                 => __( 'Document has been falsified', 'dokan' ),
-            'UNDERAGE_PERSON'                    => __( 'Underage person', 'dokan' ),
-            'OTHER'                              => __( 'Other', 'dokan' ),
-            'TRIGGER_PEPS'                       => __( 'PEPS check triggered', 'dokan' ),
-            'TRIGGER_SANCTIONS_LISTS'            => __( 'Sanction lists check triggered', 'dokan' ),
-            'TRIGGER_INTERPOL'                   => __( 'Interpol check triggered', 'dokan' ),
+            RefuseReason::DocumentUnreadable              => __( 'Document unreadable', 'dokan' ),
+            RefuseReason::DocumentNotAccepted             => __( 'Document not acceptable', 'dokan' ),
+            RefuseReason::DocumentHasExpired              => __( 'Document has expired', 'dokan' ),
+            RefuseReason::DocumentIncomplete              => __( 'Document incomplete', 'dokan' ),
+            RefuseReason::DocumentMissing                 => __( 'Document missing', 'dokan' ),
+            RefuseReason::DocumentDoesNotMatchUserData    => __( 'Document does not match user data', 'dokan' ),
+            RefuseReason::DocumentDoesNotMatchAccountData => __( 'Document does not match account data', 'dokan' ),
+            RefuseReason::DocumentFalsified                => __( 'Document has been falsified', 'dokan' ),
+            RefuseReason::SpecificCase                     => __( 'Specific case, please contact us', 'dokan' ),
+            RefuseReason::UnderagePerson                  => __( 'Underage person', 'dokan' ),
+            RefuseReason::TriggerPEPS                     => __( 'PEPS check triggered', 'dokan' ),
+            RefuseReason::TriggerSanactionLists           => __( 'Sanction lists check triggered', 'dokan' ),
+            RefuseReason::TriggerInterpol                 => __( 'Interpol check triggered', 'dokan' ),
+            'OTHER'                                       => __( 'Other', 'dokan' ),
         );
+    }
+
+    /**
+     * Retrieves KYC document statuses.
+     *
+     * @since 3.7.8
+     *
+     * @return array<string,string>
+     */
+    public static function get_doc_statuses() {
+        return [
+            KycDocumentStatus::Created         => __( 'Created', 'dokan' ),
+            KycDocumentStatus::OutOfDate       => __( 'Out of Date', 'dokan' ),
+            KycDocumentStatus::Refused         => __( 'Refused', 'dokan' ),
+            KycDocumentStatus::Validated       => __( 'Validated', 'dokan' ),
+            KycDocumentStatus::ValidationAsked => __( 'Validation Asked', 'dokan' ),
+        ];
     }
     // phpcs:enable WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 }

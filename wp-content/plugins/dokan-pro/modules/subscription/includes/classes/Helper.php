@@ -912,7 +912,16 @@ class Helper {
             $meta = $wpdb->get_results( $meta_query, 'ARRAY_A' );
 
             foreach ( $meta as $meta_item ) {
-                $new_order->update_meta_data( $meta_item['meta_key'], $meta_item['meta_value'] );
+                /*
+                 * For setting internal billing meta data, using setter methods is recommended.
+                 * The metta setter methods are typically named. For example, the setter
+                 * method for `_billing_email` meta is `set_billing_email`
+                 */
+                if ( is_callable( [ $new_order, "set{$meta_item['meta_key']}" ] ) ) {
+                    call_user_func( [ $new_order, "set{$meta_item['meta_key']}" ], $meta_item['meta_value'] );
+                } else {
+                    $new_order->update_meta_data( $meta_item['meta_key'], $meta_item['meta_value'] );
+                }
             }
             $new_order->save_meta_data();
 
@@ -1070,6 +1079,67 @@ class Helper {
         $subscription_packs = dokan()->subscription->all();
 
         return $subscription_packs->have_posts();
+    }
+
+    /**
+     * Filter arguments for product list filtering.
+     *
+     * @since 3.7.13
+     *
+     * @param array  $args
+     * @param string $filter
+     *
+     * @return array
+     */
+    public static function filter_products_by_filter_by_other_helper( $args, $filter ) {
+        if ( 'best_selling' === $filter ) {
+            $args['orderby']  = 'meta_value_num';
+            $args['meta_key'] = 'total_sales';
+
+            self::set_default_tax_query( $args );
+        }
+
+        if ( 'top_rated' === $filter ) {
+            self::set_default_tax_query( $args );
+
+            add_filter( 'posts_clauses', [ 'WC_Shortcodes', 'order_by_rating_post_clauses' ] );
+        }
+
+        if ( 'featured' === $filter ) {
+            self::set_default_tax_query( $args );
+
+            $product_visibility_term_ids = wc_get_product_visibility_term_ids();
+            $args['tax_query'][]         = [
+                'taxonomy' => 'product_visibility',
+                'field'    => 'term_taxonomy_id',
+                'terms'    => $product_visibility_term_ids['featured'],
+            ];
+        }
+
+        return $args;
+    }
+
+
+    /**
+     * Set default tax query
+     *
+     * @since 2.9.13
+     *
+     * @param array $args
+     *
+     * @return array
+     */
+    public static function set_default_tax_query( $args ) {
+        $product_visibility_term_ids = wc_get_product_visibility_term_ids();
+
+        $args['tax_query'][] = [
+            'taxonomy' => 'product_visibility',
+            'field'    => 'term_taxonomy_id',
+            'terms'    => is_search() ? $product_visibility_term_ids['exclude-from-search'] : $product_visibility_term_ids['exclude-from-catalog'],
+            'operator' => 'NOT IN',
+        ];
+
+        return $args;
     }
 }
 

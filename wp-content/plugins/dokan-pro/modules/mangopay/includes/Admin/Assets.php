@@ -26,13 +26,18 @@ class Assets {
      * @return void
      */
      public function register_scripts() {
-        $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+        $suffix  = '.min';
+        $version = DOKAN_PRO_PLUGIN_VERSION;
+        if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+            $suffix  = '';
+            $version = time();
+        }
 
         wp_register_script(
             'dokan-mangopay-admin',
             DOKAN_MANGOPAY_ASSETS . "js/admin{$suffix}.js",
             array( 'jquery' ),
-            DOKAN_PRO_PLUGIN_VERSION,
+            $version,
             true
         );
     }

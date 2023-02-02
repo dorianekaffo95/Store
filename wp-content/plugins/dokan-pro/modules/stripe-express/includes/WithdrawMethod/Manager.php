@@ -24,10 +24,6 @@ class Manager {
      * @package WeDevs\DokanPro\Modules\StripeExpress\WithdrawMethod
      */
     public function __construct() {
-        if ( ! Helper::is_gateway_ready() ) {
-            return;
-        }
-
         $this->hooks();
         $this->init_classes();
     }
@@ -59,7 +55,6 @@ class Manager {
         add_action( 'wp', [ $this, 'update_profile_progress_on_connect' ] );
         add_action( 'dokan_stripe_express_seller_deactivated', [ $this, 'update_profile_progress_on_disconnect' ] );
     }
-
 
     /**
      * Inistantiates required classes
@@ -175,10 +170,9 @@ class Manager {
         Helper::get_template(
             'vendor-gateway-settings',
             [
-                'user_id'             => $user_id,
-                'is_seller_connected' => Helper::is_seller_connected( $user_id ),
-                'stripe_account'      => User::get_data( $user_id ),
-                'payment_settings'    => $payment_settings,
+                'user_id'        => $user_id,
+                'stripe_account' => User::set( $user_id ),
+                'gateway_title'  => Helper::get_gateway_title(),
             ]
         );
     }
@@ -205,7 +199,9 @@ class Manager {
     }
 
     /**
-     * Sends announcement to vendors if their account is not connected with MnagoPay
+     * Sends announcement to vendors if their account is not connected with Stripe Express.
+     * Applies when Stripe Express is set as both payment method and withdraw method and
+     * send announcement settings is enabled.
      *
      * @since 3.6.1
      *
@@ -220,38 +216,22 @@ class Manager {
             return;
         }
 
-        // Check Stripe Express payment gateway is enabled
+        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
+            return;
+        }
+
         $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
         if ( ! array_key_exists( Helper::get_gateway_id(), $available_gateways ) ) {
             return;
         }
 
-        // Check if Stripe Express is ready
-        if ( ! Helper::is_gateway_ready() ) {
-            return;
-        }
-
-        // get current user id
         $seller_id = dokan_get_current_user_id();
-
-        // check if current user is vendor
-        if ( ! dokan_is_user_seller( $seller_id ) ) {
-            return;
-        }
-
-        // check if vendor is already connected with Stripe Express
-        if ( Helper::is_seller_connected( $seller_id ) ) {
-            return;
-        }
-
-        // Check Stripe Express payment gateway is active as withdraw method
-        if ( ! in_array( Helper::get_gateway_id(), dokan_withdraw_get_active_methods(), true ) ) {
+        if ( ! dokan_is_user_seller( $seller_id ) || Helper::is_seller_connected( $seller_id ) ) {
             return;
         }
 
         if ( false === get_transient( "dokan_stripe_express_notice_intervals_$seller_id" ) ) {
             $announcement = new Announcement();
-            // sent announcement message
             $args = [
                 'title'         => $this->notice_to_connect(),
                 'sender_type'   => 'selected_seller',
@@ -277,7 +257,9 @@ class Manager {
     }
 
     /**
-     * Display notice to vendors if their account is not connected with Stripe Express
+     * Display notice to vendors if their account is not connected with Stripe Express.
+     * Applies when Stripe Express is set as both payment method and withdraw method and
+     * display notice settings is enabled.
      *
      * @since 3.6.1
      *
@@ -288,41 +270,25 @@ class Manager {
             return;
         }
 
-        // Geet current user id
         $seller_id = dokan_get_current_user_id();
-
-        // Check if current user is vendor
         if ( ! dokan_is_user_seller( $seller_id ) ) {
             return;
         }
 
-        // Check if notice on vendor dashboard is enabled
         if ( ! Settings::is_display_notice_on_vendor_dashboard_enabled() ) {
             return;
         }
 
-        // Check Stripe Express payment gateway is active as withdraw method
-        if ( ! in_array( Helper::get_gateway_id(), dokan_withdraw_get_active_methods(), true ) ) {
+        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
             return;
         }
 
-        // Check if Stripe Express payment gateway is enabled
         $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
         if ( ! array_key_exists( Helper::get_gateway_id(), $available_gateways ) ) {
             return;
         }
 
-        // Check if Stripe Express is ready
-        if ( ! Helper::is_gateway_ready() ) {
-            return;
-        }
-
-        // Check if vendor is already connected with Stripe Express
         if ( Helper::is_seller_connected( $seller_id ) ) {
-            return;
-        }
-
-        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
             return;
         }
 
@@ -441,7 +407,9 @@ class Manager {
         if (
             empty( $_REQUEST['seller_id'] ) ||
             ! isset( $_REQUEST['action'] ) ||
-            'stripe_express_onboarding' !== sanitize_text_field( wp_unslash( $_REQUEST['action'] ) )
+            'stripe_express_onboarding' !== sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) ||
+            ! isset( $_REQUEST['_wpnonce'] ) ||
+            ! wp_verify_nonce( sanitize_key( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'dokan_stripe_express_onboarding' )
         ) {
             return;
         }

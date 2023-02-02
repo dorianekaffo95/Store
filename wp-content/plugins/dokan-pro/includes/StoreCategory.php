@@ -390,11 +390,13 @@ class StoreCategory {
      */
     public function add_store_category_query_arg( $args, $request ) {
         if ( ! empty( $request['store_categories'] ) ) {
-            $args['store_category_query'][] = array(
+            $args['store_category_query'][] = [
                 'taxonomy' => 'store_category',
-                'field'    => 'slug',
-                'terms'    => $request['store_categories'],
-            );
+                'field'     => 'slug',
+                'terms'    => ! is_array( $request['store_categories'] )
+                    ? explode( ',', sanitize_text_field( wp_unslash( $request['store_categories'] ) ) )
+                    : array_map( 'sanitize_text_field', wp_unslash( $request['store_categories'] ) ),
+            ];
         }
 
         return $args;

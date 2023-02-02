@@ -190,6 +190,10 @@ class Customer {
         try {
             $response = StripeCustomer::update( $this->get_id(), $args );
         } catch ( Exception $e ) {
+            if ( $this->is_no_such_customer_error( $e->getMessage() ) ) {
+                $this->delete_id_from_meta();
+                return $this->create_customer();
+            }
             throw new DokanException( 'customer_update_failed', $e->getMessage() );
         }
 
@@ -197,6 +201,7 @@ class Customer {
         $this->set_customer_data( $response );
 
         do_action( 'dokan_stripe_connnect_update_customer', $args, $response );
+        return $this->get_id();
     }
 
     /**

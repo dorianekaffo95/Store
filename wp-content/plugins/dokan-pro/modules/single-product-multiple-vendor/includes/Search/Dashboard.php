@@ -34,6 +34,7 @@ class Dashboard {
         add_action( 'dokan_spmv_products_search_content_table_before', [ $this, 'add_count_content' ], 10 );
         add_action( 'dokan_new_product_before_product_area', [ $this, 'load_product_search_box_template' ] );
         add_action( 'dokan_spmv_products_search_box', [ $this, 'load_product_listing_search_box_template' ] );
+        add_action( 'wp_footer', [ $this, 'load_add_category_modal' ] );
 
         if ( wp_doing_ajax() ) {
             add_action( 'wp_ajax_dokan_spmv_handle_product_clone_request', [ $this, 'handle_product_clone_request' ] );
@@ -363,6 +364,24 @@ class Dashboard {
         if ( dokan_get_navigation_url( 'products-search' ) === $current_url ) {
             wp_safe_redirect( dokan_get_navigation_url( '/' ) );
             exit;
+        }
+    }
+
+    /**
+     * Returns new category select ui html elements.
+     *
+     * @since 3.7.6
+     *
+     * @return html
+     */
+    public function load_add_category_modal() {
+        /**
+         * Checking if dokan dashboard and SPMV search product page.
+         * Because without those page we don't need to load category modal.
+         */
+        global $wp;
+        if ( dokan_is_seller_dashboard() && isset( $wp->query_vars['products-search'] ) ) {
+            dokan_get_template_part( 'products/dokan-category-ui', '', array() );
         }
     }
 }

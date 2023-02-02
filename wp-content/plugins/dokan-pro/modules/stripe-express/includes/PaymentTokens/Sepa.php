@@ -27,6 +27,18 @@ class Sepa extends WC_Payment_Token {
     protected $type = 'sepa';
 
     /**
+     * Stores SEPA payment token data.
+     *
+     * @since 3.7.8
+     *
+     * @var array
+     */
+    protected $extra_data = [
+        'last4'               => '',
+        'payment_method_type' => 'sepa_debit',
+    ];
+
+    /**
      * Stores hook prefix.
      *
      * @since 3.6.1
@@ -76,11 +88,15 @@ class Sepa extends WC_Payment_Token {
      * @return boolean True if the passed data is valid
      */
     public function validate() {
+        if ( ! parent::validate() ) {
+            return false;
+        }
+
         if ( ! $this->get_last4( 'edit' ) ) {
             return false;
         }
 
-        return parent::validate();
+        return true;
     }
 
     /**

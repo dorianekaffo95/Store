@@ -75,16 +75,16 @@ $cu_slug = get_user_meta( $user_id, 'nickname', true );
         ?>
 
         <?php
-        $show_toc = dokan_get_option( 'enable_tc_on_reg', 'dokan_general' );
+        $show_toc = dokan_get_option( 'enable_tc_on_reg', 'dokan_general', 'on' );
 
-        if ( $show_toc == 'on' ) {
-            $toc_page_id = dokan_get_option( 'reg_tc_page', 'dokan_pages' );
-            if ( $toc_page_id != -1 ) {
+        if ( $show_toc === 'on' ) {
+            $toc_page_id = (int) dokan_get_option( 'reg_tc_page', 'dokan_pages' );
+            if ( $toc_page_id !== -1 ) {
                 $toc_page_url = get_permalink( $toc_page_id );
                 ?>
                 <p class="form-row form-group form-row-wide">
                     <input class="tc_check_box" type="checkbox" id="tc_agree" name="tc_agree" required="required">
-                    <label style="display: inline" for="tc_agree"><?php echo sprintf( __( 'I have read and agree to the <a target="_blank" href="%s">Terms &amp; Conditions</a>.', 'dokan' ), $toc_page_url ); ?></label>
+                    <label style="display: inline" for="tc_agree"><?php echo sprintf( __( 'I have read and agree to the %1$sTerms &amp; Conditions%2$s.', 'dokan' ), "<a target='_blank' href='$toc_page_url'>", '</a>' ); ?></label>
                 </p>
             <?php } ?>
         <?php } ?>

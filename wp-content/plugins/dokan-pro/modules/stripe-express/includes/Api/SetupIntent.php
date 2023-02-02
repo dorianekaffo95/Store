@@ -25,7 +25,7 @@ class SetupIntent extends Api {
      *
      * @param array $args
      *
-     * @return object
+     * @return Stripe\SetupIntent
      * @throws DokanException
      */
     public static function create( $args ) {
@@ -34,8 +34,14 @@ class SetupIntent extends Api {
         } catch ( Exception $e ) {
             Helper::log( sprintf( 'Could not create setup intent. Error: %s', $e->getMessage() ), 'Setup Intent' );
             Helper::log( 'Data: ' . print_r( $args, true ), 'Setup Intent' );
+
+            $error_code = 'dokan-stripe-express-setup-intent-error';
+            if ( Helper::is_no_such_customer_error( $e->getMessage() ) ) {
+                $error_code = 'error_setup-intent_no-such-customer';
+            }
+
             /* translators: 1) error message */
-            throw new DokanException( 'dokan-stripe-express-payment-intent-error', sprintf( __( 'Could not create setup intent. Error: %s', 'dokan' ), $e->getMessage() ) );
+            throw new DokanException( $error_code, sprintf( __( 'Could not create setup intent. Error: %s', 'dokan' ), $e->getMessage() ) );
         }
     }
 
@@ -47,7 +53,7 @@ class SetupIntent extends Api {
      * @param string $intent_id
      * @param array $data
      *
-     * @return object
+     * @return Stripe\SetupIntent
      * @throws DokanException
      */
     public static function update( $intent_id, $data ) {
@@ -68,7 +74,7 @@ class SetupIntent extends Api {
      * @param string $intent_id
      * @param array  $args      (optional)
      *
-     * @return object|false
+     * @return \Stripe\SetupIntent|false
      */
     public static function get( $intent_id, $args = [] ) {
         try {

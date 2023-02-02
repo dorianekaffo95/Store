@@ -10,6 +10,8 @@ use WeDevs\Dokan\Traits\ChainableContainer;
  * Main class for Stripe Express module
  *
  * @since 3.6.1
+ *
+ * @package WeDevs\DokanPro\Modules\StripeExpress
  */
 class Module {
 
@@ -50,18 +52,24 @@ class Module {
      * @return void
      */
     private function controllers() {
-        $this->container['frontend']        = new Frontend\Manager();
-        $this->container['admin']           = new Admin\Manager();
-        $this->container['gateway']         = new Controllers\Gateway();
-        $this->container['checkout']        = new Controllers\Checkout();
-        $this->container['cart']            = new Controllers\Cart();
-        $this->container['webhook']         = new Controllers\Webhook();
-        $this->container['order']           = new Controllers\Order();
-        $this->container['refund']          = new Controllers\Refund();
-        $this->container['payment_tokens']  = new Controllers\Token();
-        $this->container['payment_request'] = new Controllers\PaymentRequest();
-        $this->container['withdraw_method'] = new WithdrawMethod\Manager();
-        $this->container['delay_disburse']  = new Utilities\BackgroundProcesses\DelayedDisbursement();
+        $this->container['frontend']          = new Frontend\Manager();
+        $this->container['admin']             = new Admin\Manager();
+        $this->container['gateway']           = new Controllers\Gateway();
+        $this->container['payment_tokens']    = new Controllers\Token();
+        $this->container['webhook']           = new Controllers\Webhook();
+        $this->container['delay_disburse']    = new Utilities\BackgroundProcesses\DelayedDisbursement();
+        $this->container['awaiting_disburse'] = new Utilities\BackgroundProcesses\AwaitingDisbursement();
+
+        if ( Support\Helper::is_api_ready() ) {
+            $this->container['order']                = new Controllers\Order();
+            $this->container['refund']               = new Controllers\Refund();
+            $this->container['cart']                 = new Controllers\Cart();
+            $this->container['checkout']             = new Controllers\Checkout();
+            $this->container['payment_request']      = new PaymentRequest\Manager();
+            $this->container['withdraw_method']      = new WithdrawMethod\Manager();
+            $this->container['vendor_subscription']  = new Subscriptions\VendorSubscription();
+            $this->container['product_subscription'] = new Subscriptions\ProductSubscription();
+        }
     }
 
     /**

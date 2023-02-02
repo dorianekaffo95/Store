@@ -5,7 +5,7 @@ Donate link: https://www.paypal.me/TycheSoftwares
 Author URI: https://www.tychesoftwares.com/
 Tags: delivery calendar, product delivery date, woocommerce order delivery, product delivery
 Requires at least: 1.3
-Tested up to: 6.0
+Tested up to: 6.1
 Stable tag: trunk
 Requires PHP: 5.6
 License: GPLv2 or later
@@ -184,6 +184,9 @@ WooCommerce Product Delivery Date Lite allows customers to select a WooCommerce 
 6. WooCommerce -> Orders - edit an existing order page.
 
 == Changelog ==
+
+= 2.7.0 (07.12.2022) =
+Enhancement :- Plugin has been made compatible with WooCommerce High-Performance Order Storage.
 
 = 2.6.0 (16.08.2022) =
 * Enhancement :- Created a filter named `prdd_lite_additional_holidays` to add custom holidays.

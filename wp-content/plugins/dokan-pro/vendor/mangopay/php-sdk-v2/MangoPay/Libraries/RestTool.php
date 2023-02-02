@@ -11,7 +11,7 @@ use Psr\Log\LoggerInterface;
  */
 class RestTool
 {
-    const VERSION = '3.12.0';
+    const VERSION = '3.18.0';
 
     /**
      * Root/parent instance that holds the OAuthToken and Configuration instance
@@ -28,6 +28,12 @@ class RestTool
      * @var array
      */
     private $_requestHttpHeaders;
+
+    /**
+     * Variable to flag if the request path should contain the clientId or not
+     * @var bool
+     */
+    private $_clientIdRequired;
 
     /**
      * Return HTTP header to send with request
@@ -97,10 +103,12 @@ class RestTool
      * Constructor
      * @param MangoPayApi $root Root/parent instance that holds the OAuthToken and Configuration instance
      * @param bool $authRequired Variable to flag that in request the authentication data are required
+     * @param bool $clientIdRequired Variable to flag if the request path should contain the clientId or not
      */
-    public function __construct($root, $authRequired = true)
+    public function __construct($root, $authRequired = true, $clientIdRequired = true)
     {
         $this->_authRequired = $authRequired;
+        $this->_clientIdRequired = $clientIdRequired;
         $this->_root = $root;
         $this->logger = $root->getLogger();
     }
@@ -169,7 +177,7 @@ class RestTool
     private function BuildRequest($urlMethod, $pagination, $additionalUrlParams = null, $idempotencyKey = null)
     {
         $urlTool = new UrlTool($this->_root);
-        $restUrl = $urlTool->GetRestUrl($urlMethod, $this->_authRequired, $pagination, $additionalUrlParams);
+        $restUrl = $urlTool->GetRestUrl($urlMethod, $this->_clientIdRequired, $pagination, $additionalUrlParams);
         $this->_requestUrl = $urlTool->GetFullUrl($restUrl);
         $logClass = $this->_root->Config->LogClass;
         $this->logger->debug('FullUrl : ' . $this->_requestUrl);

@@ -78,15 +78,17 @@ $current_reasons        = array();
                         ?>
                     </td>
                     <td>
-                        <?php if ( $warranty_item->get_quantity_remaining() > 0 ) : ?>
+                        <?php
+                        $item_quantity = $warranty_item->get_quantity_remaining();
+                        if ( $item_quantity > 0 ) :
+                        ?>
                             <select name="request_item_qty[]" id="request_item_qty[]">
                                 <?php
-                                for ( $i = 1; $i <= $item->get_quantity(); $i++ ) {
+                                for ( $i = 1; $i <= $item_quantity; $i++ ) {
                                     echo '<option value="' . $i . '">' . $i . '</option>';
                                 }
                                 ?>
                             </select>
-
                         <?php else : ?>
                             <p><?php esc_html_e( 'Quantity Unavailable', 'dokan' ); ?></p>
                         <?php endif ?>

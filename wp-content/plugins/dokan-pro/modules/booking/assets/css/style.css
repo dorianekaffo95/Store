@@ -220,3 +220,6 @@ div.dokan-booking-wrapper input.dokan-btn{
 #wc-bookings-booking-form div.form-field.form-field-wide > div {
     flex-wrap: wrap;
 }
+.dokan-dashboard .select2-container--open .select2-dropdown.select2-dropdown--below {
+    margin-top: 0 !important;
+  }

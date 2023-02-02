@@ -109,7 +109,7 @@ class Ajax {
         }
 
         $user_id  = intval( wp_unslash( $_POST['user_id'] ) );
-        $response = User::get_stripe_login_url( $user_id );
+        $response = User::set( $user_id )->get_stripe_login_url();
 
         if ( ! $response ) {
             wp_send_json_error( __( 'Something went wrong! Please try again later.', 'dokan' ) );

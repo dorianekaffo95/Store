@@ -77,7 +77,25 @@ class StoreData {
             ]
         );
 
-        $store = dokan()->vendor->get( get_query_var( 'author' ) );
+        /*
+         * During any scenario such as while running data updater
+         * of Elementor, as the updater run in the background and
+         * can be initiated from different pages, it is possible
+         * the `container` in `dokan()` has not been set and also,
+         * the `author` query variable can also be unavailable.
+         * In that case, to avoid any inconvinience, we can return
+         * the default store data from here.
+         */
+        if ( ! dokan()->vendor ) {
+            return $this->store_data;
+        }
+
+        $vendor_id = get_query_var( 'author' );
+        if ( empty( $vendor_id ) ) {
+            return $this->store_data;
+        }
+
+        $store = dokan()->vendor->get( $vendor_id );
 
         if ( $store->id ) {
             $this->store_data['id'] = $store->id;

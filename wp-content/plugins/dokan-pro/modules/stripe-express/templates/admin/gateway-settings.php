@@ -103,7 +103,7 @@ $form_fields = [
         'type'        => 'multiselect',
         'class'       => 'wc-enhanced-select',
         'default'     => [ 'card' ],
-        'options'     => Helper::get_available_methods(),
+        'options'     => Helper::get_payment_methods_dropdown(),
         'description' => __( 'Selected payment methods will be appeared on checkout if requiorements are fulfilled.', 'dokan' ),
     ],
     'sellers_pay_processing_fee'       => [
@@ -160,6 +160,25 @@ $form_fields = [
         'type'        => 'text',
         'class'       => 'input-text regular-input ',
         'description' => __( 'Enter the name your customers will see on their transactions. Use a recognizable name – e.g. the legal entity name or website address–to avoid potential disputes and chargebacks.', 'dokan' ),
+    ],
+    'appearance'                       => [
+        'title'       => __( 'Payment Element Appearance', 'dokan' ),
+        'type'        => 'title',
+        'description' => __( 'Customize theme and appearance of Payment Element', 'dokan' ),
+    ],
+    'element_theme'                    => [
+        'title'       => __( 'Theme', 'dokan' ),
+        'type'        => 'select',
+        'description' => __( 'Select the theme you would like to choose for Stripe element.', 'dokan' ),
+        'default'     => 'stripe',
+        'desc_tip'    => true,
+        'options'     => [
+            'stripe'    => __( 'Light', 'dokan' ),
+            'flat'      => __( 'Flat', 'dokan' ),
+            'night'     => __( 'Dark', 'dokan' ),
+            'dark_blue' => __( 'Dark Blue', 'dokan' ),
+            'none'      => __( 'None', 'dokan' ),
+        ],
     ],
     'payment_request_options'          => [
         'title'       => __( 'Payment Request Options (Apple Pay / Google Pay)', 'dokan' ),

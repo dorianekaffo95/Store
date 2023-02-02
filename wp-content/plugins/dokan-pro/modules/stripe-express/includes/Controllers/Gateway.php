@@ -43,7 +43,7 @@ class Gateway {
      *
      * @return void
      */
-    private function hooks() {
+    public function hooks() {
         // Registers Stripe payment gateway
         add_filter( 'woocommerce_payment_gateways', [ $this, 'register_gateway' ] );
     }

@@ -40,6 +40,9 @@ class Shortcode {
     public static function create_subscription_package_shortcode() {
         global $post;
 
+        wp_enqueue_style( 'dps-custom-style' );
+        wp_enqueue_script( 'dps-custom-js' );
+
         $user_id            = dokan_get_current_user_id();
         $subscription_packs = dokan()->subscription->all();
 

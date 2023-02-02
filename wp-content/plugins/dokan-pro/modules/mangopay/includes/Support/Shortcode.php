@@ -45,20 +45,20 @@ class Shortcode {
         }
 
         $list_to_show = Kyc::get_doc_types( $mp_user );
+        $doc_types    = $list_to_show;
         $all_docs     = Kyc::filter( $account_id );
+        $doc_statuses = Kyc::get_doc_statuses();
 
-        if ( $mp_user->KYCLevel === 'REGULAR' ) {
+        if ( $mp_user->KYCLevel === \MangoPay\KycLevel::Regular ) {
             $text_banner = __( 'You have successfully completed all the compliance checks.', 'dokan' );
         } else {
             $text_banner = __( 'You must upload the following documents to complete the compliance checks.', 'dokan' );
         }
 
         foreach ( $all_docs as &$doc ) {
-            $doc->UserDocError = get_user_meta( $wp_user_id, "kyc_error_$doc->Id", true );
-            $doc->Status       = strtolower( $doc->Status );
-            $doc->StatusLabel  = ucfirst( str_replace( '_', ' ', $doc->Status ) );
-            $doc->TypeLabel    = ucfirst( str_replace( '_', ' ', $doc->Type ) );
             $doc->CreationDate = dokan_format_date( $doc->CreationDate );
+            $doc->StatusLabel  = ! empty( $doc_statuses[ $doc->Status ] ) ? $doc_statuses[ $doc->Status ] : ucfirst( str_replace( '_', ' ', $doc->Status ) );
+            $doc->TypeLabel    = ! empty( $doc_types[ $doc->Type ] ) ? $doc_types[ $doc->Type ] : ucfirst( str_replace( '_', ' ', $doc->Type ) );
 
             unset( $list_to_show[ $doc->Type ] );
         }

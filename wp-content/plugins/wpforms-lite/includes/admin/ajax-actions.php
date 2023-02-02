@@ -72,7 +72,7 @@ function wpforms_save_form() {
 	$data['settings']['form_tags'] = wp_list_pluck( $form_tags, 'label' );
 
 	// Update form data.
-	$form_id = wpforms()->get( 'form' )->update( $data['id'], $data );
+	$form_id = wpforms()->get( 'form' )->update( $data['id'], $data, [ 'context' => 'save_form' ] );
 
 	/**
 	 * Fires after updating form data.
@@ -307,7 +307,15 @@ function wpforms_builder_increase_next_field_id() {
 		wp_send_json_error();
 	}
 
-	wpforms()->form->next_field_id( absint( $_POST['form_id'] ) );
+	$args = [];
+
+	// In the case of duplicating the Layout field that contains a bunch of fields,
+	// we need to set the next `field_id` to the desired value which is passed via POST argument.
+	if ( ! empty( $_POST['field_id'] ) ) {
+		$args['field_id'] = absint( $_POST['field_id'] );
+	}
+
+	wpforms()->get( 'form' )->next_field_id( absint( $_POST['form_id'] ), $args );
 
 	wp_send_json_success();
 }
@@ -728,3 +736,31 @@ function wpforms_install_addon() {
 	wp_send_json_error( $result );
 }
 add_action( 'wp_ajax_wpforms_install_addon', 'wpforms_install_addon' );
+
+/**
+ * Search pages for dropdown.
+ *
+ * @since 1.7.9
+ */
+function wpforms_ajax_search_pages_for_dropdown() {
+
+	// Run a security check.
+	if ( ! check_ajax_referer( 'wpforms-builder', 'nonce', false ) ) {
+		wp_send_json_error( esc_html__( 'Your session expired. Please reload the builder.', 'wpforms-lite' ) );
+	}
+
+	if ( ! array_key_exists( 'search', $_GET ) ) {
+		wp_send_json_error( esc_html__( 'Incorrect usage of this operation.', 'wpforms-lite' ) );
+	}
+
+	$result_pages = wpforms_search_pages_for_dropdown(
+		sanitize_text_field( wp_unslash( $_GET['search'] ) )
+	);
+
+	if ( empty( $result_pages ) ) {
+		wp_send_json_success( [] );
+	}
+
+	wp_send_json_success( $result_pages );
+}
+add_action( 'wp_ajax_wpforms_ajax_search_pages_for_dropdown', 'wpforms_ajax_search_pages_for_dropdown' );

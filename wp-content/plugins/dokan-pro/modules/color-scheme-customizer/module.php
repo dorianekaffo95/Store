@@ -49,6 +49,7 @@ class Module {
     public function load_actions() {
         add_filter( 'dokan_settings_sections', array( $this, 'render_apperance_section' ) );
         add_filter( 'dokan_settings_fields', array( $this, 'render_apperance_settings' ) );
+        add_filter( 'dokan_localized_args', [ $this, 'render_header_section' ], 10, 1 );
 
         add_action( 'wp_head', array( $this, 'load_styles' ) );
         add_action( 'dokan_setup_wizard_styles', array( $this, 'load_styles' ) );
@@ -358,6 +359,28 @@ class Module {
     }
 
     /**
+     * Render header styles to override default styles
+     *
+     * @since 3.7.6
+     *
+     * return $args
+     */
+    public function render_header_section( $args ) {
+        if ( ! isset( $args['modal_header_color'] ) ) {
+            return $args;
+        }
+
+        $colors         = dokan_get_option( 'store_color_pallete', 'dokan_colors', [] );
+        $default_colors = $this->get_default_color_settings();
+
+        $btn_bg     = ! empty( $colors['btn_primary'] ) ? $colors['btn_primary'] : $default_colors['btn_primary'];
+
+        $args['modal_header_color'] = $btn_bg;
+
+        return $args;
+    }
+
+    /**
      * Render styles to override default styles
      *
      * @since 1.0
@@ -383,6 +406,7 @@ class Module {
         $btn_h_border = ! empty( $colors['btn_hover_border'] ) ? $colors['btn_hover_border'] : $default_colors['btn_hover_border'];
 
         $dash_nav_bg          = ! empty( $colors['dash_nav_bg'] ) ? $colors['dash_nav_bg'] : $default_colors['dash_nav_bg'];
+        $submenu_nav_bg       = $dash_nav_bg . 'ed';
         $dash_nav_text        = ! empty( $colors['dash_nav_text'] ) ? $colors['dash_nav_text'] : $default_colors['dash_nav_text'];
         $dash_active_menu     = ! empty( $colors['dash_active_link'] ) ? $colors['dash_active_link'] : $default_colors['dash_active_link'];
         $dash_nav_active_text = ! empty( $colors['dash_nav_active_text'] ) ? $colors['dash_nav_active_text'] : $default_colors['dash_nav_active_text'];
@@ -465,6 +489,47 @@ class Module {
             .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li.active,
             .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li.dokan-common-links a:hover {
                 background-color: <?php echo esc_attr( $dash_active_menu ); ?> !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu ul.navigation-submenu,
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li ul.navigation-submenu li {
+                background: <?php echo esc_attr( $submenu_nav_bg ); ?> !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu ul.navigation-submenu li a {
+                color: <?php echo esc_attr( $dash_nav_text ); ?> !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu ul.navigation-submenu li:hover a {
+                font-weight: 800 !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu ul.navigation-submenu li a:focus {
+                outline: none !important;
+                background: none !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li.active ul.navigation-submenu {
+                border-bottom: 0.5px solid <?php echo esc_attr( $dash_active_menu ); ?> !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li:hover:not(.active) ul.navigation-submenu {
+                background: <?php echo esc_attr( $submenu_nav_bg ); ?> !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li:hover:not(.active).has-submenu:after {
+                border-color: transparent <?php echo esc_attr( $submenu_nav_bg ); ?> transparent transparent;
+                border-left-color: <?php echo esc_attr( $submenu_nav_bg ); ?>;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li ul.navigation-submenu li:hover:before,
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li ul.navigation-submenu li.current:before {
+                border-color: <?php echo esc_attr( $dash_nav_active_text ); ?> !important;
+            }
+
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li ul.navigation-submenu li:hover a,
+            .dokan-dashboard .dokan-dash-sidebar ul.dokan-dashboard-menu li ul.navigation-submenu li.current a {
+                color: <?php echo esc_attr( $dash_nav_active_text ); ?> !important;
             }
 
             .dokan-dashboard-wrap .dokan-booking-wrapper ul.dokan_tabs .active {

@@ -1,5 +1,5 @@
 <?php
-
+// phpcs:ignoreFile
 /**
  * To be compatible with both WP 4.9 (that can run on PHP 5.2+) and WP 5.3+ (PHP 5.6+)
  * we need to rewrite some core WP classes and tweak our own skins to not use PHP 5.6 splat operator (...$args)

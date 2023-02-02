@@ -45,8 +45,7 @@
                 ! empty( $fields['value'] )
                 ? $fields['value']
                 : (
-                    ! empty( $payment_settings['vendor'] )
-                    && isset( $payment_settings['vendor'][ $key ] )
+                    ! empty( $payment_settings['vendor'][ $key ] )
                     ? $payment_settings['vendor'][ $key ]
                     : ''
                 )
@@ -54,7 +53,7 @@
         endforeach; ?>
 
         <?php if ( ! $is_seller_connected ) : ?>
-            <button class="button"
+            <button class="button dokan-mp-btn-submit"
                 id="dokan-mangopay-account-connect"
                 data-user="<?php echo esc_attr( $user_id ); ?>">
                 <?php esc_html_e( 'Connect', 'dokan' ); ?>
@@ -79,7 +78,7 @@
                 data-user="<?php echo esc_attr( $user_id ); ?>">
                 <?php esc_html_e( 'Processing', 'dokan' ); ?>...
             </button>
-            <button class="button"
+            <button class="button dokan-mp-btn-submit"
                 id="dokan-mangopay-account-connect"
                 data-user="<?php echo esc_attr( $user_id ); ?>">
                 <?php esc_html_e( 'Update', 'dokan' ); ?>

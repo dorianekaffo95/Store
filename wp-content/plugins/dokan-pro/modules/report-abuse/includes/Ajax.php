@@ -48,7 +48,12 @@ class Ajax {
         dokan_report_abuse_template( 'report-form-popup' );
         $popup_html = ob_get_clean();
 
-        wp_send_json_success( $popup_html );
+        wp_send_json_success(
+            [
+                'html'  => $popup_html,
+                'title' => esc_html__( 'Report Abuse', 'dokan' ),
+            ]
+        );
     }
 
     /**

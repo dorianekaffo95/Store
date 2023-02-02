@@ -104,7 +104,8 @@ class ApplePay extends PaymentGateway {
     protected function hooks() {
         add_action( 'init', [ $this, 'add_domain_association_rewrite_rule' ] );
         add_action( 'admin_init', [ $this, 'verify_domain_on_domain_name_change' ] );
-        add_action( 'admin_notices', [ $this, 'admin_notices' ] );
+        add_filter( 'admin_notices', [ $this, 'show_verification_status_on_payment_settings' ] );
+        add_filter( 'dokan_admin_notices', [ $this, 'show_verification_status' ] );
         add_filter( 'query_vars', [ $this, 'whitelist_domain_association_query_param' ], 10, 1 );
         add_action( 'parse_request', [ $this, 'parse_domain_association_request' ], 10, 1 );
 
@@ -171,13 +172,8 @@ class ApplePay extends PaymentGateway {
      * @return bool Whether file is up to date or not.
      */
     private function verify_hosted_domain_association_file_is_up_to_date() {
+        Helper::init_filesystem();
         global $wp_filesystem;
-
-        // protect if the the global filesystem isn't setup yet
-        if ( is_null( $wp_filesystem ) ) {
-            require_once ABSPATH . '/wp-admin/includes/file.php';
-            WP_Filesystem();
-        }
 
         $file_path = $this->get_registration_file_path();
         if ( ! file_exists( $file_path ) ) {
@@ -208,16 +204,11 @@ class ApplePay extends PaymentGateway {
      *
      * @since 3.6.1
      *
-     * @return array [ 'success' => bool, 'message' => string|null ]
+     * @return array{success:bool,message:string}
      */
     private function copy_and_overwrite_domain_association_file() {
+        Helper::init_filesystem();
         global $wp_filesystem;
-
-        // protect if the the global filesystem isn't setup yet
-        if ( is_null( $wp_filesystem ) ) {
-            require_once ABSPATH . '/wp-admin/includes/file.php';
-            WP_Filesystem();
-        }
 
         $well_known_dir = untrailingslashit( ABSPATH ) . '/' . self::DOMAIN_ASSOCIATION_FILE_DIR;
         $fullpath       = $well_known_dir . '/' . self::DOMAIN_ASSOCIATION_FILE_NAME;
@@ -238,7 +229,10 @@ class ApplePay extends PaymentGateway {
             ];
         }
 
-        return [ 'success' => true ];
+        return [
+            'success' => true,
+            'message' => '',
+        ];
     }
 
     /**
@@ -316,13 +310,8 @@ class ApplePay extends PaymentGateway {
             return;
         }
 
+        Helper::init_filesystem();
         global $wp_filesystem;
-
-        // protect if the the global filesystem isn't setup yet
-        if ( is_null( $wp_filesystem ) ) {
-            require_once ABSPATH . '/wp-admin/includes/file.php';
-            WP_Filesystem();
-        }
 
         header( 'Content-Type: text/plain;charset=utf-8' );
         echo esc_html( $wp_filesystem->get_contents( $this->get_registration_file_path() ) );
@@ -463,56 +452,140 @@ class ApplePay extends PaymentGateway {
     }
 
     /**
-     * Display any admin notices to the user.
+     * Adds admin notices regarding apple pay verification status.
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
      * @return void
      */
-    public function admin_notices() {
-        if ( ! $this->is_enabled() ) {
+    public function show_verification_status_on_payment_settings() {
+        if ( ! $this->should_show_verification_status() ) {
             return;
         }
 
-        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended
+        // For dokan pages, the notice will be showed as dokan admin notice.
+        if ( ! empty( $_GET['page'] ) && 'dokan' === sanitize_text_field( wp_unslash( $_GET['page'] ) ) ) {
             return;
         }
 
-        $empty_notice = empty( $this->apple_pay_verify_notice );
-        if ( $empty_notice && ( $this->apple_pay_domain_set || empty( $this->secret_key ) ) ) {
+        // Only show the notice on the payment settings page.
+        if (
+            empty( $_GET['page'] ) ||
+            'wc-settings' !== sanitize_text_field( wp_unslash( $_GET['page'] ) ) ||
+            empty( $_GET['tab'] ) ||
+            'checkout' !== sanitize_text_field( wp_unslash( $_GET['tab'] ) )
+        ) {
             return;
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-        /**
-         * Apple pay is enabled by default and domain verification initializes
-         * when setting screen is displayed. So if domain verification is not set,
-         * something went wrong so lets notify user.
-         */
-        $allowed_html                      = [
-            'a' => [
-                'href'  => [],
-                'title' => [],
-            ],
-        ];
-        $verification_failed_without_error = __( 'Apple Pay domain verification failed.', 'dokan' );
-        $verification_failed_with_error    = __( 'Apple Pay domain verification failed with the following error:', 'dokan' );
-        $check_log_text                    = sprintf(
-            /* translators: 1) HTML anchor open tag 2) HTML anchor closing tag */
-            esc_html__( 'Please check the %1$slogs%2$s for more details on this issue. Logging must be enabled to see recorded logs.', 'dokan' ),
-            '<a href="' . admin_url( 'admin.php?page=wc-status&tab=logs' ) . '">',
-            '</a>'
-        );
+        $notice = $this->get_domain_verification_notice();
 
         ?>
         <div class="error dokan-stripe-express-apple-pay-message">
-            <?php if ( $empty_notice ) : ?>
-                <p><?php echo esc_html( $verification_failed_without_error ); ?></p>
-            <?php else : ?>
-                <p><?php echo esc_html( $verification_failed_with_error ); ?></p>
-                <p><i><?php echo wp_kses( make_clickable( esc_html( $this->apple_pay_verify_notice ) ), $allowed_html ); ?></i></p>
+            <?php if ( isset( $notice['title'] ) ) : ?>
+                <p><?php echo esc_html( $notice['title'] ); ?></p>
             <?php endif; ?>
-            <p><?php echo $check_log_text; ?></p>
+            <?php if ( isset( $notice['description'] ) ) : ?>
+                <p><?php echo wp_kses_post( $notice['description'] ); ?></p>
+            <?php endif; ?>
         </div>
         <?php
+    }
+
+    /**
+     * Adds dokan admin notices regarding apple pay verification status.
+     *
+     * @since 3.7.8
+     *
+     * @param array $notices
+     *
+     * @return array
+     */
+    public function show_verification_status( $notices ) {
+        if ( ! $this->should_show_verification_status() ) {
+            return;
+        }
+
+        $notice = $this->get_domain_verification_notice();
+
+        $notices[] = [
+            'type'        => 'alert',
+            'title'       => isset( $notice['title'] ) ? $notice['title'] : '',
+            'description' => isset( $notice['description'] ) ? $notice['description'] : '',
+            'priority'    => 10,
+        ];
+
+        return $notices;
+    }
+
+    /**
+     * Checks whether or not domain verification status should be showed.
+     *
+     * @since 3.7.8
+     *
+     * @return boolean
+     */
+    public function should_show_verification_status() {
+        if ( ! $this->is_enabled() ) {
+            return false;
+        }
+
+        if ( ! current_user_can( 'manage_woocommerce' ) ) {
+            return false;
+        }
+
+        if ( empty( $this->apple_pay_verify_notice ) && ( $this->apple_pay_domain_set || empty( $this->secret_key ) ) ) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Generates notice regarding the status of Apple Pay domain verification.
+     * Apple pay is enabled by default and domain verification initializes
+     * when setting screen is displayed. So if domain verification is not set,
+     * something went wrong so lets notify user.
+     *
+     * @since 3.7.8
+     *
+     * @return array{title:string,description:string}
+     */
+    public function get_domain_verification_notice() {
+        if ( empty( $this->apple_pay_verify_notice ) ) {
+            $title       = __( 'Apple Pay domain verification failed!', 'dokan' );
+            $description = '';
+        } else {
+            $title       = __( 'Apple Pay domain verification failed with the following error!', 'dokan' );
+            $description = sprintf(
+                '<p><i>%s</i></p>',
+                wp_kses(
+                    make_clickable( esc_html( $this->apple_pay_verify_notice ) ),
+                    [
+                        'a' => [
+                            'href'  => [],
+                            'title' => [],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        $description .= sprintf(
+            /* translators: 1) HTML anchor open tag 2) HTML anchor closing tag */
+            esc_html__(
+                'Please check the %1$slogs%2$s for more details on this issue. Logging must be enabled to see recorded logs.',
+                'dokan'
+            ),
+            sprintf( '<a href="%s">', esc_url( admin_url( 'admin.php?page=wc-status&tab=logs' ) ) ),
+            '</a>'
+        );
+
+        return [
+            'title'       => $title,
+            'description' => $description,
+        ];
     }
 }

@@ -20,10 +20,21 @@ class WOOMULTI_CURRENCY_F_Admin_Settings {
 	}
 
 	public function woomulticurrency_exchange() {
-		$orginal_price    = filter_input( INPUT_POST, 'original_price', FILTER_SANITIZE_STRING );
-		$other_currencies = filter_input( INPUT_POST, 'other_currencies', FILTER_SANITIZE_STRING );
-		$data             = WOOMULTI_CURRENCY_F_Data::get_ins();
-		$rates            = $data->get_exchange( $orginal_price, $other_currencies );
+		check_ajax_referer( 'wmc_ajax_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_woocommerce' ) || empty( $_POST['original_price'] ) || empty( $_POST['other_currencies'] ) ) {
+			wp_die();
+		}
+
+		$original_price   = sanitize_text_field( wp_unslash( $_POST['original_price'] ) );
+		$other_currencies = wc_clean( wp_unslash( $_POST['other_currencies'] ) );
+
+		if ( ! empty( $other_currencies ) ) {
+			$other_currencies = implode( ',', $other_currencies );
+		}
+
+		$data  = WOOMULTI_CURRENCY_F_Data::get_ins();
+		$rates = $data->get_exchange( $original_price, $other_currencies );
 		wp_send_json( $rates );
 	}
 
@@ -263,6 +274,23 @@ class WOOMULTI_CURRENCY_F_Admin_Settings {
                                 <p class="description">
 									<?php esc_html_e( 'Enable this if you are using a caching plugin(WP Super cache, W3 total cache, WP rocket, ...) and currency does not remain after being switched by customers in the frontend', 'woo-multi-currency' ) ?>
                                 </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <label for="<?php echo self::set_field( 'loading_price_mask' ) ?>">
+			                        <?php esc_html_e( 'Loading price mask', 'woocommerce-multi-currency' ) ?>
+                                </label>
+                            </th>
+                            <td>
+                                <div class="vi-ui toggle checkbox">
+                                    <input id="<?php echo self::set_field( 'loading_price_mask' ) ?>"
+                                           type="checkbox" <?php checked( self::get_field( 'loading_price_mask' ), 1 ) ?>
+                                           tabindex="0" class="hidden" value="1"
+                                           name="<?php echo self::set_field( 'loading_price_mask' ) ?>"/>
+                                    <label></label>
+                                </div>
+                                <p class="description"><?php esc_html_e( 'Add loading layer when loading price via AJAX', 'woocommerce-multi-currency' );//Now It is not compatible with Caching plugins.?></p>
                             </td>
                         </tr>
                         <tr>

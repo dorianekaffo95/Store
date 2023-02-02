@@ -1,3 +1,16 @@
+/*2.1.27 - 2023.01.12*/
+- Added: Add loading layer mask option when price is loading by AJAX
+- Fixed: String divide string in PHP8
+
+/*2.1.26 - 2022.12.09*/
+- Fixed: Add missing nonce
+
+/*2.1.25 - 2022.11.15*/
+- Fixed: PHP8 - convert string to float
+
+/*2.1.24 - 2022.09.10*/
+- Added: Translate for Vietnamese
+
 /*2.1.23 - 2022.07.25*/
 - Fixed: Fill order data in WooCommerce analytics
 

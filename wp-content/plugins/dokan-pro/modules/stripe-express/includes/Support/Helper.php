@@ -2,11 +2,13 @@
 
 namespace WeDevs\DokanPro\Modules\StripeExpress\Support;
 
+defined( 'ABSPATH' ) || exit; // Exit if called directly
+
 use WeDevs\Dokan\Exceptions\DokanException;
 use WeDevs\DokanPro\Modules\StripeExpress\Api\Transaction;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\User;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Webhook;
-use WeDevs\DokanPro\Modules\StripeExpress\Api\WebhookEndpoint;
+use WeDevs\DokanPro\Modules\StripeExpress\PaymentGateways\Stripe;
 
 /**
  * Helper class for Stripe gateway.
@@ -16,15 +18,6 @@ use WeDevs\DokanPro\Modules\StripeExpress\Api\WebhookEndpoint;
  * @package WeDevs\DokanPro\Modules\StripeExpress\Support
  */
 class Helper {
-
-    /**
-     * Gateway ID.
-     *
-     * @since 3.6.1
-     *
-     * @var string
-     */
-    private static $gateway_id = 'dokan_stripe_express';
 
     /**
      * Stripe API version
@@ -40,12 +33,9 @@ class Helper {
      *
      * @since 3.6.1
      *
-     * @var array
+     * @var string[]
      */
-    private static $available_method_classes = [
-        'Card',
-        'Ideal',
-    ];
+    private static $available_method_classes = [ 'Card', 'Ideal', 'Sepa' ];
 
     /**
      * Retrievs gateway ID.
@@ -55,35 +45,63 @@ class Helper {
      * @return string
      */
     public static function get_gateway_id() {
-        return self::$gateway_id;
+        return Stripe::ID;
     }
 
     /**
      * Retrievs gateway title.
      *
      * @since 3.6.1
-     * @since 3.6.2 $context parameter is added.
-     *
-     * @var string $context
      *
      * @return string
      */
-    public static function get_gateway_title( $context = 'admin' ) {
-        return 'admin' === $context ? __( 'Dokan Stripe Express', 'dokan' ) : __( 'Stripe Express', 'dokan' );
+    public static function get_gateway_title() {
+        $title = Settings::get_gateway_title();
+
+        if ( empty( $title ) ) {
+            $title = __( 'Stripe Express', 'dokan' );
+        }
+
+        return self::sanitize_html( $title );
+    }
+
+    /**
+     * Retrieves the Stripe gateway instance.
+     *
+     * @since 3.7.8
+     *
+     * @return Stripe
+     */
+    public static function get_gateway_instance() {
+        $gateways = WC()->payment_gateways()->payment_gateways();
+        return ! empty( $gateways[ self::get_gateway_id() ] ) ? $gateways[ self::get_gateway_id() ] : ( new Stripe() );
+    }
+
+    /**
+     * Creates and retrieves meta key with prefix.
+     *
+     * @since 3.7.8
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    public static function meta_key( $key ) {
+        return '_' . self::get_gateway_id() . "_$key";
     }
 
     /**
      * Retrievs gateway description.
      *
      * @since 3.6.1
-     * @since 3.6.2 $context parameter is added.
-     *
-     * @var string $context
      *
      * @return string
      */
-    public static function get_gateway_description( $context = 'admin' ) {
-        return 'admin' === $context ? __( 'Pay via Dokan Stripe Express', 'dokan' ) : __( 'Pay via Stripe Express', 'dokan' );
+    public static function get_gateway_description() {
+        $description = Settings::get_gateway_description();
+        $description = empty( $description ) ? __( 'Pay with different payment methods via Stripe Express', 'dokan' ) : $description;
+
+        return self::sanitize_html( $description );
     }
 
     /**
@@ -101,11 +119,12 @@ class Helper {
      * Retrieves text for order button on checkout page
      *
      * @since 3.6.1
+     * @since 3.7.8 Added filter `dokan_stripe_express_order_button_text`
      *
      * @return string
      */
     public static function get_order_button_text() {
-        return __( 'Place Order', 'dokan' );
+        return apply_filters( 'dokan_stripe_express_order_button_text', __( 'Place Order', 'dokan' ) );
     }
 
     /**
@@ -127,7 +146,7 @@ class Helper {
      * @return string
      */
     public static function get_sepa_payment_method_type() {
-        return 'sepa_debit';
+        return \WeDevs\DokanPro\Modules\StripeExpress\PaymentMethods\Sepa::STRIPE_ID;
     }
 
     /**
@@ -151,7 +170,7 @@ class Helper {
     }
 
     /**
-     * Checks if mangopay api is ready
+     * Checks if Stripe express api is ready.
      *
      * @since 3.6.1
      *
@@ -162,8 +181,7 @@ class Helper {
     }
 
     /**
-     * CHecks if a seller is connected to Stripe express
-     * and ready to receieve payment.
+     * Checks if a seller is connected to Stripe express.
      *
      * @since 3.6.1
      *
@@ -176,19 +194,44 @@ class Helper {
             return false;
         }
 
-        return User::is_connected( $seller_id );
+        return User::set( $seller_id )->is_connected();
+    }
+
+    /**
+     * Checks if a seller is connected and enabled for payouts.
+     *
+     * @since 3.7.8
+     *
+     * @param int|string $seller_id
+     *
+     * @return boolean
+     */
+    public static function is_seller_activated( $seller_id ) {
+        if ( ! self::is_gateway_ready() ) {
+            return false;
+        }
+
+        return User::set( $seller_id )->is_activated();
     }
 
     /**
      * Retrieves available payment methods.
      *
      * @since 3.6.1
+     * @since 3.7.8 Added optional `$available_method_classes` parameter
      *
-     * @return array
+     * @param array $available_method_classes (optional)
+     *
+     * @return array<string,string>
      */
-    public static function get_available_methods() {
+    public static function get_available_methods( $available_method_classes = [] ) {
         $available_methods = [];
-        foreach ( self::$available_method_classes as $method ) {
+
+        if ( empty( $available_method_classes ) ) {
+            $available_method_classes = self::$available_method_classes;
+        }
+
+        foreach ( $available_method_classes as $method ) {
             $method_class = "\\WeDevs\\DokanPro\\Modules\\StripeExpress\\PaymentMethods\\$method";
             $available_methods[ $method_class::STRIPE_ID ] = self::get_method_label( $method_class::STRIPE_ID );
         }
@@ -206,11 +249,15 @@ class Helper {
      */
     public static function get_method_label( $method_id ) {
         $labels = [
-            'card'  => __( 'Credit/Debit Card', 'dokan' ),
-            'ideal' => __( 'iDEAL', 'dokan' ),
+            'card'                => __( 'Credit/Debit Card', 'dokan' ),
+            'ideal'               => __( 'iDEAL', 'dokan' ),
+            'sepa_debit'          => __( 'SEPA Direct Debit', 'dokan' ),
+            'apple_pay'           => __( 'Apple Pay (Stripe)', 'dokan' ),
+            'google_pay'          => __( 'Google Pay (Stripe)', 'dokan' ),
+            'payment_request_api' => __( 'Payment Request (Stripe)', 'dokan' ),
         ];
 
-        return isset( $labels[ $method_id ] ) ? $labels[ $method_id ] : self::get_gateway_title( 'front' );
+        return isset( $labels[ $method_id ] ) ? $labels[ $method_id ] : self::get_gateway_title();
     }
 
     /**
@@ -218,7 +265,7 @@ class Helper {
      *
      * @since 3.6.1
      *
-     * @return array
+     * @return array<string,\WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\PaymentMethod>
      */
     public static function get_available_method_instances() {
         $available_method_instances = [];
@@ -227,6 +274,89 @@ class Helper {
             $available_method_instances[ $method_class::STRIPE_ID ] = new $method_class();
         }
         return $available_method_instances;
+    }
+
+    /**
+     * Returns the list of enabled payment method types that will function with the current checkout.
+     *
+     * @since 3.7.8
+     *
+     * @param int $order_id
+     *
+     * @return string[]
+     */
+    public static function get_enabled_payment_methods_at_checkout( $order_id = null ) {
+        $available_method_ids     = [];
+        $payment_method_instances = self::get_available_method_instances();
+        $selected_payment_methods = Settings::get_enabled_payment_methods();
+
+        foreach ( $selected_payment_methods as $payment_method ) {
+            if ( ! isset( $payment_method_instances[ $payment_method ] ) ) {
+                continue;
+            }
+
+            $method = $payment_method_instances[ $payment_method ];
+            if ( ! $method->is_enabled_at_checkout( $order_id ) ) {
+                continue;
+            }
+
+            if ( Settings::is_manual_capture_enabled() && $method->requires_automatic_capture() ) {
+                continue;
+            }
+
+            $available_method_ids[] = $payment_method;
+        }
+
+        return $available_method_ids;
+    }
+
+    /**
+     * Returns the list of enabled payment method types which are reusable
+     * and will function with the current checkout.
+     *
+     * @since 3.7.8
+     *
+     * @param int $order_id
+     *
+     * @return string[]
+     */
+    public static function get_enabled_reusable_payment_methods( $order_id = null ) {
+        return self::get_reusable_payment_methods( self::get_enabled_payment_methods_at_checkout( $order_id ) );
+    }
+
+    /**
+     * Returns the list of enabled payment method according to their retrievable types
+     * which are reusable and will be originally used.
+     *
+     * @since 3.7.8
+     *
+     * @param boolean $include_original (Optional) Indicates whether or not the original method is also needed to be included with its retrievable type
+     * @param int     $order_id         (Optional) To determines the method based on the order
+     *
+     * @return string[]
+     */
+    public static function get_enabled_retrievable_payment_methods( $include_original = false, $order_id = null ) {
+        $payment_method_types     = [];
+        $reusable_payment_methods = self::get_enabled_reusable_payment_methods( $order_id );
+        $payment_method_instances = self::get_available_method_instances();
+
+        foreach ( $reusable_payment_methods as $payment_method ) {
+            if ( ! isset( $payment_method_instances[ $payment_method ] ) ) {
+                continue;
+            }
+            $method_instance = $payment_method_instances[ $payment_method ];
+
+            if ( $method_instance->get_retrievable_type() !== $method_instance->get_id() ) {
+                $payment_method_types[] = $method_instance->get_retrievable_type();
+                if ( $include_original ) {
+                    $payment_method_types[] = $method_instance->get_id();
+                }
+            } else {
+                $payment_method_types[] = $method_instance->get_id();
+            }
+        }
+
+        return $payment_method_types;
     }
 
     /**
@@ -251,7 +381,7 @@ class Helper {
      *
      * @param array $payment_methods
      *
-     * @return array
+     * @return string[]
      */
     public static function get_reusable_payment_methods( $payment_methods = [] ) {
         $payment_methods = empty( $payment_methods ) ? Settings::get_enabled_payment_methods() : (array) $payment_methods;
@@ -277,7 +407,7 @@ class Helper {
 
     /**
      * Returns true if a payment is needed for the current cart or order.
-     * Pre-Orders and Subscriptions may not require an upfront payment, so we need to check whether
+     * Subscriptions may not require an upfront payment, so we need to check whether
      * or not the payment is necessary to decide for either a setup intent or a payment intent.
      *
      * @since 3.6.1
@@ -287,18 +417,32 @@ class Helper {
      * @return bool Whether a payment is necessary.
      */
     public static function is_payment_needed( $order_id = null ) {
-        // @todo: Implement logic for pre-orders
-        // Free trial subscriptions without a sign up fee, or any other type
-        // of order with a `0` amount should fall into the logic below.
+        /*
+         * Free trial subscriptions without a sign up fee, or any other type
+         * of order with a `0` amount should fall into the logic below.
+         */
         $amount = is_null( WC()->cart ) ? 0 : WC()->cart->get_total( false );
         $order  = isset( $order_id ) ? wc_get_order( $order_id ) : null;
+
         if ( is_a( $order, 'WC_Order' ) ) {
             $amount = $order->get_total();
         }
 
-        $converted_amount = self::get_stripe_amount( $amount, strtolower( get_woocommerce_currency() ) );
+        $is_payment_needed = 0 < self::get_stripe_amount( $amount, strtolower( get_woocommerce_currency() ) );
 
-        return 0 < $converted_amount;
+        /**
+         * Modify the result of whether payment is needed.
+         *
+         * For example, the vendor subscription plan that has a free trial period
+         * should not require a payment. This is a filter that can be used to modify
+         * the result to satisfy that need.
+         *
+         * @since 3.7.8
+         *
+         * @param bool $is_payment_needed Whether payment is needed.
+         * @param int  $order_id          The order ID being processed.
+         */
+        return apply_filters( 'dokan_stripe_express_is_payment_needed', $is_payment_needed, $order_id );
     }
 
     /**
@@ -326,22 +470,9 @@ class Helper {
      * @return bool
      */
     public static function is_using_saved_payment_method() {
-        $payment_method = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : self::get_gateway_id(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $payment_method = ! empty( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : self::get_gateway_id(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-        return ( isset( $_POST[ 'wc-' . $payment_method . '-payment-token' ] ) && 'new' !== $_POST[ 'wc-' . $payment_method . '-payment-token' ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-    }
-
-    /**
-     * Checks if source is of legacy type card.
-     *
-     * @since 3.6.1
-     *
-     * @param string $source_id
-     *
-     * @return bool
-     */
-    public static function is_type_legacy_card( $source_id ) {
-        return ( preg_match( '/^card_/', $source_id ) );
+        return ( ! empty( $_POST[ 'wc-' . $payment_method . '-payment-token' ] ) && 'new' !== $_POST[ 'wc-' . $payment_method . '-payment-token' ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
     }
 
     /**
@@ -367,7 +498,7 @@ class Helper {
      *
      * @since 3.6.1
      *
-     * @param object $prepared_source The object with source details.
+     * @param \Stripe\PaymentMethod $payment_method
      *
      * @return void
      * @throws DokanException An exception if the card is prepaid, but prepaid cards are not allowed.
@@ -385,6 +516,48 @@ class Helper {
     }
 
     /**
+     * Retrives the formatted blogname.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function get_blogname() {
+        return wp_specialchars_decode( get_bloginfo( 'name' ), ENT_QUOTES );
+    }
+
+    /**
+     * Sanitizes user given title/descriptions.
+     *
+     * @since 3.7.8
+     *
+     * @param string $data
+     *
+     * @return string
+     */
+    public static function sanitize_html( $data ) {
+        return wp_kses(
+            stripslashes( $data ),
+            [
+                'br'   => true,
+                'img'  => [
+                    'alt'   => true,
+                    'class' => true,
+                    'src'   => true,
+                    'title' => true,
+                ],
+                'p'    => [
+                    'class' => true,
+                ],
+                'span' => [
+                    'class' => true,
+                    'title' => true,
+                ],
+            ]
+        );
+    }
+
+    /**
      * Sanitize statement descriptor text.
      *
      * Stripe requires max of 22 characters and no special characters.
@@ -395,14 +568,17 @@ class Helper {
      *
      * @return string $statement_descriptor Sanitized statement descriptor
      */
-    public static function clean_statement_descriptor( $statement_descriptor = '' ) {
+    public static function clean_statement_descriptor( $statement_descriptor ) {
+        if ( empty( $statement_descriptor ) ) {
+            return '';
+        }
+
         $disallowed_characters = [ '<', '>', '\\', '*', '"', "'", '/', '(', ')', '{', '}' ];
 
         // Strip any tags.
         $statement_descriptor = wp_strip_all_tags( $statement_descriptor );
 
-        // Strip any HTML entities.
-        // Props https://stackoverflow.com/questions/657643/how-to-remove-html-special-chars .
+        // Remove html entities.
         $statement_descriptor = preg_replace( '/&#?[a-z0-9]{2,8};/i', '', $statement_descriptor );
 
         // Next, remove any remaining disallowed characters.
@@ -419,7 +595,7 @@ class Helper {
      *
      * @since 3.6.1
      *
-     * @return array
+     * @return string[]
      */
     public static function get_enabled_billing_fields() {
         $enabled_billing_fields = [];
@@ -436,7 +612,9 @@ class Helper {
     }
 
     /**
-     * Get Stripe amount to pay
+     * Get Stripe amount to pay.
+     *
+     * @since 3.6.1
      *
      * @param float  $total Amount due.
      * @param string $currency Accepted currency.
@@ -465,12 +643,14 @@ class Helper {
     }
 
     /**
-     * List of currencies supported by Stripe that has no decimals
-     * https://stripe.com/docs/currencies#zero-decimal from https://stripe.com/docs/currencies#presentment-currencies
+     * List of currencies supported by Stripe that has no decimals.
+     *
+     * @see https://stripe.com/docs/currencies#zero-decimal
+     * @see https://stripe.com/docs/currencies#presentment-currencies
      *
      * @since 3.6.1
      *
-     * @return array $currencies
+     * @return string[] $currencies
      */
     public static function no_decimal_currencies() {
         return [
@@ -500,8 +680,8 @@ class Helper {
      *
      * @since 3.6.1
      *
-     * @param object $balance_transaction
-     * @param string $type Type of number to format
+     * @param \Stripe\BalanceTransaction $balance_transaction Stripe Balance transaction object
+     * @param string                     $type                Type of number to format
      *
      * @return string
      */
@@ -542,45 +722,41 @@ class Helper {
     }
 
     /**
-     * Validates cart contents to ensure they're allowed to be paid through Stripe Express.
+     * Initiates the WP Filesystem API.
      *
-     * @since 3.6.2
+     * @since 3.7.8
      *
-     * @return boolean
+     * @uses WP_Filesystem()
+     *
+     * @return void
      */
-    public static function validate_cart_items() {
-        // If cart is empty, we don't need further checking
-        if ( empty( WC()->cart->cart_contents ) ) {
-            return true;
+    public static function init_filesystem() {
+        if ( ! function_exists( 'WP_Filesystem' ) ) {
+            require_once ABSPATH . '/wp-admin/includes/file.php';
         }
 
         /*
-         * This payment method can't be used if a Vendor is not connected
-         * to Stripe express. So we need to traverse all the cart items
-         * to check if any vendor is not connected.
+         * Fix the filesystem method to `direct`. It will be filtered for this operation
+         * only and the hook will be removed after initialization.
          */
-        foreach ( WC()->cart->cart_contents as $item ) {
-            // Get vendor id from product id
-            $vendor_id = dokan_get_vendor_by_product( $item['data']->get_id(), true );
-            if ( ! $vendor_id ) {
-                return false;
-            }
+        add_filter( 'filesystem_method', [ __CLASS__, 'get_filesystem_method' ], 10, 1 );
 
-            /*
-             * If any vendor is not registered for a MangoPay account,
-             * the gateway is not available for checkout.
-             */
-            if ( ! self::is_seller_connected( $vendor_id ) ) {
-                return false;
-            }
+        WP_Filesystem();
 
-            // Check if the vendor has payout eligibility
-            if ( ! User::is_payout_enabled( $vendor_id ) ) {
-                return false;
-            }
-        }
+        remove_filter( 'filesystem_method', [ __CLASS__, 'get_filesystem_method' ], 10, 1 );
+    }
 
-        return true;
+    /**
+     * Modifies filesystem method as necessary.
+     *
+     * @since 3.7.8
+     *
+     * @param string $method
+     *
+     * @return string
+     */
+    public static function get_filesystem_method( $method ) {
+        return 'direct';
     }
 
     /**
@@ -632,6 +808,22 @@ class Helper {
     }
 
     /**
+     * Retrives dropdown options for the payment method selector.
+     *
+     * @since 3.7.8
+     *
+     * @return string[]
+     */
+    public static function get_payment_methods_dropdown() {
+        return self::get_available_methods(
+            [
+                'Card',
+                'Ideal',
+            ]
+        );
+    }
+
+    /**
      * Verifies whether a certain ZIP code is valid for a country.
      * The default country is US incl. 4-digit extensions.
      *
@@ -677,77 +869,13 @@ class Helper {
     }
 
     /**
-     * Check if the product is a vendor subscription product.
-     *
-     * @since 3.6.1
-     *
-     * @param WC_Product|int $product
-     *
-     * @return bool
-     **/
-    public static function is_vendor_subscription_product( $product ) {
-        if ( is_int( $product ) ) {
-            $product = wc_get_product( $product );
-        }
-
-        if ( ! $product instanceof \WC_Product ) {
-            return false;
-        }
-
-        if ( ! self::is_vendor_subscription_module_active() ) {
-            return false;
-        }
-
-        if ( 'product_pack' === $product->get_type() ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check whether subscription module is enabled or not
-     *
-     * @since 3.6.1
-     *
-     * @return bool
-     */
-    public static function is_vendor_subscription_module_active() {
-        // Don't get confused with product_subscription, id for vendor subscription module is product_subscription
-        return function_exists( 'dokan_pro' ) && dokan_pro()->module->is_active( 'product_subscription' );
-    }
-
-    /**
-     * Checks if the order has subscription.
-     *
-     * @since 3.6.1
-     *
-     * @param int|string $order_id
-     *
-     * @return boolean
-     */
-    public static function has_subscription( $order_id ) {
-        return function_exists( 'wcs_order_contains_subscription' ) &&
-            ( wcs_order_contains_subscription( $order_id ) || wcs_is_subscription( $order_id ) || wcs_order_contains_renewal( $order_id ) );
-    }
-
-    /**
-     * Checks if subscription module is active.
-     *
-     * @since 3.6.1
-     *
-     * @return boolean
-     */
-    public static function has_subscription_module() {
-        return dokan_pro()->module->is_active( 'product_subscription' );
-    }
-
-    /**
      * Converts a WooCommerce locale to the closest supported by Stripe.js.
      *
-     * Stripe.js supports only a subset of IETF language tags, if a country specific locale is not supported we use
-     * the default for that language (https://stripe.com/docs/js/appendix/supported_locales).
+     * Stripe.js supports only a subset of IETF language tags,
+     * if a country specific locale is not supported we use the default for that language.
      * If no match is found we return 'auto' so Stripe.js uses the browser locale.
+     *
+     * @see https://stripe.com/docs/js/appendix/supported_locales
      *
      * @since 3.6.1
      *
@@ -756,7 +884,6 @@ class Helper {
      * @return string Closest locale supported by Stripe ('auto' if NONE).
      */
     public static function convert_locale( $wc_locale ) {
-        // List copied from: https://stripe.com/docs/js/appendix/supported_locales.
         $supported = [
             'ar',     // Arabic.
             'bg',     // Bulgarian (Bulgaria).
@@ -805,7 +932,7 @@ class Helper {
             return $locale;
         }
 
-        /**
+        /*
          * We need to map these locales to Stripe's Spanish
          * 'es-419' locale and other variations.
          * This list should be updated if more localized versions of
@@ -835,13 +962,13 @@ class Helper {
     /**
      * Retrieves locale options for Stripe.
      *
+     * @see https://support.stripe.com/questions/language-options-for-customer-emails
+     *
      * @since 3.6.1
      *
-     * @return array
+     * @return string[]
      */
     public static function get_stripe_locale_options() {
-        // Options based on Stripe locales.
-        // https://support.stripe.com/questions/language-options-for-customer-emails
         return [
             'ar'    => 'ar-AR',
             'da_DK' => 'da-DK',
@@ -891,30 +1018,54 @@ class Helper {
      *
      * @since 3.6.1
      *
-     * @param object $error
+     * @param object|string $error
      *
      * @return boolean
      */
     public static function is_no_such_customer_error( $error ) {
-        return (
-            $error &&
-            'invalid_request_error' === $error->type &&
-            preg_match( '/No such customer/i', $error->message )
-        );
+        if ( is_object( $error ) ) {
+            if ( $error instanceof DokanException ) {
+                return preg_match( '/no-such-customer/', $error->get_error_code() );
+            }
+
+            return (
+                'invalid_request_error' === $error->type &&
+                preg_match( '/No such customer/i', $error->message )
+            );
+        }
+
+        return preg_match( '/No such customer/i', $error );
     }
 
     /**
-     * Checks to see if error is of invalid request
-     * error and it is no such token.
+     * Checks if the error message is pointing to a missing subscription.
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
      * @param string $error_message
      *
-     * @return false|int
+     * @return boolean
      */
-    public static function is_no_such_token_error( $error_message ) {
-        return preg_match( '/No such token./i', $error_message );
+    public static function is_no_such_subscription_error( $error_message ) {
+        return preg_match( '/No such subscription/i', $error_message );
+    }
+
+    /**
+     * Checks to see if error is of same idempotency key
+     * error due to retries with different parameters.
+     *
+     * @since 3.7.8
+     *
+     * @param object $error
+     *
+     * @return boolean
+     */
+    public static function is_same_idempotency_error( $error ) {
+        return (
+            is_object( $error ) &&
+            'idempotency_error' === $error->type &&
+            preg_match( '/Keys for idempotent requests can only be used with the same parameters they were first used with./i', $error->message )
+        );
     }
 
     /**
@@ -928,6 +1079,7 @@ class Helper {
      */
     public static function is_retryable_error( $error ) {
         return (
+            is_object( $error ) &&
             'invalid_request_error' === $error->type ||
             'idempotency_error' === $error->type ||
             'rate_limit_error' === $error->type ||
@@ -938,20 +1090,62 @@ class Helper {
 
     /**
      * Checks to see if error is of invalid request
+     * error and it is no such source.
+     *
+     * @since 3.7.8
+     *
+     * @param object $error
+     *
+     * @return boolean
+     */
+    public static function is_no_such_source_error( $error ) {
+        return (
+            is_object( $error ) &&
+            'invalid_request_error' === $error->type &&
+            preg_match( '/No such (source|PaymentMethod)/i', $error->message )
+        );
+    }
+
+    /**
+     * Checks to see if error is of invalid request
+     * error and it is no such source linked to customer.
+     *
+     * @since 3.7.8
+     *
+     * @param object|string $error
+     *
+     * @return boolean
+     */
+    public static function is_no_linked_source_error( $error ) {
+        if ( is_object( $error ) ) {
+            return (
+                'invalid_request_error' === $error->type &&
+                preg_match( '/does not have a linked source with ID/i', $error->message )
+            );
+        }
+
+        return preg_match( '/does not have a linked source with ID/i', $error );
+    }
+
+    /**
+     * Checks to see if error is of invalid request
      * error and it is no such customer.
      *
      * @since 3.6.1
      *
-     * @param object $error
+     * @param object|string $error
      *
      * @return bool
      */
     public static function is_source_already_attached_error( $error ) {
-        return (
-            $error &&
-            'invalid_request_error' === $error->type &&
-            preg_match( '/already been attached to a customer/i', $error->message )
-        );
+        if ( is_object( $error ) ) {
+            return (
+                'invalid_request_error' === $error->type &&
+                preg_match( '/already been attached to a customer/i', $error->message )
+            );
+        }
+
+        return preg_match( '/already been attached to a customer/i', $error );
     }
 
     /**
@@ -959,7 +1153,7 @@ class Helper {
      *
      * @since 3.6.1
      *
-     * @return array|string
+     * @return array<string,string>|string
      */
     public static function get_payment_message( $key = '' ) {
         $messages = apply_filters(
@@ -981,7 +1175,6 @@ class Helper {
                 'card_declined'            => __( 'The card was declined.', 'dokan' ),
                 'missing'                  => __( 'There is no card on a customer that is being charged.', 'dokan' ),
                 'processing_error'         => __( 'An error occurred while processing the card.', 'dokan' ),
-                'invalid_sofort_country'   => __( 'The billing country is not accepted by Sofort. Please try another country.', 'dokan' ),
                 'email_invalid'            => __( 'Invalid email address, please correct and try again.', 'dokan' ),
                 'invalid_request_error'    => is_add_payment_method_page()
                     ? __( 'Unable to save this payment method, please try again or use alternative method.', 'dokan' )
@@ -1028,7 +1221,7 @@ class Helper {
      *
      * @param string $key
      *
-     * @return array|string
+     * @return array<string,string>|string
      */
     public static function get_error_message( $key = '' ) {
         $messages = [
@@ -1058,11 +1251,14 @@ class Helper {
     public static function get_webhook_description() {
         return wp_kses(
             sprintf(
-                /* translators: 1) webhook url 2) webhook status */
-                __( 'You must add the following webhook endpoint %1$s%2$s%3$s%4$s%5$s to your %6$sStripe account settings%7$s (if there isn\'t one already enabled). This will enable you to receive notifications on the charge statuses. The webhook endpoint will be attempted to be configured automatically on saving these admin settings. If it is not configured automatically, please register it manually.%8$s%9$s%10$s%11$s%12$s', 'dokan' ),
+                /* translators: 1) opening strong tag, 2) non-breaking space, 3) webhook url, 4) non-breaking space, 5) closing strong tag, 6) opening anchor tag with stripe dashboard link, 7) closing anchor tag, 8) <br> tag, 9) <br> tag, 10) opening code tag, 11) webhook status, 12) closing code tag */
+                __(
+                    'You must add the following webhook endpoint %1$s%2$s%3$s%4$s%5$s to your %6$sStripe account settings%7$s (if there isn\'t one already enabled). This will enable you to receive notifications on the charge statuses. The webhook endpoint will be attempted to be configured automatically on saving these admin settings. If it is not configured automatically, please register it manually.%8$s%9$s%10$s%11$s%12$s',
+                    'dokan'
+                ),
                 '<strong style="background-color:#ddd;">',
                 '&nbsp;',
-                WebhookEndpoint::generate_url(),
+                Webhook::generate_url(),
                 '&nbsp;',
                 '</strong>',
                 '<a href="https://dashboard.stripe.com/account/webhooks" target="_blank">',

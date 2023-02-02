@@ -52,6 +52,14 @@ body.home #dokan-store-listing-filter-form-wrap {
     display: none;
 }
 
+#Searchbar #vmc_search-2 {
+    margin-bottom: 0px;
+}
+
+#Searchbar > ul {
+    margin-bottom: 0px;
+}
+
 #Searchbar div.vmc-search {
     position: absolute;
     z-index: 1001;

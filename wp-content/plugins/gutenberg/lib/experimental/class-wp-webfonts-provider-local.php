@@ -36,6 +36,21 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 	protected $id = 'local';
 
 	/**
+	 * Constructor.
+	 *
+	 * @since 6.1.0
+	 */
+	public function __construct() {
+		if (
+			function_exists( 'is_admin' ) && ! is_admin()
+			&&
+			function_exists( 'current_theme_supports' ) && ! current_theme_supports( 'html5', 'style' )
+		) {
+			$this->style_tag_atts = array( 'type' => 'text/css' );
+		}
+	}
+
+	/**
 	 * Gets the `@font-face` CSS styles for locally-hosted font files.
 	 *
 	 * This method does the following processing tasks:
@@ -81,7 +96,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 	 * }
 	 * </code>
 	 *
-	 * @since 6.0.0
+	 * @since X.X.X
 	 *
 	 * @return string The `@font-face` CSS.
 	 */
@@ -117,7 +132,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 
 		foreach ( $webfont['src'] as $url ) {
 			// Add data URIs first.
-			if ( 0 === strpos( trim( $url ), 'data:' ) ) {
+			if ( str_starts_with( trim( $url ), 'data:' ) ) {
 				$src_ordered[] = array(
 					'url'    => $url,
 					'format' => 'data',
@@ -183,11 +198,12 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 	private function build_font_face_css( array $webfont ) {
 		$css = '';
 
-		// Wrap font-family in quotes if it contains spaces.
+		// Wrap font-family in quotes if it contains spaces
+		// and is not already wrapped in quotes.
 		if (
-			false !== strpos( $webfont['font-family'], ' ' ) &&
-			false === strpos( $webfont['font-family'], '"' ) &&
-			false === strpos( $webfont['font-family'], "'" )
+			str_contains( $webfont['font-family'], ' ' ) &&
+			! str_contains( $webfont['font-family'], '"' ) &&
+			! str_contains( $webfont['font-family'], "'" )
 		) {
 			$webfont['font-family'] = '"' . $webfont['font-family'] . '"';
 		}
@@ -232,7 +248,7 @@ class WP_Webfonts_Provider_Local extends WP_Webfonts_Provider {
 
 		foreach ( $value as $item ) {
 
-			if ( 0 === strpos( $item['url'], get_site_url() ) ) {
+			if ( str_starts_with( $item['url'], get_site_url() ) ) {
 				$item['url'] = wp_make_link_relative( $item['url'] );
 			}
 

@@ -51,7 +51,7 @@ class UpdateQuote extends WC_Email {
      * Constructor.
      */
     public function __construct() {
-        $this->id             = 'dokan_request_new_quote';
+        $this->id             = 'dokan_request_update_quote';
         $this->title          = __( 'Dokan Request Update Quote', 'dokan' );
         $this->description    = __( 'New quote emails are sent to chosen recipient(s) when a quote is updated.', 'dokan' );
         $this->template_html  = 'emails/request-update-quote-email.php';

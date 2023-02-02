@@ -272,9 +272,10 @@ export default {
         },
 
         deleteComment( id ) {
-            this.$swal({
+            Swal.fire({
                 title: this.__( 'Delete comment', 'dokan' ),
                 text: this.__( 'Are you sure, you want to delete this comment!', 'dokan' ),
+                icon: 'warning',
                 showCloseButton: true,
                 showCancelButton: true,
                 confirmButtonText: this.__( 'Yes', 'dokan' ),

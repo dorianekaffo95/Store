@@ -98,6 +98,10 @@ class Module {
             return;
         }
 
+        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
+            return;
+        }
+
         // check if stripe is ready
         if ( ! Helper::is_ready() ) {
             return;

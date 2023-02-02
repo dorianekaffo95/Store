@@ -32,6 +32,7 @@ function dokan_save_variations( $post_id ) {
 
         $variable_manage_stock = isset( $_post_data['variable_manage_stock'] ) ? $_post_data['variable_manage_stock'] : [];
         $variable_stock        = isset( $_post_data['variable_stock'] ) ? $_post_data['variable_stock'] : [];
+        $variable_low_stock_amount        = isset( $_post_data['variable_low_stock_amount'] ) ? $_post_data['variable_low_stock_amount'] : [];
         $variable_backorders   = isset( $_post_data['variable_backorders'] ) ? $_post_data['variable_backorders'] : [];
         $variable_stock_status = isset( $_post_data['variable_stock_status'] ) ? $_post_data['variable_stock_status'] : [];
 
@@ -140,6 +141,7 @@ function dokan_save_variations( $post_id ) {
             if ( 'yes' === $manage_stock ) {
                 update_post_meta( $variation_id, '_backorders', wc_clean( $variable_backorders[ $i ] ) );
                 wc_update_product_stock( $variation_id, wc_stock_amount( $variable_stock[ $i ] ) );
+                update_post_meta( $variable_low_stock_amount, '_low_stock_amount', wc_format_decimal( $variable_low_stock_amount[ $i ] ) );
             } else {
                 $parent_manage_stock = ! empty( $_post_data['_manage_stock'] ) ? 'yes' : 'no';
                 $parent_stock_amount = isset( $_post_data['_stock'] ) ? wc_clean( $_post_data['_stock'] ) : '';
@@ -164,8 +166,18 @@ function dokan_save_variations( $post_id ) {
             }
 
             if ( 'yes' === $is_downloadable ) {
-                update_post_meta( $variation_id, '_download_limit', wc_clean( $variable_download_limit[ $i ] ) );
-                update_post_meta( $variation_id, '_download_expiry', wc_clean( $variable_download_expiry[ $i ] ) );
+                // fix download limit
+                $download_limit = intval( $variable_download_limit[ $i ] );
+                if ( ! $download_limit || -1 === $download_limit ) {
+                    $download_limit = '';
+                }
+                // fix download expiry
+                $download_expiry = intval( $variable_download_expiry[ $i ] );
+                if ( ! $download_expiry || -1 === $download_expiry ) {
+                    $download_expiry = '';
+                }
+                update_post_meta( $variation_id, '_download_limit', $download_limit );
+                update_post_meta( $variation_id, '_download_expiry', $download_expiry );
 
                 $files         = [];
                 $_post_data    = wp_unslash( $_POST );//phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -1268,37 +1280,6 @@ function dokan_get_minimum_order_discount_for_vendor( $vendor_id ) {
 
     return $discount_total;
 }
-
-/**
- * Update author for variation product
- *
- * @since 2.6.2
- *
- * @return void
- **/
-function dokan_override_author_for_variations( $product, $seller_id ) {
-    if ( $product->get_type() === 'variable' ) {
-        $args = [
-            'post_parent' => $product->get_id(),
-            'post_type'   => 'product_variation',
-            'numberposts' => - 1,
-            'post_status' => 'any',
-        ];
-
-        $variations = get_children( $args );
-
-        foreach ( $variations as $key => $variation ) {
-            wp_update_post(
-                [
-                    'ID'          => $variation->ID,
-                    'post_author' => $seller_id,
-                ]
-            );
-        }
-    }
-}
-
-add_action( 'dokan_after_override_product_author', 'dokan_override_author_for_variations', 11, 2 );
 
 add_action( 'product_cat_add_form_fields', 'dokan_add_category_commission_field' );
 add_action( 'product_cat_edit_form_fields', 'dokan_edit_category_commission_field', 10 );

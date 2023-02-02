@@ -3,7 +3,6 @@
 namespace WeDevs\DokanPro\Modules\StripeExpress\Api;
 
 use Exception;
-use Stripe\Event;
 use WeDevs\Dokan\Exceptions\DokanException;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Api;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
@@ -20,62 +19,13 @@ defined( 'ABSPATH' ) || exit;
 class WebhookEndpoint extends Api {
 
     /**
-     * Prefix for webhook.
-     *
-     * @since 3.6.1
-     *
-     * @var string
-     */
-    private static $prefix = 'dokan-stripe-express';
-
-    /**
-     * Retrieves prefix for webhook.
-     *
-     * @since 3.6.1
-     *
-     * @return string
-     */
-    public static function prefix() {
-        return self::$prefix;
-    }
-
-    /**
-     * Retrieves supported webhook events.
-     *
-     * @since 3.6.1
-     *
-     * @return array
-     */
-    public static function get_supported_events() {
-        return apply_filters(
-            'dokan_stripe_express_webhook_events',
-            [
-                Event::PAYMENT_INTENT_SUCCEEDED                 => 'PaymentIntentSucceeded',
-                Event::PAYMENT_INTENT_REQUIRES_ACTION           => 'PaymentIntentRequiresAction',
-                Event::PAYMENT_INTENT_AMOUNT_CAPTURABLE_UPDATED => 'PaymentIntentAmountCapturableUpdated',
-                Event::SETUP_INTENT_SUCCEEDED                   => 'SetupIntentSucceeded',
-                Event::SETUP_INTENT_SETUP_FAILED                => 'SetupIntentSetupFailed',
-                Event::SOURCE_CHARGEABLE                        => 'SourceChargeable',
-                Event::SOURCE_CANCELED                          => 'SourceCanceled',
-                Event::CHARGE_SUCCEEDED                         => 'ChargeSucceeded',
-                Event::CHARGE_CAPTURED                          => 'ChargeCaptured',
-                Event::CHARGE_FAILED                            => 'ChargeFailed',
-                Event::CHARGE_DISPUTE_CREATED                   => 'ChargeDisputeCreated',
-                Event::CHARGE_DISPUTE_CLOSED                    => 'ChargeDisputeClosed',
-                Event::REVIEW_OPENED                            => 'ReviewOpened',
-                Event::REVIEW_CLOSED                            => 'ReviewClosed',
-            ]
-        );
-    }
-
-    /**
      * Retrieves a webhook endpoint.
      *
      * @since 3.6.1
      *
      * @param string $webhook_id
      *
-     * @return object|false
+     * @return \Stripe\WebhookEndpoint|false
      */
     public static function get( $webhook_id ) {
         try {
@@ -93,7 +43,7 @@ class WebhookEndpoint extends Api {
      *
      * @param array $args (Optional)
      *
-     * @return array|false
+     * @return \Stripe\WebhookEndpoint[]|false
      */
     public static function all( $args = [] ) {
         $data = [
@@ -118,12 +68,10 @@ class WebhookEndpoint extends Api {
      *
      * @param array $args (Optional)
      *
-     * @return object
+     * @return \Stripe\WebhookEndpoint
      * @throws DokanException
      */
     public static function create( $args = [] ) {
-        $args = wp_parse_args( $args, self::generate_data() );
-
         try {
             return static::api()->webhookEndpoints->create( $args );
         } catch ( Exception $e ) {
@@ -149,14 +97,10 @@ class WebhookEndpoint extends Api {
      * @param string $webhook_id
      * @param array  $args       (Optional)
      *
-     * @return object
+     * @return \Stripe\WebhookEndpoint
      * @throws DokanException
      */
     public static function update( $webhook_id, $args = [] ) {
-        $args = wp_parse_args( $args, self::generate_data() );
-
-        unset( $args['api_version'] );
-
         try {
             return static::api()->webhookEndpoints->update( $webhook_id, $args );
         } catch ( Exception $e ) {
@@ -181,7 +125,7 @@ class WebhookEndpoint extends Api {
      *
      * @param string $webhook_id
      *
-     * @return object
+     * @return \Stripe\WebhookEndpoint
      * @throws DokanException
      */
     public static function delete( $webhook_id ) {
@@ -206,7 +150,7 @@ class WebhookEndpoint extends Api {
      * @param string $event_id
      * @param array  $args     (Optional)
      *
-     * @return object|false
+     * @return \Stripe\Event|false
      */
     public static function get_event( $event_id, $args = [] ) {
         try {
@@ -215,32 +159,5 @@ class WebhookEndpoint extends Api {
             Helper::log( sprintf( 'Could not retrieve webhook: %s. Message: %s', $event_id, $e->getMessage() ) );
             return false;
         }
-    }
-
-    /**
-     * Generates URL for webhook.
-     *
-     * @since 3.6.1
-     *
-     * @return string
-     */
-    public static function generate_url() {
-        return home_url( 'wc-api/' . self::prefix(), 'https' );
-    }
-
-    /**
-     * Generates default webhook data.
-     *
-     * @since 3.6.1
-     *
-     * @return array
-     */
-    public static function generate_data() {
-        return [
-            'url'            => self::generate_url(),
-            'enabled_events' => array_keys( self::get_supported_events() ),
-            'api_version'    => Helper::get_api_version(),
-            'description'    => __( 'This webhook is created by Dokan Pro.', 'dokan' ),
-        ];
     }
 }

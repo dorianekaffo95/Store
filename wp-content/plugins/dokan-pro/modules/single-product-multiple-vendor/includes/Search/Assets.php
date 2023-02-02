@@ -2,6 +2,8 @@
 
 namespace WeDevs\DokanPro\Modules\SPMV\Search;
 
+use WeDevs\Dokan\ProductCategory\Helper as CategoryHelper;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
@@ -59,6 +61,12 @@ class Assets {
         ) {
             wp_enqueue_style( 'dokan-spmv-search-style' );
             wp_enqueue_script( 'dokan-spmv-search-js' );
+            wp_enqueue_style( 'dokan-timepicker' );
+            wp_enqueue_style( 'dokan-date-range-picker' );
+        }
+
+        if ( dokan_is_seller_dashboard() && isset( $wp->query_vars['products-search'] ) ) { // phpcs:ignore
+            CategoryHelper::enqueue_and_localize_dokan_multistep_category();
         }
     }
 }

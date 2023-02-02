@@ -372,7 +372,7 @@ class WOOMULTI_CURRENCY_F_Admin_Reports {
 	 * @return float|int
 	 */
 	public static function convert_to_default_currency( $price, $rate ) {
-		return $price / $rate;
+		return floatval( $price ) / floatval( $rate );
 	}
 
 	/**

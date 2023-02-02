@@ -96,7 +96,7 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 		 */
 		dismissEvents: function() {
 
-			$( '.wpforms-dismiss-container' ).on( 'click', '.wpforms-dismiss-button', function( e ) {
+			$( document ).on( 'click', '.wpforms-dismiss-container .wpforms-dismiss-button', function( e ) {
 
 				var $this = $( this ),
 					$cont = $this.closest( '.wpforms-dismiss-container' ),
@@ -224,6 +224,11 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 
 			// Test if the base URL already contains `?`.
 			var appendChar = /(\?)/.test( baseURL ) ? '&' : '?';
+
+			// If the upgrade link is changed by partners, appendChar has to be encoded.
+			if ( baseURL.indexOf( 'https://wpforms.com' ) === -1 ) {
+				appendChar = encodeURIComponent( appendChar );
+			}
 
 			return baseURL + appendChar + 'utm_content=' + encodeURIComponent( utmContent.trim() );
 		},
@@ -519,6 +524,14 @@ WPFormsEducation.core = window.WPFormsEducation.core || ( function( document, wi
 		getUpgradeModalWidth: function( isVideoModal ) {
 
 			var windowWidth = $( window ).width();
+
+			if ( windowWidth <= 300 ) {
+				return '250px';
+			}
+
+			if ( windowWidth <= 750 ) {
+				return '350px';
+			}
 
 			if ( ! isVideoModal || windowWidth <= 1024 ) {
 				return '550px';

@@ -597,7 +597,7 @@ class Module {
                     ],
                     'razorpay' => [
                         'id'           => 'razorpay',
-                        'name'         => __( 'Dokan Razorpay', 'dokan' ),
+                        'name'         => __( 'Razorpay', 'dokan' ),
                         'description'  => __( 'Accept credit card payments and allow your sellers to get automatic split payment in Dokan via Razorpay.', 'dokan' ),
                         'thumbnail'    => $thumbnail_dir . '/razorpay.svg',
                         'module_file'  => DOKAN_PRO_MODULE_DIR . '/razorpay/module.php',

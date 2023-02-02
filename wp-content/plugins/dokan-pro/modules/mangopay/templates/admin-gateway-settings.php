@@ -145,17 +145,6 @@ $form_fields = array(
         'desc_tip'    => true,
         'default'     => 'no',
     ),
-    'disabled_3DS2'              => array(
-        'title'		  => '3DS2',
-        'type'		  => 'checkbox',
-        'label'		  => __( 'Disable 3DS2 mode (not recommended)', 'dokan' ),
-        'default'	  => 'no',
-        'class'		  => 'mp_payment_method',
-        'description' => __(
-            'By default 3DS2 mode is enabled as MangoPay suggests. We recommend not to disable this. Otherwise, you will be liable for all 3DS1 transactions for all currencies via CB and VISA',
-            'dokan'
-        ),
-    ),
     'platform_fees'              => array(
         'title'       => __( 'Platform Fees', 'dokan' ),
         'type'        => 'title',

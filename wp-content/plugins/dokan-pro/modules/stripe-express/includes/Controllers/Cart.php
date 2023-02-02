@@ -5,6 +5,7 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\Controllers;
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
+use WeDevs\DokanPro\Modules\StripeExpress\Processors\Subscription;
 
 /**
  * Cart controller class.
@@ -23,7 +24,7 @@ class Cart {
      * @return void
      */
     public function __construct() {
-        $this->hooks();
+        add_action( 'init', [ $this, 'hooks' ] );
     }
 
     /**
@@ -33,7 +34,7 @@ class Cart {
      *
      * @return void
      */
-    protected function hooks() {
+    public function hooks() {
         add_filter( 'woocommerce_add_to_cart_validation', [ $this, 'validate_add_to_cart' ], 10, 2 );
     }
 
@@ -52,8 +53,11 @@ class Cart {
      * @return boolean
      */
     public function validate_add_to_cart( $passed, $product_id ) {
+        if ( ! $passed ) {
+            return $passed;
+        }
         // If it is a vendor subscription product then pass
-        if ( Helper::is_vendor_subscription_product( $product_id ) ) {
+        if ( Subscription::is_vendor_subscription_product( $product_id ) ) {
             return $passed;
         }
 
@@ -75,7 +79,7 @@ class Cart {
         // Get seller id
         $seller_id = dokan_get_vendor_by_product( $product_id, true );
 
-        // check if vendor is not connected with mangopay
+        // check if vendor is not connected with Stripe Express
         if ( ! Helper::is_seller_connected( $seller_id ) ) {
             wc_add_notice(
                 wp_kses(
@@ -85,7 +89,7 @@ class Cart {
                         '<strong>',
                         '</strong>',
                         get_the_title( $product_id ),
-                        Helper::get_gateway_title( 'front' )
+                        Helper::get_gateway_title()
                     ),
                     [
                         'strong' => [],

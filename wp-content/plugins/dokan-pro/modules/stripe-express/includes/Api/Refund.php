@@ -36,7 +36,7 @@ class Refund extends Api {
      * @param string $refund_id
      * @param array  $args
      *
-     * @return object|false
+     * @return \Stripe\Refund|false
      */
     public static function get( $refund_id, $args = [] ) {
         try {
@@ -54,7 +54,7 @@ class Refund extends Api {
      *
      * @param array $args
      *
-     * @return object
+     * @return \Stripe\Refund
      * @throws DokanException
      */
     public static function create( $args = [] ) {

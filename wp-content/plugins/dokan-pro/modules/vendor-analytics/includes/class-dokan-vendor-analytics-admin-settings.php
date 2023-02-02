@@ -143,7 +143,7 @@ class Dokan_Vendor_Analytics_Admin_Settings {
                     'label'   => __( 'Add Tracking Code', 'dokan' ),
                     'desc'    => __( 'This is an optional settings that will add Analytics Global Site Tag in you site header. If you use any SEO plugin or add your tracking code by other means, then choose `no` in the settings.', 'dokan' ),
                     'type'    => 'switcher',
-                    'default' => 'no',
+                    'default' => 'off',
                 ),
             );
         }
@@ -185,9 +185,9 @@ class Dokan_Vendor_Analytics_Admin_Settings {
      * @return void
      */
     public function add_tracking_code() {
-        $add_tracking_code = dokan_get_option( 'add_tracking_code', 'dokan_vendor_analytics', 'no' );
+        $add_tracking_code = dokan_get_option( 'add_tracking_code', 'dokan_vendor_analytics', 'off' );
 
-        if ( 'yes' !== $add_tracking_code ) {
+        if ( 'on' !== $add_tracking_code ) {
             return;
         }
 

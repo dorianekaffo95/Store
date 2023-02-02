@@ -193,6 +193,8 @@ class Module {
         if (
             is_shop()
             || dokan_is_store_listing()
+            || is_product_category()
+            || is_product_tag()
             || ( isset( $wp->query_vars['products'] ) && isset( $_GET['action'] ) && 'edit' === sanitize_text_field( wp_unslash( $_GET['action'] ) ) ) //phpcs:ignore
             || ( isset( $wp->query_vars['booking'] ) && 'edit' === $wp->query_vars['booking'] )
             || ( isset( $wp->query_vars['auction'] ) && isset( $_GET['action'] ) && 'edit' === sanitize_text_field( wp_unslash( $_GET['action'] ) ) ) //phpcs:ignore

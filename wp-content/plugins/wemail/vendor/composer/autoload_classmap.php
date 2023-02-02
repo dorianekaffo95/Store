@@ -133,6 +133,7 @@ return array(
     'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\CategoryResource' => $baseDir . '/includes/Rest/Resources/Ecommerce/EDD/CategoryResource.php',
     'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderItemResource' => $baseDir . '/includes/Rest/Resources/Ecommerce/EDD/OrderItemResource.php',
     'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderResource' => $baseDir . '/includes/Rest/Resources/Ecommerce/EDD/OrderResource.php',
+    'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\OrderResourceV3' => $baseDir . '/includes/Rest/Resources/Ecommerce/EDD/OrderResourceV3.php',
     'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\EDD\\ProductResource' => $baseDir . '/includes/Rest/Resources/Ecommerce/EDD/ProductResource.php',
     'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\CategoryResource' => $baseDir . '/includes/Rest/Resources/Ecommerce/WooCommerce/CategoryResource.php',
     'WeDevs\\WeMail\\Rest\\Resources\\Ecommerce\\WooCommerce\\OrderItemResource' => $baseDir . '/includes/Rest/Resources/Ecommerce/WooCommerce/OrderItemResource.php',

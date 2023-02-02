@@ -6,8 +6,7 @@ defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Settings;
-use WeDevs\DokanPro\Modules\StripeExpress\PaymentMethods\Card;
-use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Traits\Subscriptions;
+use WeDevs\DokanPro\Modules\StripeExpress\Processors\Subscription;
 use WeDevs\DokanPro\Modules\StripeExpress\PaymentTokens\Sepa as PaymentTokenSepa;
 
 /**
@@ -20,8 +19,6 @@ use WeDevs\DokanPro\Modules\StripeExpress\PaymentTokens\Sepa as PaymentTokenSepa
  * @package WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts
  */
 abstract class PaymentMethod {
-
-    use Subscriptions;
 
     /**
      * Stripe key for payment method.
@@ -113,10 +110,6 @@ abstract class PaymentMethod {
      */
     public function __construct() {
         $enabled_payment_methods = Settings::get_enabled_payment_methods();
-        if ( empty( $enabled_payment_methods ) ) {
-            $enabled_payment_methods = [ Card::STRIPE_ID ];
-        }
-
         $this->enabled = in_array( $this->get_id(), $enabled_payment_methods, true );
     }
 
@@ -193,7 +186,11 @@ abstract class PaymentMethod {
         }
 
         // If cart or order contains subscription, enable payment method if it's reusable.
-        if ( $this->is_subscription_item_in_cart() || ( ! empty( $order_id ) && Helper::has_subscription( $order_id ) ) ) {
+        if ( Subscription::exists_in_cart() ) {
+            return $this->is_reusable();
+        }
+
+        if ( ! empty( $order_id ) && Subscription::is_subscription_order( $order_id ) ) {
             return $this->is_reusable();
         }
 
@@ -246,8 +243,8 @@ abstract class PaymentMethod {
      *
      * @since 3.6.1
      *
-     * @param int    $user_id
-     * @param object $payment_method
+     * @param int|string            $user_id        WP User ID
+     * @param \Stripe\PaymentMethod $payment_method Stripe payment method object
      *
      * @return PaymentTokenSepa
      */

@@ -1,12 +1,6 @@
 /*!*****************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/less-loader/dist/cjs.js!./modules/mangopay/assets/src/less/checkout.less ***!
   \*****************************************************************************************************************************************/
-#dokan-mangopay-signup {
-  margin-bottom: 30px;
-}
-#dokan-mangopay-signup p {
-  margin-bottom: 20px !important;
-}
 #dokan-mangopay-payment-options {
   border-radius: 5px;
   padding: 0 10px;

@@ -5,7 +5,6 @@ namespace WeDevs\DokanPro\Modules\Booking;
 use WeDevs\Dokan\Cache;
 use WeDevs\Dokan\ProductCategory\Helper;
 use WeDevs\DokanPro\Modules\Booking\BookingCache;
-use WeDevs\Dokan\ProductCategory\Categories;
 
 /**
  * Dokan_WC_Booking class
@@ -107,8 +106,7 @@ class Module {
         // Clear addon notices on manual booking creation
         add_action( 'template_redirect', [ $this, 'clear_addons_validation_notices' ], 10 );
 
-        add_action( 'dokan_new_product_before_product_area', array( $this, 'load_add_category_modal' ), 10 );
-        add_action( 'dokan_edit_product_before_product_area', array( $this, 'load_add_category_modal' ), 10 );
+        add_action( 'wp_footer', [ $this, 'load_add_category_modal' ], 10 );
 
         // Init accommodation booking
         $this->init_accommodation_booking();
@@ -243,22 +241,7 @@ class Module {
 
         // Multi-step category box ui.
         if ( ( isset( $wp->query_vars['booking'] ) && $wp->query_vars['booking'] === 'new-product' ) || ( isset( $wp->query_vars['booking'] ) && $wp->query_vars['booking'] === 'edit' ) ) {
-            wp_enqueue_style( 'dokan-product-category-ui-css' );
-            wp_enqueue_script( 'product-category-ui' );
-
-            $categories = new Categories();
-            $all_categories = $categories->get();
-
-            $data = [
-                'categories' => $all_categories,
-                'is_single'  => Helper::product_category_selection_is_single(),
-                'i18n'       => [
-                    'select_a_category' => __( 'Select a category', 'dokan' ),
-                    'duplicate_category' => __( 'This category has already been selected', 'dokan' ),
-                ],
-            ];
-
-            wp_localize_script( 'product-category-ui', 'dokan_product_category_data', $data );
+            Helper::enqueue_and_localize_dokan_multistep_category();
         }
     }
 
@@ -592,7 +575,6 @@ class Module {
         $is_virtual = 'on' === $_virtual ? 'yes' : 'no';
         update_post_meta( $post_id, '_virtual', $is_virtual );
 
-
         if ( ! empty( $post_data['chosen_product_cat'] ) ) {
             $chosen_cat = Helper::product_category_selection_is_single() ? [ reset( $post_data['chosen_product_cat'] ) ] : $post_data['chosen_product_cat'];
         } else {
@@ -652,12 +634,15 @@ class Module {
      * @return void
      */
     public function add_new_resource() {
-        // @codingStandardsIgnoreLine
-        $add_resource_name = wc_clean( $_POST['add_resource_name'] );
-
-        if ( empty( $add_resource_name ) ) {
-            wp_send_json_error();
+        if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['_wpnonce'] ), 'dokan-booking-resource-nonce' ) ) {
+            wp_send_json_error( esc_html__( 'Nonce verification failed!', 'dokan' ) );
         }
+
+        if ( empty( $_POST['add_resource_name'] ) ) {
+            wp_send_json_error( esc_html__( 'Please provide a resource name', 'dokan' ) );
+        }
+
+        $add_resource_name = sanitize_text_field( wp_unslash( $_POST['add_resource_name'] ) );
 
         $resource    = array(
             'post_title'   => $add_resource_name,

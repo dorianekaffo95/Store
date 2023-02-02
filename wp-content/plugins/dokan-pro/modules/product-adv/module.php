@@ -11,6 +11,7 @@ use WeDevs\DokanPro\Modules\ProductAdvertisement\Frontend\Order;
 use WeDevs\DokanPro\Modules\ProductAdvertisement\Frontend\Product;
 use WeDevs\DokanPro\Modules\ProductAdvertisement\Frontend\Shortcode;
 use WeDevs\DokanPro\Modules\ProductAdvertisement\Frontend\ProductWidget;
+use WeDevs\DokanPro\Modules\ProductAdvertisement\BlockData;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
@@ -94,6 +95,9 @@ final class Module {
         $this->container['order']         = new Order();
         $this->container['cart']          = new Cart();
         $this->container['subscriptions'] = new VendorSubscription();
+
+        // Block data modifier
+        new BlockData();
 
         if ( wp_doing_ajax() ) {
             $this->container['ajax'] = new Ajax();

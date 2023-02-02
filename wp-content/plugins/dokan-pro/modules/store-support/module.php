@@ -3,6 +3,7 @@
 namespace WeDevs\DokanPro\Modules\StoreSupport;
 
 use WeDevs\Dokan\Cache;
+use WeDevs\DokanPro\Modules\StoreSupport\SettingsApi\Store;
 use WP_Query;
 
 class Module {
@@ -227,7 +228,7 @@ class Module {
 
         wp_register_style( 'dokan-store-support-styles', plugins_url( 'assets/css/style.css', __FILE__ ), false, $version );
         wp_register_script( 'dokan-store-support-scripts', plugins_url( 'assets/js/script.js', __FILE__ ), [ 'jquery' ], $version, true );
-        wp_register_script( 'dokan-store-support-filter', plugins_url( 'assets/js/store-support-filter.js', __FILE__ ), [ 'jquery', 'dokan-select2-js', 'dokan-moment', 'dokan-date-range-picker', 'dokan-i18n-jed', 'dokan-util-helper' ], $version, true );
+        wp_register_script( 'dokan-store-support-filter', plugins_url( 'assets/js/store-support-filter.js', __FILE__ ), [ 'jquery', 'dokan-select2-js', 'moment', 'dokan-date-range-picker', 'dokan-i18n-jed', 'dokan-util-helper' ], $version, true );
     }
 
     /**
@@ -250,7 +251,7 @@ class Module {
             ( is_checkout() && isset( $wp->query_vars['order-received'] ) )
         ) {
             wp_enqueue_style( 'dokan-magnific-popup' );
-            wp_enqueue_script( 'dokan-popup' );
+            wp_enqueue_script( 'dokan-magnific-popup' );
             wp_enqueue_script( 'dokan-login-form-popup' );
             wp_enqueue_style( 'dokan-store-support-styles' );
             wp_enqueue_script( 'dokan-store-support-scripts' );
@@ -275,7 +276,7 @@ class Module {
     public function include_scripts() {
         if ( is_product() || dokan_is_store_page() || false !== get_query_var( 'view-order', false ) || false !== get_query_var( 'order-received', false ) ) {
             wp_enqueue_style( 'dokan-magnific-popup' );
-            wp_enqueue_script( 'dokan-popup' );
+            wp_enqueue_script( 'dokan-magnific-popup' );
         }
     }
 
@@ -2112,8 +2113,10 @@ class Module {
      */
     private function instances() {
         require_once DOKAN_STORE_SUPPORT_INC_DIR . '/Admin/class-admin-support.php';
+        require_once DOKAN_STORE_SUPPORT_INC_DIR . '/SettingsApi/Store.php';
 
         new \Dokan_Admin_Support();
+        new Store();
     }
 
     /**

@@ -47,7 +47,7 @@ $localized_date = $date_from && $date_to ? dokan_format_datetime( $date_from ) .
             <div class="filter">
                 <form id="auction-activity-form" method="get" class="dokan-form-inline">
                     <div class="dokan-form-group">
-                        <input id="auction-activity-datetime-range" type="text" autocomplete="off" placeholder="<?php esc_attr_e( 'Select Date Range', 'dokan' ); ?>" value="<?php echo esc_attr( $localized_date ); ?> "/>
+                        <input id="auction-activity-datetime-range" type="text" autocomplete="off" placeholder="<?php esc_attr_e( 'Select Date Range', 'dokan' ); ?>" value="<?php echo esc_attr( $localized_date ); ?>"/>
                         <input name="_auction_dates_from" id="_auction_dates_from" type="hidden" value="<?php echo esc_attr( $date_from ); ?>" readonly="">
                         <input name="_auction_dates_to" id="_auction_dates_to" type="hidden" value="<?php echo esc_attr( $date_to ); ?>" readonly="">
                     </div>

@@ -20,8 +20,8 @@ class Dokan_Geolocation_Scripts {
         // Use minified libraries if SCRIPT_DEBUG is turned off
         $this->suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-        add_action( 'wp_enqueue_scripts', array( $this, 'register_styles' ) );
-        add_action( 'wp_enqueue_scripts', array( $this, 'register_scripts' ) );
+        add_action( 'wp', array( $this, 'register_styles' ) );
+        add_action( 'wp', array( $this, 'register_scripts' ) );
 
         add_filter( 'dokan_google_maps_script_query_args', array( $this, 'add_gmap_script_query_args' ) );
     }
@@ -50,9 +50,9 @@ class Dokan_Geolocation_Scripts {
 
         $js_src = ( 'mapbox' === $source ) ? '/js/dokan-geolocation-locations-map-mapbox' . $this->suffix . '.js' : '/js/dokan-geolocation-locations-map-google-maps' . $this->suffix . '.js';
 
-        wp_register_script( 'dokan-geo-locations-map', DOKAN_GEOLOCATION_ASSETS . $js_src, array( 'jquery' ), DOKAN_PRO_PLUGIN_VERSION, true );
+        wp_register_script( 'dokan-geo-locations-map', DOKAN_GEOLOCATION_ASSETS . $js_src, array( 'jquery', 'dokan-magnific-popup' ), DOKAN_PRO_PLUGIN_VERSION, true );
 
-        wp_register_script( 'dokan-geo-filters-store-lists', DOKAN_GEOLOCATION_ASSETS . '/js/dokan-geolocation-store-lists-filters' . $this->suffix . '.js', array( 'jquery', 'google-maps' ), DOKAN_GEOLOCATION_VERSION, true );
+        wp_register_script( 'dokan-geo-filters-store-lists', DOKAN_GEOLOCATION_ASSETS . '/js/dokan-geolocation-store-lists-filters' . $this->suffix . '.js', array( 'jquery', 'google-maps', 'underscore' ), DOKAN_GEOLOCATION_VERSION, true );
         wp_register_script( 'dokan-geo-filters', DOKAN_GEOLOCATION_ASSETS . '/js/dokan-geolocation-filters' . $this->suffix . '.js', array( 'jquery', 'underscore', 'dokan-maps' ), DOKAN_PRO_PLUGIN_VERSION, true );
     }
 

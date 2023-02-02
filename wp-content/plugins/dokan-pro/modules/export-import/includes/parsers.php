@@ -60,11 +60,11 @@ class Dokan_WXR_Parser_SimpleXML {
 
 		$dom = new DOMDocument;
 		$old_value = null;
-		if ( function_exists( 'libxml_disable_entity_loader' ) ) {
+		if ( function_exists( 'libxml_disable_entity_loader' ) && PHP_VERSION_ID < 80000 ) {
 			$old_value = libxml_disable_entity_loader( true );
 		}
 		$success = $dom->loadXML( file_get_contents( $file ) );
-		if ( ! is_null( $old_value ) ) {
+		if ( ! is_null( $old_value ) && PHP_VERSION_ID < 80000 ) {
 			libxml_disable_entity_loader( $old_value );
 		}
 
@@ -204,7 +204,7 @@ class Dokan_WXR_Parser_SimpleXML {
 						);
 					}
 				}
-			
+
 				$post['comments'][] = array(
 					'comment_id' => (int) $comment->comment_id,
 					'comment_author' => (string) $comment->comment_author,

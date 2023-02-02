@@ -4,16 +4,20 @@
     <div class="dokan-alert dokan-alert-success dokan-text-middle signup-message" id="dokan-stripe-express-signup-message"></div>
     <div class="dokan-alert dokan-alert-danger dokan-text-middle signup-message" id="dokan-stripe-express-signup-error"></div>
 
-    <?php if ( ! empty( $stripe_account ) ) : ?>
-        <?php if ( $stripe_account->charges_enabled ) : ?>
+    <?php if ( ! empty( $stripe_account->get_account_id() ) ) : ?>
+        <?php if ( $stripe_account->is_connected() ) : ?>
             <div class="dokan-alert dokan-alert-success dokan-text-middle">
                 <?php
-                    printf(
-                        /* translators: 1) line break <br> tag, 2) merchant id, 3) line break <br> tag, */
-                        esc_html__( 'Your account is connected with Stripe Express.%1$sMerchant ID: %2$s.%3$sYou can visit your Stripe Express dashboard to track your payments and transactions.', 'dokan' ),
-                        '<br>',
-                        "<strong>{$stripe_account->id}</strong>",
-                        '<br>'
+                    echo wp_kses_post(
+                        sprintf(
+                            /* translators: 1) gateway title, 2) line break <br> tag, 3) merchant id, 4) line break <br> tag, 5) gateway title */
+                            esc_html__( 'Your account is connected with %1$s.%2$sMerchant ID: %3$s.%4$sYou can visit your %5$s dashboard to track your payments and transactions.', 'dokan' ),
+                            $gateway_title,
+                            '<br>',
+                            "<strong>{$stripe_account->get_account_id()}</strong>",
+                            '<br>',
+                            $gateway_title
+                        )
                     );
                 ?>
             </div>
@@ -33,7 +37,15 @@
             </button>
         <?php else : ?>
             <div class="dokan-alert dokan-alert-warning dokan-text-middle">
-                <?php esc_html_e( 'Your have not completed the onboarding for Stripe Express. You can complete the process by clicking the button below.', 'dokan' ); ?>
+                <?php
+                    echo esc_html(
+                        sprintf(
+                            /* translators: gateway title */
+                            __( 'Your have not completed the onboarding for %s. You can complete the process by clicking the button below.', 'dokan' ),
+                            $gateway_title
+                        )
+                    );
+                ?>
             </div>
 
             <div id="dokan-stripe-express-vendor-signup-message"></div>
@@ -46,7 +58,15 @@
         <?php endif; ?>
     <?php else : ?>
         <div class="dokan-alert dokan-alert-warning dokan-text-left" id="dokan-stripe-express-account-notice">
-            <?php esc_html_e( 'Your account is not connected with Stripe Express. Click on the button below to sign up.', 'dokan' ); ?>
+            <?php
+                echo esc_html(
+                    sprintf(
+                        /* translators: gateway title */
+                        __( 'Your account is not connected with %s. Click on the button below to sign up.', 'dokan' ),
+                        $gateway_title
+                    )
+                );
+            ?>
         </div>
 
         <div id="dokan-stripe-express-account-connect"

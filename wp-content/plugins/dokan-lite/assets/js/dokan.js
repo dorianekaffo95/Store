@@ -478,11 +478,19 @@ jQuery(function($) {
                 $( 'td.line_tax', $row ).each( function() {
                     var line_total_tax        = $( 'input.line_tax', $( this ) );
                     var refund_line_total_tax = $( 'input.refund_line_tax', $( this ) );
-                    var unit_total_tax = accounting.unformat( line_total_tax.attr( 'data-total_tax' ), dokan_refund.mon_decimal_point ) / qty;
+                    var unit_total_tax        = accounting.unformat(
+                        line_total_tax.attr( 'data-total_tax' ),
+                        dokan_refund.mon_decimal_point
+                    ) / qty;
 
                     if ( 0 < unit_total_tax ) {
+                        var round_at_subtotal = 'yes' === dokan_refund.round_at_subtotal;
+                        var precision         = dokan_refund[
+                            round_at_subtotal ? 'rounding_precision' : 'currency_format_num_decimals'
+                        ];
+
                         refund_line_total_tax.val(
-                            parseFloat( accounting.formatNumber( unit_total_tax * refund_qty, dokan_refund.rounding_precision, '' ) )
+                            parseFloat( accounting.formatNumber( unit_total_tax * refund_qty, precision, '' ) )
                                 .toString()
                                 .replace( '.', dokan_refund.mon_decimal_point )
                         ).trigger( 'change' );
@@ -622,6 +630,7 @@ jQuery(function($) {
 
     var Dokan_Editor = {
 
+        modal: false,
         /**
          * Constructor function
          */
@@ -873,41 +882,45 @@ jQuery(function($) {
         },
 
         openProductPopup: function() {
-            var productTemplate = wp.template( 'dokan-add-new-product' );
-            $.magnificPopup.open({
-                fixedContentPos: true,
-                items: {
-                    src: productTemplate().trim(),
-                    type: 'inline'
+            const productTemplate = wp.template( 'dokan-add-new-product' ),
+                modalElem = $( '#dokan-add-product-popup' );
+                Dokan_Editor.modal = modalElem.iziModal( {
+                headerColor : dokan.modal_header_color,
+                overlayColor: 'rgba(0, 0, 0, 0.8)',
+                width       : 690,
+                top         : 32,
+                onOpening   : () => {
+                  Dokan_Editor.reRenderPopupElements();
                 },
-                callbacks: {
-                    open: function() {
-                        $(this.content).closest('.mfp-wrap').removeAttr('tabindex');
-                        Dokan_Editor.loadSelect2();
-                        Dokan_Editor.bindProductTagDropdown();
+                onClosed: () => {
+                    product_gallery_frame  = undefined;
+                    product_featured_frame = undefined;
+                    $( '#dokan-add-new-product-popup input[name="_sale_price_dates_from"], #dokan-add-new-product-popup input[name="_sale_price_dates_to"]' ).datepicker( 'destroy' );
+                },
+            } );
+            Dokan_Editor.modal.iziModal( 'setContent', productTemplate().trim() );
+            Dokan_Editor.modal.iziModal( 'open' );
+        },
 
-                        $('.sale_price_dates_from, .sale_price_dates_to').on('focus', function() {
-                            $(this).css('z-index', '99999');
-                        });
+        reRenderPopupElements: function() {
+            Dokan_Editor.loadSelect2();
+            Dokan_Editor.bindProductTagDropdown();
 
-                        $( ".sale_price_dates_fields input" ).datepicker({
-                            defaultDate: "",
-                            dateFormat: "yy-mm-dd",
-                            numberOfMonths: 1
-                        });
+            $( '#dokan-add-new-product-popup .sale_price_dates_fields input' ).daterangepicker({
+                singleDatePicker: true,
+                showDropdowns: false,
+                autoApply: true,
+                parentEl: '#dokan-add-new-product-popup',
+                opens: 'left',
+                autoUpdateInput : false,
+            } ).on( 'apply.daterangepicker', function( ev, picker ) {
+                $( this ).val( picker.startDate.format( 'YYYY-MM-DD' ) );
+            } );
 
-                        $('.tips').tooltip();
+            $( '.tips' ).tooltip();
 
-                        Dokan_Editor.gallery.sortable();
-
-                        $( 'body' ).trigger( 'dokan-product-editor-popup-opened', Dokan_Editor );
-                    },
-                    close: function() {
-                        product_gallery_frame = undefined;
-                        product_featured_frame = undefined;
-                    }
-                }
-            });
+            Dokan_Editor.gallery.sortable();
+            $( 'body' ).trigger( 'dokan-product-editor-popup-opened', Dokan_Editor );
         },
 
         createNewProduct: function (e) {
@@ -943,16 +956,18 @@ jQuery(function($) {
                 _wpnonce : dokan.nonce
             };
 
+            Dokan_Editor.modal.iziModal('startLoading');
             $.post( dokan.ajaxurl, data, function( resp ) {
                 if ( resp.success ) {
                     self.removeAttr( 'disabled' );
-                    if ( btn_id == 'create_new' ) {
-                        $.magnificPopup.close();
+                    if ( btn_id === 'create_new' ) {
+                        $( '#dokan-add-product-popup' ).iziModal('close');
                         window.location.href = resp.data;
                     } else {
                         $('.dokan-dashboard-product-listing-wrapper').load( window.location.href + ' table.product-listing-table' );
-                        $.magnificPopup.close();
+                        Dokan_Editor.modal.iziModal('resetContent');
                         Dokan_Editor.openProductPopup();
+                        Dokan_Editor.reRenderPopupElements();
                         $( 'span.dokan-show-add-product-success' ).html( dokan.product_created_response );
 
                         setTimeout(function() {
@@ -964,6 +979,9 @@ jQuery(function($) {
                     $( 'span.dokan-show-add-product-error' ).html( resp.data );
                 }
                 form.find( 'span.dokan-add-new-product-spinner' ).css( 'display', 'none' );
+            })
+            .always( function () {
+                Dokan_Editor.modal.iziModal('stopLoading');
             });
         },
 
@@ -1122,7 +1140,6 @@ jQuery(function($) {
                         $($html).find('.dokan-product-attribute-heading').css({ borderBottom: '1px solid #e3e3e3' });
 
                         attributeWrapper.append( $html );
-                        $( 'select#product_type' ).trigger('change');
                         Dokan_Editor.loadSelect2();
                         Dokan_Editor.bindProductTagDropdown();
                         Dokan_Editor.attribute.reArrangeAttribute();
@@ -1146,6 +1163,9 @@ jQuery(function($) {
                         attrWrap.find( 'option[value="' + attribute + '"]' ).attr( 'disabled','disabled' );
                         attrWrap.val( '' );
                     }
+                })
+                .done(function() {
+                    $( 'select#product_type' ).trigger('change');
                 });
             },
 
@@ -1259,6 +1279,10 @@ jQuery(function($) {
                 $('.show_if_stock').slideDown('fast');
             } else {
                 $('.show_if_stock').slideUp('fast');
+            }
+
+            if ( 'simple' === product_type ) {
+                $(this).is(':checked') ? $('.hide_if_stock_global').slideUp('fast') : $('.hide_if_stock_global').slideDown('fast');
             }
         },
 
@@ -1886,6 +1910,8 @@ jQuery(function($) {
 
   var api = wp.customize;
 
+  var selectors = 'input[name="settings[bank][disconnect]"], input[name="settings[paypal][disconnect]"], input[name="settings[skrill][disconnect]"], input[name="settings[dokan_custom][disconnect]"]';
+
   var Dokan_Settings = {
     init: function() {
       var self = this;
@@ -1902,7 +1928,31 @@ jQuery(function($) {
           $("input[name='dokan_update_store_settings']").trigger( 'click' );
       });
 
+
       this.validateForm(self);
+
+      $('.dokan_payment_disconnect_btn').on( 'click', function(){
+        var form = $(this).closest('form');
+        var self = $('form#' + form.attr('id'));
+
+        $(':input',form)
+        .not(':button, :submit, :reset, :hidden, :checkbox')
+        .val('')
+        .prop('selected', false);
+
+        var data = form.serializeArray().reduce(function(obj, item) {
+            obj[item.name] = item.value;
+            return obj;
+        }, {});
+
+        data[$(this).attr('name')] = ''
+        data['form_id'] = form.attr('id');
+        data['action'] = 'dokan_settings';
+
+        var isDisconnect = true;
+
+        Dokan_Settings.handleRequest( self, data, isDisconnect );
+      });
 
       return false;
     },
@@ -2241,23 +2291,14 @@ jQuery(function($) {
       }
 
       var self = $('form#' + form_id),
-        form_data =
-          self.serialize() + '&action=dokan_settings&form_id=' + form_id;
+        form_data = self.serialize() + '&action=dokan_settings&form_id=' + form_id;
 
       var isDisconnect = false;
-      var selectors = 'input[name="settings[bank][disconnect]"], input[name="settings[paypal][disconnect]"], input[name="settings[skrill][disconnect]"], input[name="settings[dokan_custom][disconnect]"]';
-      if (self.find(selectors).length > 0){
-        isDisconnect = true;
-        var nonce = self.find('input[name="_wpnonce"]').val();
-        self.find('input[type=text]').val('');
-        self.find('textarea').val('');
-        self.find('input[type=checkbox]').prop('checked', false);
-        self.find('#ac_type').prop('selectedIndex', 0);
 
-        self.find('input[name="_wpnonce"').val(nonce);
-        form_data = self.serialize() + '&action=dokan_settings&form_id=' + form_id;
-      }
+      Dokan_Settings.handleRequest( self, form_data, isDisconnect );
+    },
 
+    handleRequest: function ( self, form_data, isDisconnect ) {
       if (isDisconnect) {
         self.find('.ajax_prev.disconnect').append('<span class="dokan-loading"> </span>');
       } else {
@@ -2266,6 +2307,7 @@ jQuery(function($) {
 
       $('.dokan-update-setting-top-button span.dokan-loading').remove();
       $('.dokan-update-setting-top-button').append('<span class="dokan-loading"> </span>');
+
       $.post(dokan.ajaxurl, form_data, function(resp) {
         self.find('span.dokan-loading').remove();
         $('.dokan-update-setting-top-button span.dokan-loading').remove();
@@ -2651,69 +2693,6 @@ jQuery(function($) {
   };
 
   bulkItemsSelection.init();
-
-  $('.product-cat-stack-dokan li.has-children').on(
-    'click',
-    '> a span.caret-icon',
-    function(e) {
-      e.preventDefault();
-      var self = $(this),
-        liHasChildren = self.closest('li.has-children');
-
-      if (!liHasChildren.find('> ul.children').is(':visible')) {
-        self.find('i.fa').addClass('fa-rotate-90');
-        if (liHasChildren.find('> ul.children').hasClass('level-0')) {
-          self.closest('a').css({ borderBottom: 'none' });
-        }
-      }
-
-      liHasChildren.find('> ul.children').slideToggle('fast', function() {
-        if (!$(this).is(':visible')) {
-          self.find('i.fa').removeClass('fa-rotate-90');
-
-          if (liHasChildren.find('> ul.children').hasClass('level-0')) {
-            self.closest('a').css({ borderBottom: '1px solid #eee' });
-          }
-        }
-      });
-    }
-  );
-
-  $('.store-cat-stack-dokan li.has-children').on(
-    'click',
-    '> a span.caret-icon',
-    function(e) {
-      e.preventDefault();
-      var self = $(this),
-        liHasChildren = self.closest('li.has-children');
-
-      if (!liHasChildren.find('> ul.children').is(':visible')) {
-        self.find('i.fa').addClass('fa-rotate-90');
-        if (liHasChildren.find('> ul.children').hasClass('level-0')) {
-          self.closest('a').css({ borderBottom: 'none' });
-        }
-      }
-
-      liHasChildren.find('> ul.children').slideToggle('fast', function() {
-        if (!$(this).is(':visible')) {
-          self.find('i.fa').removeClass('fa-rotate-90');
-
-          if (liHasChildren.find('> ul.children').hasClass('level-0')) {
-            self.closest('a').css({ borderBottom: '1px solid #eee' });
-          }
-        }
-      });
-    }
-  );
-
-  $(document).ready(function() {
-    var selectedLi = $('#cat-drop-stack ul').find('a.selected');
-    selectedLi.css({ fontWeight: 'bold' });
-
-    selectedLi.parents('ul.children').each(function(i, val) {
-      $(val).css({ display: 'block' });
-    });
-  });
 })(jQuery);
 
 (function($) {
@@ -2957,6 +2936,86 @@ jQuery(function($) {
           .css('cursor', 'help');
       });
     });
+
+    // Submenu navigation on vendor dashboard
+    $( '#dokan-navigation .dokan-dashboard-menu li.has-submenu:not(.active)' )
+    .on( 'mouseover', (e) => {
+        dokanNavigateSubmenu(e);
+    } )
+    .on( 'mouseout', (e) => {
+        dokanNavigateSubmenu( e, true );
+    } );
+
+    /**
+     * Navigates submenu on hovering the parent menu.
+     *
+     * @param {event}   evt  The dom event
+     * @param {boolean} hide Hide or show sub menu
+     *
+     * @return {void}
+     */
+    function dokanNavigateSubmenu( evt, hide ) {
+        const elem = $( evt.target ).closest( 'li.has-submenu' );
+
+        elem.find( '.navigation-submenu' ).each( ( index, subElem ) => {
+            if ( ! hide ) {
+                elem.addClass( 'submenu-hovered' );
+
+                let elemRect        = elem[0].getBoundingClientRect(),
+                    subElemRect     = subElem.getBoundingClientRect(),
+                    dashboard       = $( '.dokan-dashboard-wrap' ),
+                    dashboardRect   = dashboard[0].getBoundingClientRect(),
+                    dashboardHeight = Math.min( dashboardRect.bottom, dashboardRect.height );
+
+                if ( dashboardHeight < subElemRect.height ) {
+                    let extendedHeight = subElemRect.height - dashboardHeight;
+                    if ( elemRect.top < elemRect.height ) {
+                        extendedHeight += elemRect.top;
+                    }
+                    dashboard.css( 'height', dashboardRect.height + extendedHeight );
+                } else {
+                    dashboard.css( 'height', '' );
+                }
+
+                if ( elemRect.top < elemRect.height ) {
+                    $(subElem).css( 'bottom', 'unset' );
+                    $(subElem).css( 'top', 0 );
+                } else {
+                    $(subElem).css( 'top', 'unset' );
+
+                    let dist = elemRect.top - subElemRect.height;
+                    if ( dist > 0 ) {
+                        $(subElem).css( 'bottom', 0 );
+
+                        subElemRect = subElem.getBoundingClientRect();
+                        if ( subElemRect.top < 0 ) {
+                            $(subElem).css( 'bottom', 'unset' );
+                            $(subElem).css( 'top', 0 );
+                        }
+                    } else {
+                        $(subElem).css( 'bottom', dist );
+
+                        let navRect             = $( '.dokan-dash-sidebar' )[0].getBoundingClientRect(),
+                            navElderSiblingRect = $( '.entry-header' )[0].getBoundingClientRect();
+                        subElemRect = subElem.getBoundingClientRect();
+
+                        if ( subElemRect.bottom > navRect.bottom ) {
+                            dist += subElemRect.bottom - navRect.bottom;
+                        } else if ( subElemRect.bottom - navElderSiblingRect.bottom < subElemRect.height ) {
+                            dist += subElemRect.bottom - navElderSiblingRect.bottom - subElemRect.height - 20;
+                        }
+
+                        $(subElem).css( 'bottom', dist );
+                    }
+                }
+            } else {
+                elem.removeClass( 'submenu-hovered' );
+                $( '.dokan-dashboard-wrap' ).css( 'height', '' );
+                $(subElem).css( 'bottom', 0 );
+                $(subElem).removeAttr( 'style' );
+            }
+        } );
+    }
 })(jQuery);
 /**
  * Show Delete Button Prompt
@@ -2984,7 +3043,6 @@ jQuery(function($) {
     return false;
   }
 }
-
 
 ;(function($) {
     var storeLists = {
@@ -3211,6 +3269,12 @@ jQuery(function($) {
         submitForm: function( event ) {
             event.preventDefault();
 
+            // check if nonce exists on storeLists.query
+            if ( storeLists.query._store_filter_nonce ) {
+                delete storeLists.query._store_filter_nonce;
+            }
+            storeLists.query._store_filter_nonce = $('input[name="_store_filter_nonce"]').first().val();
+
             const queryString = decodeURIComponent( $.param( storeLists.query ) );
             const target      = '/page';
             const pathName    = window.location.pathname;
@@ -3389,31 +3453,29 @@ jQuery(function($) {
             });
         },
         openRequestWithdrawWindow: () => {
-            let self = $(this),
-                withdrawTemplate = wp.template( 'withdraw-request-popup' );
+            const withdrawTemplate = wp.template( 'withdraw-request-popup' ),
+                modal = $( '#dokan-withdraw-request-popup' ).iziModal( {
+                    width       : 690,
+                    overlayColor: 'rgba(0, 0, 0, 0.8)',
+                    headerColor : '#b11d1db8',
+                } );
 
-            $.magnificPopup.open({
-                fixedContentPos: true,
-                items: {
-                    src: withdrawTemplate().trim(),
-                    type: 'inline'
-                },
-                callbacks: {}
-            });
+            modal.iziModal( 'setContent', withdrawTemplate().trim() );
+            modal.iziModal( 'open' );
+
             Dokan_Withdraw.init();
         },
         opensScheduleWindow: () => {
-            let self = $(this),
-                scheduleTemplate = wp.template( 'withdraw-schedule-popup' );
+            const scheduleTemplate = wp.template( 'withdraw-schedule-popup' ),
+                modal = $( '#dokan-withdraw-schedule-popup' ).iziModal( {
+                    width       : 690,
+                    overlayColor: 'rgba(0, 0, 0, 0.8)',
+                    headerColor : '#b11d1db8',
+                } );
 
-            $.magnificPopup.open({
-                fixedContentPos: true,
-                items: {
-                    src: scheduleTemplate().trim(),
-                    type: 'inline'
-                },
-                callbacks: {}
-            });
+            modal.iziModal( 'setContent', scheduleTemplate().trim() );
+            modal.iziModal( 'open' );
+
             Dokan_Withdraw.init();
         },
         makeDefault: ( e ) => {
@@ -3480,22 +3542,26 @@ jQuery(function($) {
                 dokan.ajaxurl,
                 {
                     action: 'dokan_handle_withdraw_request',
-                    nonce: nonce,
+                    _handle_withdraw_request: nonce,
                     amount: amount,
                     method: method,
                 },
-                ( response ) => {
+                async ( response ) => {
                     if ( response.success ) {
-                        dokan_sweetalert( response.data, {
+                        await dokan_sweetalert( response.data, {
                             position: 'bottom-end',
                             toast: true,
                             icon: 'success',
                             showConfirmButton: false,
                             timer: 2000,
                             timerProgressBar: true,
+                            didOpen: (toast) => {
+                              setTimeout( function() {
+                                form.unblock();
+                                window.location.reload();
+                              }, 2000);
+                            }
                         } );
-                        form.unblock();
-                        window.location.reload();
                     } else {
                         dokan_sweetalert( '', {
                             icon: 'error',

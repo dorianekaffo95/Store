@@ -2,6 +2,8 @@
 
 namespace WeDevs\DokanPro\Modules\MangoPay\Support;
 
+defined( 'ABSPATH' ) || exit; // Exit if called directly
+
 use WC_Product;
 
 class Helper {
@@ -787,45 +789,34 @@ class Helper {
     }
 
     /**
-     * Retrieves Mangopay signup fields for vendors
+     * Retrieves extra sign up fields upon condition
      *
      * @since 3.5.0
      *
+     * @param int|string $user_id
+     * @param array      $data
+     *
      * @return array
      */
-    public static function get_signup_fields() {
-        return array(
-            'birthday'    => array(
+    public static function get_signup_fields( $user_id = null, $data = [] ) {
+        $default_status        = Settings::get_default_vendor_status();
+        $default_business_type = Settings::get_default_business_type();
+
+        $fields = array(
+            'birthday'      => array(
                 'id'       => 'dokan-mangopay-user-birthday',
                 'type'     => 'date',
                 'label'    => __( 'Date of Birth', 'dokan' ),
                 'class'    => array( 'inline-field' ),
                 'required' => true,
             ),
-            'nationality' => array(
+            'nationality'   => array(
                 'id'       => 'dokan-mangopay-user-nationality',
                 'type'     => 'country',
                 'label'    => __( 'Nationality', 'dokan' ),
                 'class'    => array( 'inline-field', 'wc-enhanced-select' ),
                 'required' => true,
             ),
-        );
-    }
-
-    /**
-     * Retrieves extra sign up fields upon condition
-     *
-     * @since 3.5.0
-     *
-     * @param int|string $user_id
-     *
-     * @return array
-     */
-    public static function get_extra_signup_fields( $user_id = null ) {
-        $default_status        = Settings::get_default_vendor_status();
-        $default_business_type = Settings::get_default_business_type();
-
-        $fields = array(
             'status'        => array(
                 'id'       => 'dokan-mangopay-user-status',
                 'type'     => 'hidden',
@@ -886,12 +877,36 @@ class Helper {
                 'validate'     => array( 'postcode' ),
                 'autocomplete' => 'postal-code',
             ),
+            'terms'           => array(
+                'id'       => 'dokan-mangopay-terms',
+                'label'    => wp_kses(
+                    sprintf(
+                        /* translators: %1$s) opening anchor tag with link, %2$s) closing anchor tag */
+                        __( 'I have read and accepted the %1$sTerms and Conditions%2$s of MangoPay', 'dokan' ),
+                        '<a href="https://www.mangopay.com/terms/MANGOPAY_Terms-EN.pdf" target="_blank">',
+                        '</a>'
+                    ),
+                    [
+                        'a' => [
+                            'href'   => true,
+                            'target' => true,
+                        ],
+                    ]
+                ),
+                'type'     => 'checkbox',
+                'class'    => [ 'form-row-wide', 'dokan-mangopay-terms' ],
+                'required' => true,
+            ),
         );
 
         if ( ! empty( $user_id ) ) {
             $user_status   = Meta::get_user_status( $user_id );
             $business_type = Meta::get_user_business_type( $user_id );
             $account_id    = Meta::get_mangopay_account_id( $user_id );
+
+            if ( empty( $account_id ) ) {
+                $account_id = Meta::get_trashed_mangopay_account_id( $user_id );
+            }
         }
 
         if ( 'EITHER' === $default_status ) {
@@ -927,6 +942,12 @@ class Helper {
             $fields['status']['type']        = 'hidden';
             $fields['business_type']['type'] = 'hidden';
             unset( $fields['status']['label'], $fields['business_type']['label'] );
+        }
+
+        if ( is_array( $data ) && ! empty( $data['status'] ) ) {
+            $fields['company_number']['required'] = 'LEGAL' === $data['status']
+                && ! empty( $data['business_type'] )
+                && 'BUSINESS' === $data['business_type'];
         }
 
         return $fields;
@@ -1236,9 +1257,9 @@ class Helper {
      * @param string $message
      * @param string $level
      *
-     * @return string
+     * @return void
      */
     public static function log( $message, $category = '', $level = 'debug' ) {
-        return dokan_log( sprintf( '[Dokan MangoPay] %s: ', $category ) . print_r( $message, true ), $level );
+        dokan_log( sprintf( '[Dokan MangoPay] %s: ', $category ) . print_r( $message, true ), $level );
     }
 }

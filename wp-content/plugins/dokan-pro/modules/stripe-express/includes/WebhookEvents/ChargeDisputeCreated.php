@@ -6,11 +6,12 @@ defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Order;
+use WeDevs\DokanPro\Modules\StripeExpress\Support\UserMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\OrderMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 
 /**
- * Class to handle `charge.disput.created` webhook.
+ * Class to handle `charge.dispute.created` webhook.
  *
  * @since 3.6.1
  *
@@ -19,31 +20,22 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 class ChargeDisputeCreated extends WebhookEvent {
 
     /**
-     * Class constructor.
-     *
-     * @since 3.6.1
-     *
-     * @param object $event
-     */
-    public function __construct( $event ) {
-        $this->set( $event );
-    }
-
-    /**
      * Handles the event.
      *
      * @since 3.6.1
      *
-     * @param object $disput
-     *
      * @return void
      */
-    public function handle( $disput ) {
-        $order = Order::get_order_by_charge_id( $disput->charge );
+    public function handle() {
+        $dispute = $this->get_payload();
+        $order   = $this->get_order_from_stripe_object( $dispute );
 
         if ( ! $order ) {
-            Helper::log( 'Could not find order via charge ID: ' . $disput->charge );
             return;
+        }
+
+        if ( $this->vendor_subscription ) {
+            UserMeta::update_post_product( $this->user_id, '0' );
         }
 
         OrderMeta::update_status_before_hold( $order, $order->get_status() );

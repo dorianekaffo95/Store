@@ -34,31 +34,33 @@ class TemplateHooks {
      * @return void
      */
     public function load_settings_content( $query_vars ) {
-        if ( isset( $query_vars['settings'] ) && 'table-rate-shipping' === $query_vars['settings'] ) {
-            if ( ! current_user_can( 'dokan_view_store_shipping_menu' ) || ! dokan_pro()->module->table_rate_shipping->get_instance() ) {
+        if ( ! isset( $query_vars['settings'] ) || 'table-rate-shipping' !== $query_vars['settings'] ) {
+            return;
+        }
+
+        if ( ! current_user_can( 'dokan_view_store_shipping_menu' ) || ! dokan_pro()->module->table_rate_shipping->get_instance() ) {
+            dokan_get_template_part(
+                'global/dokan-error', '', array(
+                    'deleted' => false,
+                    'message' => __( 'You have no permission to view this page', 'dokan' ),
+                )
+            );
+        } else {
+            $disable_woo_shipping = get_option( 'woocommerce_ship_to_countries' );
+
+            if ( 'disabled' === $disable_woo_shipping ) {
                 dokan_get_template_part(
                     'global/dokan-error', '', array(
                         'deleted' => false,
-                        'message' => __( 'You have no permission to view this page', 'dokan' ),
+                        'message' => __( 'Shipping functionality is currentlly disabled by site owner', 'dokan' ),
                     )
                 );
             } else {
-                $disable_woo_shipping = get_option( 'woocommerce_ship_to_countries' );
-
-                if ( 'disabled' === $disable_woo_shipping ) {
-                    dokan_get_template_part(
-                        'global/dokan-error', '', array(
-                            'deleted' => false,
-                            'message' => __( 'Shipping functionality is currentlly disabled by site owner', 'dokan' ),
-                        )
-                    );
-                } else {
-                    dokan_get_template_part(
-                        'settings', '', [
-                            'is_table_rate_shipping' => true,
-                        ]
-                    );
-                }
+                dokan_get_template_part(
+                    'settings', '', [
+                        'is_table_rate_shipping' => true,
+                    ]
+                );
             }
         }
     }
@@ -73,11 +75,15 @@ class TemplateHooks {
      * @return string $active_menu
      */
     public function filter_nav_active( $active_menu ) {
-        if (
-            'settings/table-rate-shipping' === $active_menu ||
-            'settings/distance-rate-shipping' === $active_menu
-        ) {
-            return 'settings/shipping';
+        global $wp;
+
+        if ( ! isset( $wp->query_vars['settings'] ) || ( ! in_array( $wp->query_vars['settings'], [ 'table-rate-shipping', 'distance-rate-shipping' ], true )  ) ) {
+            return $active_menu;
+        }
+
+        if ( preg_match( '/table-rate-shipping|distance-rate-shipping/i', $active_menu ) ) {
+            $menu = explode( '/', $active_menu );
+            return $menu[0] . '/shipping';
         }
 
         return $active_menu;
@@ -228,11 +234,21 @@ class TemplateHooks {
             return;
         }
 
-        $classes          = WC()->shipping->get_shipping_classes();
         $method_info      = dokan_pro()->module->table_rate_shipping->get_shipping_method( $instance_id );
         $class_priorities = isset( $method_info['settings']['classes_priorities'] ) ? $method_info['settings']['classes_priorities'] : array();
         $default_priority = isset( $method_info['settings']['default_priority'] ) ? $method_info['settings']['default_priority'] : 10;
-        $shipping_classes = get_terms( 'product_shipping_class', 'hide_empty=0' );
+
+        if ( function_exists( 'WCML\functions\getSitePress' ) ) { // wpml compatibility, will move this code to dokan wpml plugin in future
+            $sitepress = \WCML\functions\getSitePress();
+            $sitepress->switch_lang( $sitepress->get_default_language() );
+            $shipping_classes = get_terms( 'product_shipping_class', 'hide_empty=0' );
+            $classes          = WC()->shipping->get_shipping_classes(); // for shipping priority
+            $sitepress->switch_lang();
+        } else {
+            $shipping_classes = get_terms( 'product_shipping_class', 'hide_empty=0' );
+            $classes          = WC()->shipping->get_shipping_classes(); // for shipping priority
+        }
+
         $shipping_rates   = dokan_pro()->module->table_rate_shipping->get_normalized_shipping_rates( $instance_id );
         $normalized_rates = function_exists( 'wc_esc_json' ) ? wc_esc_json( wp_json_encode( $shipping_rates ) ) : _wp_specialchars( wp_json_encode( $shipping_rates ), ENT_QUOTES, 'UTF-8', true );
 

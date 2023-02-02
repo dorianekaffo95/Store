@@ -188,8 +188,9 @@ class Dokan_RMA_Ajax {
 
         try {
             $refund_amount = wc_format_decimal( $data['refund_total_amount'] );
-            $coupon = new WC_Coupon();
+            $vendor_id     = dokan_get_current_user_id();
 
+            $coupon = new WC_Coupon();
             $coupon->set_code( dokan_rma_generate_coupon_code() );
             $coupon->set_amount( $refund_amount );
             $coupon->set_date_created( dokan_current_datetime()->setTimezone( new DateTimeZone( 'UTC' ) )->getTimestamp() );
@@ -198,7 +199,6 @@ class Dokan_RMA_Ajax {
             $coupon->set_description( '' );
             $coupon->set_usage_count( 0 );
             $coupon->set_individual_use( false );
-            $coupon->set_product_ids( [] );
             $coupon->set_excluded_product_ids( [] );
             $coupon->set_usage_limit( '1' );
             $coupon->set_usage_limit_per_user( '1' );
@@ -213,15 +213,28 @@ class Dokan_RMA_Ajax {
             $coupon->set_used_by( [] );
             $coupon->set_virtual( false );
 
+            /*
+             * We need to include all the product IDs
+             * of the vendor so that the coupon can be
+             * used for the vendor's products.
+             */
+            $product_ids = dokan_coupon_get_seller_product_ids( $vendor_id );
+            $coupon->set_product_ids( $product_ids );
             $coupon->save();
-            $coupon_id = $coupon->get_id();
 
+            $coupon_id = $coupon->get_id();
             wp_update_post(
                 [
-                    'ID' => $coupon_id,
-                    'post_author' => dokan_get_current_user_id(),
+                    'ID'          => $coupon_id,
+                    'post_author' => $vendor_id,
                 ]
             );
+
+            /*
+             * This will allow the coupon to be used for new products
+             * that will be created in future as well.
+             */
+            update_post_meta( $coupon_id, 'apply_new_products', 'yes' );
 
             dokan_update_warranty_request_status( absint( $data['request_id'] ), 'completed' );
             do_action( 'dokan_send_coupon_to_customer', $coupon, $data );

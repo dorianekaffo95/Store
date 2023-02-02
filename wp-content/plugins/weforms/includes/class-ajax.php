@@ -576,7 +576,7 @@ class WeForms_Ajax {
                 }
             } elseif ( empty( $field['value'] ) ) {
                 $has_empty      = true;
-                break;
+                continue;
             } else {
                 $field = WeForms_Form_Entry_Manager::format_entry_value( $field );
                 array_push( $fields_formatted, $field );
@@ -703,7 +703,6 @@ class WeForms_Ajax {
      */
     public function handle_frontend_submission() {
         check_ajax_referer( 'wpuf_form_add' );
-
         $form_id       = isset( $_POST['form_id'] ) ? intval( $_POST['form_id'] ) : 0;
         $page_id       = isset( $_POST['page_id'] ) ? intval( $_POST['page_id'] ) : 0;
 
@@ -763,26 +762,34 @@ class WeForms_Ajax {
 
         $entry_fields = apply_filters( 'weforms_before_entry_submission', $entry_fields, $form, $form_settings, $form_fields );
 
-        $entry_id = 1;
-        $global_settings = weforms_get_settings();
-        if ( empty( $form_settings['after_submission'] ) ) {
-            $entry_id = weforms_insert_entry( [
-                'form_id' => $form_id,
-            ], $entry_fields );
-            if ( is_wp_error( $entry_id ) ) {
-                wp_send_json( [
-                    'success' => false,
-                    'error'   => $entry_id->get_error_message(),
-                ] );
-            }
-            // Fire a hook for integration
-            do_action( 'weforms_entry_submission', $entry_id, $form_id, $page_id, $form_settings );
-            $notification = new WeForms_Notification( [
-                'form_id'  => $form_id,
-                'page_id'  => $page_id,
-                'entry_id' => $entry_id,
+        //check for entry_fields for a return error
+        if ( is_wp_error( $entry_fields ) ) {
+            wp_send_json( [
+                'success' => false,
+                'error'   => $entry_fields->get_error_message(),
             ] );
-            $notification->send_notifications();
+        } else {
+            $entry_id = 1;
+            $global_settings = weforms_get_settings();
+            if ( empty( $form_settings['after_submission'] ) ) {
+                $entry_id = weforms_insert_entry( [
+                    'form_id' => $form_id,
+                ], $entry_fields );
+                if ( is_wp_error( $entry_id ) ) {
+                    wp_send_json( [
+                        'success' => false,
+                        'error'   => $entry_id->get_error_message(),
+                    ] );
+                }
+                // Fire a hook for integration
+                do_action( 'weforms_entry_submission', $entry_id, $form_id, $page_id, $form_settings );
+                $notification = new WeForms_Notification( [
+                    'form_id'  => $form_id,
+                    'page_id'  => $page_id,
+                    'entry_id' => $entry_id,
+                ] );
+                $notification->send_notifications();
+            }
         }
         // redirect URL
         $show_message = false;
@@ -819,6 +826,7 @@ class WeForms_Ajax {
             'entry_id'  => $entry_id,
             'entry_fields' =>$entry_fields,
         ] );
+
         weforms_clear_buffer();
         wp_send_json( $response );
         }

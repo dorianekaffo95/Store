@@ -70,7 +70,6 @@ class Dokan_SPMV_Admin {
                 'desc'    => __( 'Set your heading for available vendor section in single product page', 'dokan' ),
                 'type'    => 'text',
                 'default' => __( 'Other Available Vendor', 'dokan' ),
-                'tooltip' => __( 'Select where to display available vendor section in single product page.', 'dokan' ),
             ],
 
             'available_vendor_list_position' => [
@@ -84,6 +83,7 @@ class Dokan_SPMV_Admin {
                     'after_tabs'  => __( 'After Single Product Tabs', 'dokan' ),
                 ),
                 'default' => 'below_tabs',
+                'tooltip' => __( 'Select where to display available vendor section in single product page.', 'dokan' ),
             ],
 
             'show_order' => [

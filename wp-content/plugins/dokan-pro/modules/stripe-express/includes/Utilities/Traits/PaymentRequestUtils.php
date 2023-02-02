@@ -5,9 +5,11 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\Utilities\Traits;
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
+use WeDevs\DokanPro\Modules\StripeExpress\Support\Settings;
+use WeDevs\DokanPro\Modules\StripeExpress\Processors\Subscription;
 
 /**
- * Trait for subscription utility functions.
+ * Trait for payment request utility methods.
  *
  * @since 3.6.1
  *
@@ -18,14 +20,22 @@ trait PaymentRequestUtils {
     use PaymentRequestStates;
 
     /**
-     * Checks to make sure product type is supported.
+     * Checks if gateway is available.
      *
+     * @since 3.7.8
+     *
+     * @return boolean
+     */
+    public function is_gateway_available() {
+        $gateways = WC()->payment_gateways->get_available_payment_gateways();
+        return isset( $gateways[ Helper::get_gateway_id() ] );
+    }
+
+    /**
+     * Checks to make sure product type is supported.
      * Currently simple and variable products are supported.
      *
      * @todo Add support for the following product types:
-     *      'subscription',
-     *      'variable-subscription',
-     *      'subscription_variation',
      *      'booking',
      *      'bundle',
      *      'composite'
@@ -53,19 +63,34 @@ trait PaymentRequestUtils {
      * @return boolean True if the current page is supported, false otherwise.
      */
     private function is_page_supported() {
-        return $this->is_product() ||
-            is_cart() ||
-            isset( $_GET['pay_for_order'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        return $this->is_product() || is_cart();
     }
 
     /**
-     * Returns true if a the provided product is supported, false otherwise.
+     * Retrieves total label for payment request option.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public function get_total_label() {
+        $total_label = str_replace( "'", '', Settings::get_statement_descriptor() );
+
+        if ( empty( $total_label ) ) {
+            $total_label = apply_filters( 'dokan_stripe_express_payment_request_total_label_suffix', __( 'Total Payment', 'dokan' ) );
+        }
+
+        return $total_label;
+    }
+
+    /**
+     * Checks whether a certain product is supported for Payment Request.
      *
      * @since 3.6.1
      *
-     * @param WC_Product $param  The product that's being checked for support.
+     * @param WC_Product $product The product that's being checked for support.
      *
-     * @return boolean  True if the provided product is supported, false otherwise.
+     * @return boolean True if the provided product is supported, false otherwise.
      */
     private function is_product_supported( $product ) {
         if ( ! is_object( $product ) || ! in_array( $product->get_type(), $this->supported_product_types(), true ) ) {
@@ -78,7 +103,11 @@ trait PaymentRequestUtils {
         }
 
         // Trial subscriptions with shipping are not supported.
-        if ( class_exists( 'WC_Subscriptions_Product' ) && $product->needs_shipping() && \WC_Subscriptions_Product::get_trial_length( $product ) > 0 ) {
+        if (
+            Subscription::is_wc_subscription_product( $product->get_id() )
+            && $product->needs_shipping()
+            && \WC_Subscriptions_Product::get_trial_length( $product ) > 0
+        ) {
             return false;
         }
 
@@ -172,7 +201,7 @@ trait PaymentRequestUtils {
 
         $data['displayItems'] = $items;
         $data['total']        = [
-            'label'   => $this->total_label,
+            'label'   => $this->get_total_label(),
             'amount'  => Helper::get_stripe_amount( $product_price + $tax_amount ),
             'pending' => true,
         ];
@@ -215,8 +244,20 @@ trait PaymentRequestUtils {
     public function get_customer_data() {
         $customer      = new \WC_Customer( get_current_user_id() );
         $customer_data = [
-            'first_name'  => ! empty( $customer->get_billing_first_name() ) ? $customer->get_billing_first_name() : ( ! empty( $customer->get_shipping_first_name() ? $customer->get_shipping_first_name() : $customer->get_first_name() ) ),
-            'last_name'  => ! empty( $customer->get_billing_last_name() ) ? $customer->get_billing_last_name() : ( ! empty( $customer->get_shipping_last_name() ? $customer->get_shipping_last_name() : $customer->get_last_name() ) ),
+            'first_name'  => ! empty( $customer->get_billing_first_name() )
+                ? $customer->get_billing_first_name()
+                : (
+                    ! empty( $customer->get_shipping_first_name() )
+                    ? $customer->get_shipping_first_name()
+                    : $customer->get_first_name()
+                ),
+            'last_name'  => ! empty( $customer->get_billing_last_name() )
+                ? $customer->get_billing_last_name()
+                : (
+                    ! empty( $customer->get_shipping_last_name() )
+                    ? $customer->get_shipping_last_name()
+                    : $customer->get_last_name()
+                ),
         ];
 
         return $customer_data;
@@ -345,33 +386,6 @@ trait PaymentRequestUtils {
     }
 
     /**
-     * Create order. Security is handled by WC.
-     *
-     * @since 3.6.1
-     *
-     * @return void
-     */
-    public function create_order() {
-        if ( WC()->cart->is_empty() ) {
-            wp_send_json_error( __( 'Empty cart', 'dokan' ) );
-        }
-
-        if ( ! defined( 'WOOCOMMERCE_CHECKOUT' ) ) {
-            define( 'WOOCOMMERCE_CHECKOUT', true );
-        }
-
-        // Normalizes billing and shipping state values.
-        $this->normalize_state();
-
-        // In case the state is required, but is missing, add a more descriptive error notice.
-        $this->validate_state();
-
-        WC()->checkout()->process_checkout();
-
-        die( 0 );
-    }
-
-    /**
      * Builds the shippings methods to pass to Payment Request
      *
      * @since 3.6.1
@@ -491,7 +505,7 @@ trait PaymentRequestUtils {
         return [
             'displayItems' => $items,
             'total'        => [
-                'label'   => $this->total_label,
+                'label'   => $this->get_total_label(),
                 'amount'  => max( 0, apply_filters( 'dokan_stripe_express_calculated_total', Helper::get_stripe_amount( $order_total ), $order_total, WC()->cart ) ),
                 'pending' => false,
             ],
@@ -565,50 +579,113 @@ trait PaymentRequestUtils {
     }
 
     /**
-     * Checks the cart to see if all items are allowed to be used.
+     * Gets shipping options available for specified shipping address.
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
-     * @return boolean
+     * @param array   $shipping_address       Shipping address.
+     * @param boolean $itemized_display_items Indicates whether to show subtotals or itemized views.
+     *
+     * @return array Shipping options data.
+     * @throws \Exception
      */
-    public function allowed_items_in_cart() {
-        /*
-         * If the cart is not available we don't have any
-         * unsupported products in the cart, so we return true.
-         * This can happen e.g. when loading the cart or checkout blocks in Gutenberg.
-         */
-        if ( is_null( WC()->cart ) ) {
-            return true;
-        }
+    protected function process_shipping_options( $shipping_address, $itemized_display_items = false ) {
+        try {
+            // Set the shipping options.
+            $data = [];
 
-        foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-            $_product = apply_filters( 'woocommerce_cart_item_product', $cart_item['data'], $cart_item, $cart_item_key );
+            // Remember current shipping method before resetting.
+            $chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods' );
+            $this->calculate_shipping( apply_filters( 'dokan_stripe_express_payment_request_shipping_posted_values', $shipping_address ) );
 
-            if ( ! in_array( $_product->get_type(), $this->supported_product_types(), true ) ) {
-                return false;
+            $packages          = WC()->shipping->get_packages();
+            $shipping_rate_ids = [];
+
+            if ( ! empty( $packages ) && WC()->customer->has_calculated_shipping() ) {
+                foreach ( $packages as $package_key => $package ) {
+                    if ( empty( $package['rates'] ) ) {
+                        throw new \Exception( __( 'Unable to find shipping method for address.', 'dokan' ) );
+                    }
+
+                    foreach ( $package['rates'] as $key => $rate ) {
+                        if ( in_array( $rate->id, $shipping_rate_ids, true ) ) {
+                            // The Payment Requests will try to load indefinitely if there are duplicate shipping
+                            // option IDs.
+                            throw new \Exception( __( 'Unable to provide shipping options for Payment Requests.', 'dokan' ) );
+                        }
+                        $shipping_rate_ids[]        = $rate->id;
+                        $data['shipping_options'][] = [
+                            'id'     => $rate->id,
+                            'label'  => $rate->label,
+                            'detail' => '',
+                            'amount' => Helper::get_stripe_amount( $rate->cost ),
+                        ];
+                    }
+                }
+            } else {
+                throw new \Exception( __( 'Unable to provide shipping options for Payment Requests.', 'dokan' ) );
             }
 
-            // Trial subscriptions with shipping are not supported.
-            if (
-                class_exists( 'WC_Subscriptions_Product' ) &&
-                \WC_Subscriptions_Product::is_subscription( $_product ) &&
-                $_product->needs_shipping() &&
-                \WC_Subscriptions_Product::get_trial_length( $_product ) > 0
-            ) {
-                return false;
+            /*
+             * The first shipping option is automatically applied on the client.
+             * Keep chosen shipping method by sorting shipping options
+             * if the method still available for new address.
+             * Fallback to the first available shipping method.
+             */
+            if ( isset( $data['shipping_options'][0] ) ) {
+                if ( isset( $chosen_shipping_methods[0] ) ) {
+                    $chosen_method_id = $chosen_shipping_methods[0];
+                    usort(
+                        $data['shipping_options'],
+                        function ( $option_1, $option_2 ) use ( $chosen_method_id ) {
+                            if ( $option_1['id'] === $chosen_method_id ) {
+                                return -1;
+                            }
+
+                            if ( $option_2['id'] === $chosen_method_id ) {
+                                return 1;
+                            }
+
+                            return 0;
+                        }
+                    );
+                }
+
+                $first_shipping_method_id = $data['shipping_options'][0]['id'];
+                $this->modify_shipping_method( [ $first_shipping_method_id ] );
+            }
+
+            WC()->cart->calculate_totals();
+
+            $data          += $this->build_display_items( $itemized_display_items );
+            $data['result'] = 'success';
+        } catch ( \Exception $e ) {
+            $data          += $this->build_display_items( $itemized_display_items );
+            $data['result'] = 'invalid_shipping_address';
+        }
+
+        return $data;
+    }
+
+    /**
+     * Updates shipping method in WC session.
+     *
+     * @since 3.7.8
+     *
+     * @param array $shipping_methods Array of selected shipping methods ids.
+     *
+     * @return void
+     */
+    public function modify_shipping_method( $shipping_methods ) {
+        $chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods' );
+
+        if ( is_array( $shipping_methods ) ) {
+            foreach ( $shipping_methods as $i => $value ) {
+                $chosen_shipping_methods[ $i ] = wc_clean( $value );
             }
         }
 
-        /*
-         * For now, payment request doesn't work with
-         * multiple shipping packages.
-         */
-		$packages = WC()->cart->get_shipping_packages();
-		if ( 1 < count( $packages ) ) {
-			return false;
-		}
-
-        return true;
+        WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
     }
 
     /**
@@ -620,7 +697,7 @@ trait PaymentRequestUtils {
      * @param string $country Country.
      */
     public function get_normalized_postal_code( $postcode, $country ) {
-        /**
+        /*
          * Currently, Apple Pay truncates the UK and Canadian postal codes to the first 4 and 3 characters respectively
          * when passing it back from the shippingcontactselected object. This causes WC to invalidate
          * the postal code and not calculate shipping zones correctly.

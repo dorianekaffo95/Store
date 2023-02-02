@@ -5,6 +5,11 @@
  * @since 3.5.0
  */
 ?>
+
+<div id="dokan-withdraw-schedule-popup"
+    data-izimodal-title="<i class='fa fa-clock-o' aria-hidden='true'></i>&nbsp;<?php esc_html_e( 'Edit Withdraw Schedule', 'dokan' ); ?>"
+></div>
+
 <div class="dokan-clearfix dokan-panel-inner-container">
     <div class="dokan-w8">
         <p>

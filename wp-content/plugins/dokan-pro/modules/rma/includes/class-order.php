@@ -142,8 +142,10 @@ class Dokan_RMA_Order {
         $data['number']      = $item_per_page;
         $data['offset']      = $offset;
         $data['customer_id'] = dokan_get_current_user_id();
+        // get warranty requests data
+        $requests_data = $warrnty_requests->all( $data );
 
-        if( $total_page > 1 ){
+        if( $total_page > 1 && ! empty( $requests_data ) ) {
             $pagination_html = '<div class="pagination-wrap">';
             $page_links = paginate_links( array(
                 'base'      => add_query_arg( 'cpage', '%#%' ),
@@ -162,7 +164,7 @@ class Dokan_RMA_Order {
 
         dokan_get_template_part( 'rma/customer-rma-requests', '', array(
             'is_rma'          => true,
-            'requests'        => $warrnty_requests->all( $data ),
+            'requests'        => $requests_data,
             'total_count'     => $total_count,
             'pagination_html' => $pagination_html
         ) );

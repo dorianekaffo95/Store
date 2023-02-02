@@ -178,6 +178,8 @@ class WOOMULTI_CURRENCY_F_Admin_Admin {
 			wp_enqueue_script( 'woo-multi-currency', WOOMULTI_CURRENCY_F_JS . 'woo-multi-currency-admin.js', array( 'jquery' ), WOOMULTI_CURRENCY_F_VERSION );
 			/*Color picker*/
 			wp_enqueue_script( 'iris' );
+
+			wp_localize_script( 'woo-multi-currency', 'wmcParams', [ 'nonce' => wp_create_nonce( 'wmc_ajax_nonce' ) ] );
 		}
 	}
 
@@ -202,7 +204,7 @@ class WOOMULTI_CURRENCY_F_Admin_Admin {
 	function init() {
 		/*Register post type*/
 
-		load_plugin_textdomain( 'woo-multi-currency' );
+//		load_plugin_textdomain( 'woo-multi-currency' );
 		$this->load_plugin_textdomain();
 	}
 
@@ -211,10 +213,13 @@ class WOOMULTI_CURRENCY_F_Admin_Admin {
 	 * load Language translate
 	 */
 	public function load_plugin_textdomain() {
-		$locale = apply_filters( 'plugin_locale', get_locale(), 'woo-multi-currency' );
+		$locale   = apply_filters( 'plugin_locale', get_locale(), 'woo-multi-currency' );
+		$basename = 'woo-multi-currency';
+		unload_textdomain( 'woo-multi-currency' );
+
 		// Global + Frontend Locale
-		load_textdomain( 'woo-multi-currency', WOOMULTI_CURRENCY_F_LANGUAGES . "woo-multi-currency-$locale.mo" );
-		load_plugin_textdomain( 'woo-multi-currency', false, WOOMULTI_CURRENCY_F_LANGUAGES );
+		load_textdomain( 'woo-multi-currency', WP_LANG_DIR . "/{$basename}/{$basename}-{$locale}.mo" );
+		load_plugin_textdomain( 'woo-multi-currency', false, $basename . '/languages' );
 	}
 
 	/**

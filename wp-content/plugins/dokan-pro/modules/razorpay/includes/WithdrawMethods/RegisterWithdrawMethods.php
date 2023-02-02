@@ -86,7 +86,7 @@ class RegisterWithdrawMethods {
         if ( isset( $wp->query_vars['settings'] ) && in_array( $wp->query_vars['settings'], [ 'payment', 'payment-manage-' . Helper::get_gateway_id(), 'payment-manage-' . Helper::get_gateway_id() . '-edit' ], true ) ) {
             wp_enqueue_style( 'dokan-razorpay-vendor-register' );
             wp_enqueue_style( 'dokan-magnific-popup' );
-            wp_enqueue_script( 'dokan-popup' );
+            wp_enqueue_script( 'dokan-magnific-popup' );
         }
     }
 
@@ -177,6 +177,10 @@ class RegisterWithdrawMethods {
         }
 
         if ( ! Helper::display_announcement_to_non_connected_sellers() ) {
+            return;
+        }
+
+        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
             return;
         }
 

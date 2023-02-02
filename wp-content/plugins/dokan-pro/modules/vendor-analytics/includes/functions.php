@@ -139,26 +139,22 @@ function dokan_general_analytics() {
 function dokan_analytics_overview_chart_data( $start_date, $end_date, $group_by, $analytics ) {
     global $wp_locale;
 
-    $start_date_to_time = strtotime( $start_date );
-    $end_date_to_time = strtotime( $end_date );
+    $start_date_to_time = dokan_current_datetime()->modify( $start_date )->getTimestamp();
+    $end_date_to_time   = dokan_current_datetime()->modify( $end_date )->getTimestamp();
+    $chart_interval     = dokan_get_interval_between_dates( $start_date_to_time, $end_date_to_time, $group_by );
 
     if ( $group_by == 'day' ) {
         $group_by_query       = 'YEAR(post_date), MONTH(post_date), DAY(post_date)';
-        $chart_interval       = ceil( max( 0, ( $end_date_to_time - $start_date_to_time ) / ( 60 * 60 * 24 ) ) );
         $barwidth             = 60 * 60 * 24 * 1000;
     } else {
         $group_by_query = 'YEAR(post_date), MONTH(post_date)';
         $chart_interval = 0;
-        $min_date             = $start_date_to_time;
-        while ( ( $min_date   = strtotime( "+1 MONTH", $min_date ) ) <= $end_date_to_time ) {
-            $chart_interval ++;
-        }
         $barwidth             = 60 * 60 * 24 * 7 * 4 * 1000;
     }
 
     // Prepare data for report
-    $user_counts      = dokan_prepare_chart_data( $analytics, 'post_date', 'users', $chart_interval, $start_date_to_time, $group_by );
-    $session_counts     = dokan_prepare_chart_data( $analytics, 'post_date', 'sessions', $chart_interval, $start_date_to_time, $group_by );
+    $user_counts    = dokan_prepare_chart_data( $analytics, 'post_date', 'users', $chart_interval, $start_date_to_time, $group_by );
+    $session_counts = dokan_prepare_chart_data( $analytics, 'post_date', 'sessions', $chart_interval, $start_date_to_time, $group_by );
 
     // Encode in json format
     $chart_data = json_encode( array(
@@ -179,7 +175,7 @@ function dokan_analytics_overview_chart_data( $start_date, $end_date, $group_by,
     <script type="text/javascript">
         jQuery(function($) {
 
-            var analytics_data = jQuery.parseJSON( '<?php echo $chart_data; ?>' );
+            var analytics_data = JSON.parse( '<?php echo $chart_data; ?>' );
             var isRtl = '<?php echo is_rtl() ? "1" : "0"; ?>'
 
             var series = [

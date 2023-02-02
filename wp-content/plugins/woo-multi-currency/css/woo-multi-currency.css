@@ -543,7 +543,6 @@
     margin-left: auto;
     margin-right: auto;
   }
-
   .woo-multi-currency.wmc-sidebar .wmc-title {
     margin-left: auto;
     margin-right: auto;
@@ -554,7 +553,6 @@
   .woo-multi-currency.wmc-sidebar .wmc-list-currencies .wmc-sidebar-open {
     display: flex;
   }
-
   .woo-multi-currency.wmc-sidebar.wmc-hover {
     width: 100%;
     top: 0;
@@ -595,6 +593,40 @@
 /*Remove duplicated regular price of LearnPress courses for some themes*/
 .course-origin-price + .origin-price {
   display: none;
+}
+
+.wmc-cache-loading .woocommerce-Price-amount.amount {
+  position: relative;
+}
+.wmc-cache-loading .woocommerce-Price-amount.amount:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f0f0f0;
+}
+.wmc-cache-loading .woocommerce-Price-amount.amount:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 10px;
+  bottom: 0;
+  background-color: #fefefe;
+  opacity: 0.5;
+  left: 0;
+  filter: blur(1px);
+  animation: waiting_bar_effect 1s infinite;
+}
+
+@keyframes waiting_bar_effect {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 /*# sourceMappingURL=woo-multi-currency.css.map */

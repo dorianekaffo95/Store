@@ -84,7 +84,7 @@ jQuery(document).ready(function () {
     jQuery('.wmc-submit').one('click', function () {
         jQuery(this).addClass('loading');
     });
-    
+
     jQuery('.select2-multiple').select2({
         width: '100%', // need to override the changed default
     });
@@ -209,9 +209,16 @@ jQuery(document).ready(function () {
 
             jQuery.ajax({
                 type: 'POST',
-                data: 'action=woomulticurrency_exchange&' + str_data,
+                // data: 'action=woomulticurrency_exchange&' + str_data,
+                data: {
+                    action: 'woomulticurrency_exchange',
+                    nonce: wmcParams.nonce,
+                    original_price: original_currency,
+                    other_currencies: other_currencies,
+                },
                 url: ajaxurl,
                 success: function (obj) {
+                    console.log(obj)
                     jQuery.each(obj, function (currency, rate) {
                         if (jQuery('tr.' + currency + '-currency').length > 0) {
                             jQuery('tr.' + currency + '-currency').find('input[name="woo_multi_currency_params[currency_rate][]"]').val(rate);

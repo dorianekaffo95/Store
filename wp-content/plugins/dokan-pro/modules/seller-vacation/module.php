@@ -2,6 +2,8 @@
 
 namespace WeDevs\DokanPro\Modules\SellerVacation;
 
+use WeDevs\DokanPro\Modules\SellerVacation\SettingsApi\Store;
+
 class Module {
 
     /**
@@ -66,6 +68,7 @@ class Module {
         require_once DOKAN_SELLER_VACATION_INCLUDES . '/class-dokan-seller-vacation-store-settings.php';
         require_once DOKAN_SELLER_VACATION_INCLUDES . '/class-dokan-seller-vacation-ajax.php';
         require_once DOKAN_SELLER_VACATION_INCLUDES . '/class-dokan-seller-vacation-cron.php';
+        require_once DOKAN_SELLER_VACATION_INCLUDES . '/SettingsApi/Store.php';
     }
 
     /**
@@ -92,6 +95,7 @@ class Module {
         new \Dokan_Seller_Vacation_Store_Settings();
         new \Dokan_Seller_Vacation_Ajax();
         new \Dokan_Seller_Vacation_Cron();
+        new Store();
     }
 
     /**

@@ -19,30 +19,18 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 class ChargeCaptured extends WebhookEvent {
 
     /**
-     * Class constructor.
-     *
-     * @since 3.6.1
-     *
-     * @param object $event
-     */
-    public function __construct( $event ) {
-        $this->set( $event );
-    }
-
-    /**
      * Handles the event.
      *
      * @since 3.6.1
      *
-     * @param object $charge
-     *
      * @return void
      */
-    public function handle( $charge ) {
-        $order = Order::get_order_by_charge_id( $charge->id );
+    public function handle() {
+        $charge = $this->get_payload();
+        $order  = Order::get_order_by_charge_id( $charge->id );
 
         if ( ! $order ) {
-            Helper::log( 'Could not find order via charge ID: ' . $charge->id );
+            $this->log( 'Could not find order via charge ID: ' . $charge->id );
             return;
         }
 
@@ -60,6 +48,7 @@ class ChargeCaptured extends WebhookEvent {
 
         OrderMeta::update_charge_captured( $order );
         OrderMeta::update_transaction_id( $order, $charge->id );
+        OrderMeta::save( $order );
 
         // Check and see if capture is partial.
         if ( 0 < $charge->amount_refunded ) {
@@ -79,14 +68,12 @@ class ChargeCaptured extends WebhookEvent {
             $order->add_order_note(
                 sprintf(
                     /* translators: 1) gateway title, 2) transaction id */
-                    __( '[%1$s] Stripe charge complete (Charge ID: %2$s)', 'dokan' ),
+                    __( '[%1$s] Charge complete (Charge ID: %2$s)', 'dokan' ),
                     Helper::get_gateway_title(),
                     $charge->id
                 )
             );
         }
-
-        OrderMeta::save( $order );
     }
 
     /**
@@ -94,7 +81,7 @@ class ChargeCaptured extends WebhookEvent {
      *
      * @since 3.6.1
      *
-     * @param object $charge
+     * @param \Stripe\Charge $charge
      *
      * @return float
      */

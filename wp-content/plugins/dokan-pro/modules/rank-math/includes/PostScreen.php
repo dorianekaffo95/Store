@@ -43,10 +43,27 @@ class PostScreen extends Post_Screen {
      * Retrieves object id
      *
      * @since 3.4.0
+     * @since 3.7.13 Added logics for handle from the new
+     *                        Vendor Dashboard Product edit page.
      *
      * @return int
      */
     public function get_object_id() {
-        return ! empty( $_GET['product_id'] ) ? absint( wp_unslash( $_GET['product_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $product_id = ! empty( $_GET['product_id'] ) ? absint( wp_unslash( $_GET['product_id'] ) ) : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+        if ( ! empty( $product_id ) ) {
+            return $product_id;
+        }
+
+        /**
+         * Fetch `dokan_rank_math_edit_post_id` from user meta
+         *
+         * As, we're storing current edit post id when user goes in
+         * Product edit page and updates this value through API.
+         *
+         * Then also reload the page and fetch from this object id.
+         */
+        $user_id = dokan_get_current_user_id();
+        return (int) get_user_meta( $user_id, 'dokan_rank_math_edit_post_id', true );
     }
 }

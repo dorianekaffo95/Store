@@ -450,11 +450,8 @@ class PayIn extends Processor {
 
                 if ( in_array( $data['card_type'], Helper::get_3ds_supported_cards(), true ) ) {
                     $pay_in->SecureMode                            = 'FORCE';
+                    $pay_in->Requested3DSVersion                   = 'V2_1';
                     $pay_in->ExecutionDetails->SecureModeReturnURL = $data['return_url'];
-
-                    if ( ! Settings::is_3ds2_disabled() ) {
-                        $pay_in->Requested3DSVersion = 'V2_1';
-                    }
                 }
                 break;
 

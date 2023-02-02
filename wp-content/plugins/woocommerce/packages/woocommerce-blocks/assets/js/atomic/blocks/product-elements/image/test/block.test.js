@@ -9,12 +9,7 @@ import { ProductDataContextProvider } from '@woocommerce/shared-context';
  */
 import { Block } from '../block';
 
-jest.mock( '@woocommerce/block-settings', () => ( {
-	__esModule: true,
-	PLACEHOLDER_IMG_SRC: 'placeholder.jpg',
-} ) );
-
-jest.mock( '../../../../../hooks/style-attributes', () => ( {
+jest.mock( '@woocommerce/base-hooks', () => ( {
 	__esModule: true,
 	useBorderProps: jest.fn( () => ( {
 		className: '',
@@ -67,8 +62,18 @@ describe( 'Product Image Block', () => {
 	describe( 'with product link', () => {
 		test( 'should render an anchor with the product image', () => {
 			const component = render(
-				<ProductDataContextProvider product={ productWithImages }>
-					<Block showProductLink={ true } />
+				<ProductDataContextProvider
+					product={ productWithImages }
+					isLoading={ false }
+				>
+					<Block
+						showProductLink={ true }
+						productId={ productWithImages.id }
+						showSaleBadge={ false }
+						saleBadgeAlign={ 'left' }
+						imageSizing={ 'full-size' }
+						isDescendentOfQueryLoop={ false }
+					/>
 				</ProductDataContextProvider>
 			);
 
@@ -84,15 +89,25 @@ describe( 'Product Image Block', () => {
 			);
 
 			const anchor = productImage.closest( 'a' );
-			expect( anchor.getAttribute( 'href' ) ).toBe(
+			expect( anchor?.getAttribute( 'href' ) ).toBe(
 				productWithImages.permalink
 			);
 		} );
 
 		test( 'should render an anchor with the placeholder image', () => {
 			const component = render(
-				<ProductDataContextProvider product={ productWithoutImages }>
-					<Block showProductLink={ true } />
+				<ProductDataContextProvider
+					product={ productWithoutImages }
+					isLoading={ false }
+				>
+					<Block
+						showProductLink={ true }
+						productId={ productWithoutImages.id }
+						showSaleBadge={ false }
+						saleBadgeAlign={ 'left' }
+						imageSizing={ 'full-size' }
+						isDescendentOfQueryLoop={ false }
+					/>
 				</ProductDataContextProvider>
 			);
 
@@ -102,10 +117,10 @@ describe( 'Product Image Block', () => {
 			);
 
 			const anchor = placeholderImage.closest( 'a' );
-			expect( anchor.getAttribute( 'href' ) ).toBe(
+			expect( anchor?.getAttribute( 'href' ) ).toBe(
 				productWithoutImages.permalink
 			);
-			expect( anchor.getAttribute( 'aria-label' ) ).toBe(
+			expect( anchor?.getAttribute( 'aria-label' ) ).toBe(
 				`Link to ${ productWithoutImages.name }`
 			);
 		} );
@@ -114,8 +129,18 @@ describe( 'Product Image Block', () => {
 	describe( 'without product link', () => {
 		test( 'should render the product image without an anchor wrapper', () => {
 			const component = render(
-				<ProductDataContextProvider product={ productWithImages }>
-					<Block showProductLink={ false } />
+				<ProductDataContextProvider
+					product={ productWithImages }
+					isLoading={ false }
+				>
+					<Block
+						showProductLink={ false }
+						productId={ productWithImages.id }
+						showSaleBadge={ false }
+						saleBadgeAlign={ 'left' }
+						imageSizing={ 'full-size' }
+						isDescendentOfQueryLoop={ false }
+					/>
 				</ProductDataContextProvider>
 			);
 			const image = component.getByTestId( 'product-image' );
@@ -134,8 +159,18 @@ describe( 'Product Image Block', () => {
 
 		test( 'should render the placeholder image without an anchor wrapper', () => {
 			const component = render(
-				<ProductDataContextProvider product={ productWithoutImages }>
-					<Block showProductLink={ false } />
+				<ProductDataContextProvider
+					product={ productWithoutImages }
+					isLoading={ false }
+				>
+					<Block
+						showProductLink={ false }
+						productId={ productWithoutImages.id }
+						showSaleBadge={ false }
+						saleBadgeAlign={ 'left' }
+						imageSizing={ 'full-size' }
+						isDescendentOfQueryLoop={ false }
+					/>
 				</ProductDataContextProvider>
 			);
 
@@ -146,6 +181,33 @@ describe( 'Product Image Block', () => {
 
 			const anchor = placeholderImage.closest( 'a' );
 			expect( anchor ).toBe( null );
+		} );
+	} );
+
+	describe( 'without image', () => {
+		test( 'should render the placeholder with no inline width or height attributes', () => {
+			const component = render(
+				<ProductDataContextProvider
+					product={ productWithoutImages }
+					isLoading={ false }
+				>
+					<Block
+						showProductLink={ true }
+						productId={ productWithoutImages.id }
+						showSaleBadge={ false }
+						saleBadgeAlign={ 'left' }
+						imageSizing={ 'full-size' }
+						isDescendentOfQueryLoop={ false }
+					/>
+				</ProductDataContextProvider>
+			);
+
+			const placeholderImage = component.getByAltText( '' );
+			expect( placeholderImage.getAttribute( 'src' ) ).toBe(
+				'placeholder.jpg'
+			);
+			expect( placeholderImage.getAttribute( 'width' ) ).toBe( null );
+			expect( placeholderImage.getAttribute( 'height' ) ).toBe( null );
 		} );
 	} );
 } );

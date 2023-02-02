@@ -19,17 +19,26 @@
  * See https://wp.me/p9Jlb4-22P
  */
 const JETPACK_GOOGLE_FONTS_LIST = array(
+	'Albert Sans',
+	'Alegreya',
 	'Arvo',
 	'Bodoni Moda',
 	'Cabin',
 	'Chivo',
+	'Commissioner',
+	'Cormorant',
 	'Courier Prime',
+	'Crimson Pro',
+	'DM Mono',
 	'DM Sans',
 	'Domine',
 	'EB Garamond',
+	'Epilogue',
+	'Figtree',
 	'Fira Sans',
-	'IBM Plex Sans',
+	'Fraunces',
 	'IBM Plex Mono',
+	'IBM Plex Sans',
 	'Inter',
 	'Josefin Sans',
 	'Jost',
@@ -43,12 +52,16 @@ const JETPACK_GOOGLE_FONTS_LIST = array(
 	'Nunito',
 	'Open Sans',
 	'Overpass',
+	'Petrona',
+	'Piazzolla',
 	'Playfair Display',
+	'Plus Jakarta Sans',
 	'Poppins',
 	'Raleway',
-	'Roboto',
 	'Roboto Slab',
+	'Roboto',
 	'Rubik',
+	'Sora',
 	'Source Sans Pro',
 	'Source Serif Pro',
 	'Space Mono',
@@ -104,4 +117,7 @@ add_action( 'after_setup_theme', 'jetpack_add_google_fonts_provider' );
 
 add_filter( 'wp_resource_hints', '\Automattic\Jetpack\Fonts\Utils::font_source_resource_hint', 10, 2 );
 add_filter( 'pre_render_block', '\Automattic\Jetpack\Fonts\Introspectors\Blocks::enqueue_block_fonts', 10, 2 );
-add_action( 'init', '\Automattic\Jetpack\Fonts\Introspectors\Global_Styles::enqueue_global_styles_fonts' );
+// The priority for the next hook is is set to 22 because it needs to run after Gutenberg's
+// re-registration (at priority 22) of the core blocks it de-registers (at the default priority 10),
+// otherwise Gutenberg caches an incorrect state.
+add_action( 'init', '\Automattic\Jetpack\Fonts\Introspectors\Global_Styles::enqueue_global_styles_fonts', 22 );

@@ -9,7 +9,7 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\PaymentMethod;
 use WeDevs\DokanPro\Modules\StripeExpress\PaymentTokens\Card as PaymentTokenCC;
 
 /**
- * Gateway handler class for Stripe Credit/Debit Cards.
+ * Payment method handler class for Stripe Credit/Debit Cards.
  *
  * @since 3.6.1
  *
@@ -59,7 +59,7 @@ class Card extends PaymentMethod {
      *
      * @since 3.6.1
      *
-     * @param array|bool $payment_details Optional payment details from charge object.
+     * @param array $payment_details Optional payment details from charge object.
      *
      * @return string
      */
@@ -68,13 +68,17 @@ class Card extends PaymentMethod {
             return $this->title;
         }
 
-        $details       = $payment_details[ $this->stripe_id ];
+        $details       = isset( $payment_details[ $this->stripe_id ] ) ? $payment_details[ $this->stripe_id ] : '';
         $funding_types = [
             'credit'  => __( 'credit', 'dokan' ),
             'debit'   => __( 'debit', 'dokan' ),
             'prepaid' => __( 'prepaid', 'dokan' ),
             'unknown' => __( 'unknown', 'dokan' ),
         ];
+
+        if ( empty( $details ) || ! isset( $funding_types[ $details->funding ] ) || ! isset( $details->network ) ) {
+            return $this->title;
+        }
 
         return sprintf(
             // Translators: %1$s card brand, %2$s card funding (prepaid, credit, etc.).
@@ -101,8 +105,8 @@ class Card extends PaymentMethod {
      *
      * @since 3.6.1
      *
-     * @param string $user_id        WP_User ID
-     * @param object $payment_method Stripe payment method object
+     * @param int|string            $user_id        WP User ID
+     * @param \Stripe\PaymentMethod $payment_method Stripe payment method object
      *
      * @return PaymentTokenCC
      */

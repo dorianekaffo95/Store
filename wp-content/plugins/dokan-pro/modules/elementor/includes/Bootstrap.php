@@ -161,7 +161,7 @@ class Bootstrap extends ModuleBase {
 
         foreach ( $controls as $control ) {
             $control_class = "\\WeDevs\\DokanPro\\Modules\\Elementor\\Controls\\{$control}";
-            $controls_manager->register( new $control_class(), $control_class::CONTROL_TYPE );
+            $controls_manager->register( new $control_class() );
         }
     }
 

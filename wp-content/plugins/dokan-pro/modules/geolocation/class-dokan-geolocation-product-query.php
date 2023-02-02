@@ -61,6 +61,10 @@ class Dokan_Geolocation_Product_Query {
         $this->longitude = isset( $_GET['longitude'] ) ? $_GET['longitude'] : null;
         $this->distance  = isset( $_GET['distance'] ) ? $_GET['distance'] : 0;
 
+        if ( empty( $this->latitude ) || empty( $this->longitude ) ) {
+            return;
+        }
+
         add_filter( 'posts_fields_request', array( $this, 'posts_fields_request' ) );
         add_filter( 'posts_join_request', array( $this, 'posts_join_request' ) );
         add_filter( 'posts_groupby_request', array( $this, 'posts_groupby_request' ) );

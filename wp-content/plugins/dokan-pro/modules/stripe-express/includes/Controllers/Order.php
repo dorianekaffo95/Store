@@ -4,15 +4,16 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\Controllers;
 
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
+use WC_Order;
 use Exception;
 use WeDevs\Dokan\Exceptions\DokanException;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
-use WeDevs\DokanPro\Modules\StripeExpress\Api\SetupIntent;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Settings;
 use WeDevs\DokanPro\Modules\StripeExpress\Api\PaymentMethod;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\OrderMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Payment;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Customer;
+use WeDevs\DokanPro\Modules\StripeExpress\Processors\Subscription;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Order as OrderProcessor;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\BackgroundProcesses\DelayedDisbursement;
 
@@ -31,11 +32,7 @@ class Order {
      * @since 3.6.1
      */
     public function __construct() {
-        if ( ! Helper::is_gateway_ready() ) {
-            return;
-        }
-
-        $this->hooks();
+        add_action( 'init', [ $this, 'hooks' ] );
     }
 
     /**
@@ -45,7 +42,7 @@ class Order {
      *
      * @return void
      */
-    private function hooks() {
+    public function hooks() {
         // Process order redirect
         add_action( 'wp', [ $this, 'maybe_process_order_redirect' ] );
         // Handle payment disbursement
@@ -67,41 +64,81 @@ class Order {
      */
     public function maybe_process_order_redirect() {
         if ( Helper::is_payment_methods_page() ) {
-            if ( Helper::is_setup_intent_success_creation_redirection() ) {
-                if ( isset( $_GET['redirect_status'] ) && 'succeeded' === $_GET['redirect_status'] ) {
-                    $user_id  = get_current_user_id();
-                    $customer = Customer::set( $user_id );
-                    wc_add_notice( __( 'Payment method successfully added.', 'dokan' ) );
-
-                    /*
-                     * The newly created payment method does not inherit the customers' billing info, so we manually
-                     * trigger an update; in case of failure we log the error and continue because the payment method's
-                     * billing info will be updated when the customer makes a purchase anyway.
-                     */
-                    try {
-                        $setup_intent_id       = isset( $_GET['setup_intent'] ) ? sanitize_text_field( wp_unslash( $_GET['setup_intent'] ) ) : '';
-                        $setup_intent          = SetupIntent::get( $setup_intent_id );
-                        $customer_data         = $customer->map_data( null, new \WC_Customer( $user_id ) );
-                        $payment_method_object = PaymentMethod::update(
-                            $setup_intent->payment_method,
-                            [
-                                'billing_details' => [
-                                    'name'    => $customer_data['name'],
-                                    'email'   => $customer_data['email'],
-                                    'phone'   => $customer_data['phone'],
-                                    'address' => $customer_data['address'],
-                                ],
-                            ]
-                        );
-
-                        do_action( 'dokan_stripe_express_add_payment_method', $user_id, $payment_method_object );
-                    } catch ( DokanException $e ) {
-                        Helper::log( 'Error: ' . $e->getMessage() );
-                    }
-                } else {
-                    wc_add_notice( __( 'Failed to add payment method.', 'dokan' ), 'error', [ 'icon' => 'error' ] );
-                }
+            if ( ! Helper::is_setup_intent_success_creation_redirection() ) {
+                return;
             }
+
+            if ( ! isset( $_GET['redirect_status'] ) || 'succeeded' !== $_GET['redirect_status'] ) {
+                wc_add_notice( __( 'Failed to add payment method.', 'dokan' ), 'error', [ 'icon' => 'error' ] );
+                return;
+            }
+
+            $setup_intent = false;
+            if ( isset( $_GET['setup_intent'] ) ) {
+                $setup_intent = Payment::get_intent(
+                    null,
+                    sanitize_text_field( wp_unslash( $_GET['setup_intent'] ) ),
+                    [
+                        'expand' => [
+                            'payment_method',
+                            'latest_attempt',
+                        ],
+                    ],
+                    true
+                );
+            }
+
+            if ( ! $setup_intent ) {
+                return;
+            }
+
+            /*
+             * The newly created payment method does not inherit the customers' billing info, so we manually
+             * trigger an update; in case of failure we log the error and continue because the payment method's
+             * billing info will be updated when the customer makes a purchase anyway.
+             */
+            try {
+                $user_id           = get_current_user_id();
+                $customer          = Customer::set( $user_id );
+                $payment_method_id = $setup_intent->payment_method;
+
+                if (
+                    ! empty( $setup_intent->latest_attempt->payment_method_details ) &&
+                    'ideal' === $setup_intent->latest_attempt->payment_method_details->type &&
+                    ! empty(
+                        $setup_intent->latest_attempt->payment_method_details
+                            ->{$setup_intent->latest_attempt->payment_method_details->type}
+                                ->generated_sepa_debit
+                    )
+                ) {
+                    $payment_method_id = $setup_intent->latest_attempt->payment_method_details
+                        ->{$setup_intent->latest_attempt->payment_method_details->type}
+                            ->generated_sepa_debit;
+                }
+
+                // Payment method needs to be attached to a customer before updating
+                $customer->attach_payment_method( $payment_method_id );
+                $customer_data         = $customer->map_data( null, new \WC_Customer( $user_id ) );
+                $payment_method_object = PaymentMethod::update(
+                    $payment_method_id,
+                    [
+                        'billing_details' => [
+                            'name'    => $customer_data['name'],
+                            'email'   => $customer_data['email'],
+                            'phone'   => $customer_data['phone'],
+                            'address' => $customer_data['address'],
+                        ],
+                    ]
+                );
+
+                do_action( 'dokan_stripe_express_add_payment_method', $user_id, $payment_method_object );
+
+                wc_add_notice( __( 'Payment method successfully added.', 'dokan' ) );
+            } catch ( DokanException $e ) {
+                wc_add_notice( __( 'Failed to add payment method.', 'dokan' ), 'error' );
+                Helper::log( 'Error: ' . $e->get_message() );
+            }
+
             return;
         }
 
@@ -110,27 +147,40 @@ class Order {
             empty( $_GET['wc_payment_method'] ) ||
             Helper::get_gateway_id() !== sanitize_text_field( wp_unslash( $_GET['wc_payment_method'] ) ) ||
             ! isset( $_GET['_wpnonce'] ) ||
-            ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'dokan_stripe_express_process_redirect_order' )
+            ! wp_verify_nonce( sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ), 'dokan_stripe_express_process_redirect_order' ) ||
+            empty( $_GET['order_id'] )
         ) {
+            return;
+        }
+
+        $order = wc_get_order( absint( $_GET['order_id'] ) );
+        if ( ! $order ) {
             return;
         }
 
         if ( ! empty( $_GET['payment_intent_client_secret'] ) ) {
             $intent_id = isset( $_GET['payment_intent'] ) ? sanitize_text_field( wp_unslash( $_GET['payment_intent'] ) ) : '';
+            OrderMeta::update_debug_payment_intent( $order, $intent_id );
+            OrderMeta::save( $order );
         } elseif ( ! empty( $_GET['setup_intent_client_secret'] ) ) {
             $intent_id = isset( $_GET['setup_intent'] ) ? sanitize_text_field( wp_unslash( $_GET['setup_intent'] ) ) : '';
+            OrderMeta::update_debug_setup_intent( $order, $intent_id );
+            OrderMeta::save( $order );
         } else {
             return;
         }
 
-        $order_id            = isset( $_GET['order_id'] ) ? intval( wp_unslash( $_GET['order_id'] ) ) : '';
-        $save_payment_method = isset( $_GET['save_payment_method'] ) ? 'yes' === sanitize_text_field( wp_unslash( $_GET['save_payment_method'] ) ) : false;
-
-        if ( empty( $intent_id ) || empty( $order_id ) ) {
+        if ( empty( $intent_id ) ) {
             return;
         }
 
-        $this->process_order_redirect( $order_id, $intent_id, $save_payment_method );
+        if ( apply_filters( 'dokan_stripe_express_should_not_process_order_redirect', $order->has_status( [ 'processing', 'completed', 'on-hold' ] ), $order ) ) {
+            return;
+        }
+
+        $save_payment_method = isset( $_GET['save_payment_method'] ) && 'yes' === sanitize_text_field( wp_unslash( $_GET['save_payment_method'] ) );
+
+        $this->process_order_redirect( $order, $intent_id, $save_payment_method );
     }
 
     /**
@@ -138,19 +188,14 @@ class Order {
      *
      * @since 3.6.1
      *
-     * @param int|string $order_id
-     * @param string     $intent_id
-     * @param boolean    $save_payment_method
+     * @param WC_Order $order
+     * @param string   $intent_id
+     * @param boolean  $save_payment_method
      *
      * @return void
      */
-    public function process_order_redirect( $order_id, $intent_id, $save_payment_method ) {
-        $order = wc_get_order( $order_id );
-        if ( ! $order ) {
-            return;
-        }
-
-        if ( $order->has_status( [ 'processing', 'completed', 'on-hold' ] ) ) {
+    public function process_order_redirect( $order, $intent_id, $save_payment_method ) {
+        if ( ! $order instanceof WC_Order ) {
             return;
         }
 
@@ -158,7 +203,7 @@ class Order {
             return;
         }
 
-        Helper::log( "Begin processing redirect payment for order $order_id for the amount of {$order->get_total()}" );
+        Helper::log( "Begin processing redirect payment for order {$order->get_id()} for the amount of {$order->get_total()}" );
 
         try {
             Payment::process_confirmed_intent( $order, $intent_id, $save_payment_method );
@@ -199,8 +244,17 @@ class Order {
             return;
         }
 
-        // check payment gateway used was mangopay
+        // check if the used payment method was Stripe Express
         if ( $order->get_payment_method() !== Helper::get_gateway_id() ) {
+            return;
+        }
+
+        // Disbursement is not needed for vendor subscription orders.
+        if ( Subscription::is_vendor_subscription_order( $order ) ) {
+            return;
+        }
+
+        if ( ! Helper::is_payment_needed( $order->get_id() ) ) {
             return;
         }
 
@@ -215,8 +269,13 @@ class Order {
             OrderMeta::save( $order );
         }
 
-        // check if both order status and disburse mode is completed
-        if ( 'completed' === $new_status && 'ON_ORDER_COMPLETED' !== $disburse_mode ) {
+        /*
+         * In case of delayed disbursement mode,
+         * we don't need to process it here.
+         *
+         * @see $this->disburse_delayed_payment()
+         */
+        if ( 'DELAYED' === $disburse_mode ) {
             return;
         }
 
@@ -305,12 +364,6 @@ class Order {
         ];
 
         $query['meta_query'][] = [
-            'key'     => 'has_sub_order',
-            'value'   => '1',
-            'compare' => '=',
-        ];
-
-        $query['meta_query'][] = [
             'key'     => '_payment_method',
             'value'   => Helper::get_gateway_id(),
             'compare' => '=',
@@ -334,6 +387,10 @@ class Order {
             return $processing_fee;
         }
 
+        if ( ! Helper::is_payment_needed( $order->get_id() ) ) {
+            return 0;
+        }
+
         $stripe_processing_fee = OrderMeta::get_dokan_gateway_fee( $order );
 
         if ( ! $stripe_processing_fee ) {
@@ -341,7 +398,7 @@ class Order {
             $stripe_processing_fee = OrderMeta::get_stripe_fee( $order );
         }
 
-        return ! empty( $stripe_processing_fee ) ? $stripe_processing_fee : $processing_fee;
+        return $stripe_processing_fee > 0 ? $stripe_processing_fee : $processing_fee;
     }
 
     /**

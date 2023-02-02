@@ -62,17 +62,17 @@
         },
         {
             "name": "hybridauth/hybridauth",
-            "version": "v3.8.2",
-            "version_normalized": "3.8.2.0",
+            "version": "3.7.1",
+            "version_normalized": "3.7.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hybridauth/hybridauth.git",
-                "reference": "0d6e31482c544e5ed2bdc83bd3c033054129c482"
+                "reference": "0ec1b8cb8b230aae739422c5e42bc5733b3a7316"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/0d6e31482c544e5ed2bdc83bd3c033054129c482",
-                "reference": "0d6e31482c544e5ed2bdc83bd3c033054129c482",
+                "url": "https://api.github.com/repos/hybridauth/hybridauth/zipball/0ec1b8cb8b230aae739422c5e42bc5733b3a7316",
+                "reference": "0ec1b8cb8b230aae739422c5e42bc5733b3a7316",
                 "shasum": ""
             },
             "require": {
@@ -86,7 +86,7 @@
                 "firebase/php-jwt": "Needed to support Apple provider",
                 "phpseclib/phpseclib": "Needed to support Apple provider"
             },
-            "time": "2022-08-18T19:48:17+00:00",
+            "time": "2021-03-13T17:35:33+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -121,23 +121,23 @@
             "support": {
                 "gitter": "https://gitter.im/hybridauth/hybridauth",
                 "issues": "https://github.com/hybridauth/hybridauth/issues",
-                "source": "https://github.com/hybridauth/hybridauth/tree/v3.8.2"
+                "source": "https://github.com/hybridauth/hybridauth/tree/3.7.1"
             },
             "install-path": "../hybridauth/hybridauth"
         },
         {
             "name": "mangopay/php-sdk-v2",
-            "version": "3.12.0",
-            "version_normalized": "3.12.0.0",
+            "version": "3.18.0",
+            "version_normalized": "3.18.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Mangopay/mangopay2-php-sdk.git",
-                "reference": "52e4cd70f41d7e2c2015f1537c3404de6f30ac43"
+                "reference": "89455d631e21cd08be971abc958770e47eb832d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Mangopay/mangopay2-php-sdk/zipball/52e4cd70f41d7e2c2015f1537c3404de6f30ac43",
-                "reference": "52e4cd70f41d7e2c2015f1537c3404de6f30ac43",
+                "url": "https://api.github.com/repos/Mangopay/mangopay2-php-sdk/zipball/89455d631e21cd08be971abc958770e47eb832d1",
+                "reference": "89455d631e21cd08be971abc958770e47eb832d1",
                 "shasum": ""
             },
             "require": {
@@ -151,7 +151,7 @@
                 "friendsofphp/php-cs-fixer": "^2.18",
                 "phpunit/phpunit": ">=5.7.27 <10"
             },
-            "time": "2022-03-31T17:02:44+00:00",
+            "time": "2023-01-12T15:47:12+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -166,14 +166,14 @@
             "description": "PHP SDK for MANGOPAY",
             "support": {
                 "issues": "https://github.com/Mangopay/mangopay2-php-sdk/issues",
-                "source": "https://github.com/Mangopay/mangopay2-php-sdk/tree/3.12.0"
+                "source": "https://github.com/Mangopay/mangopay2-php-sdk/tree/3.18.0"
             },
             "install-path": "../mangopay/php-sdk-v2"
         },
         {
             "name": "moip/moip-sdk-php",
-            "version": "dev-release/3.7.5",
-            "version_normalized": "dev-release/3.7.5",
+            "version": "dev-release/3.7.13",
+            "version_normalized": "dev-release/3.7.13",
             "dist": {
                 "type": "path",
                 "url": "modules/moip/moip-sdk",

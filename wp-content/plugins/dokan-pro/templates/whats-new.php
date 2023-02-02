@@ -4,6 +4,424 @@
  */
 $changelog = [
     [
+        'version'  => 'Version 3.7.13',
+        'released' => '2023-01-26',
+        'changes'  => [
+            'New'         => [
+                [
+                    'title'       => 'Extended REST API support for Dokan',
+                    'description' => '-- https://example.com/wp-json/dokan/v1/vendor-dashboard/profile-progressbar
+-- https://example.com/wp-json/dokan/v1/rank-math/{id}//store-current-editable-post
+-- https://example.com/wp-json/dokan/v1/blocks/product-variation/{id}
+-- https://example.com/wp-json/dokan/v1/products/{id}/variations/{id}
+-- https://example.com/wp-json/dokan/v1/products/{id}/variations/batch',
+                ],
+                [
+                    'title'       => 'Added a filter hook named `dokan_vendor_biography_form` to control vendor biography form arguments',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Added a filter named `dokan_paypal_marketplace_product_type` hook to control PayPal marketplace default product type',
+                    'description' => '',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => 'Allow vendors to add new values to predefined attributes',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Added a new section to regenerate variable products author under Dokan → Tools page.',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => 'Multiple store category modal wasn’t working for some theme',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreReview]: Reviews page markup broken if Vendor Product Review option disabled from admin settings',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] The vendors are getting an error on the vendor dashboard while adding a person type.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Enabling two booking products that require confirmation is throwing an email error.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Added translation support for delivery slot calendar under checkout page.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.12',
+        'released' => '2023-01-10',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => '[StripeExpress ] Added support for source transaction in Stripe Express.',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[DeliveryTime] Missing delivery time for the newly registered customer at the time of ordering.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.11',
+        'released' => '2022-12-26',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => '[VendorSubscription] Vendors subscription pack validity date invalid, it was getting the date without formating from subscription product.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.10',
+        'released' => '2022-11-30',
+        'changes'  => [
+            'Improvement' => [
+                [
+                    'title'       => 'Updated UI/UX of vendor dashboard submenu',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Vendor Subscription] Enabled support for guest users to purchase vendor subscription pack',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[Stripe Express] Payment error when WooCommerce subscription is disabled',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Geolocation] Product filtering was not working when geolocation was not set in the filters',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RMA] A fatal error occurs when the RMA Requests page is visited from my account page if order doesn\'t exists on database',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Rank Math SEO] Assets dependency issue with the latest version of Rank Math SEO',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.9',
+        'released' => '2022-11-03',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => 'Store category filter was not working in the admin panel',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'SweetAlert library is conflicting with the WooCommerce Conversion Tracking plugin',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed a fatal error after installing the `Disable Rest API` plugin',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Geolocation] Store filtering was not working when geolocation was not set in the filters',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Delivery time box is showing on admin orders, even though the delivery setting is not enabled',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Delivery time box is showing on vendor orders, even though the delivery setting is not enabled',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Fixed some warnings on a fresh installation',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.8',
+        'released' => '2022-10-27',
+        'changes'  => [
+            'New'         => [
+                [
+                    'title'       => '[DeliveryTime] Added per day multiple delivery time slot support',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription/StripeExpress] Added Stripe Express support for the Vendor Subscription module',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[ProductSubscription/StripeExpress] Added Stripe Express support for the Vendor Product Subscription module',
+                    'description' => '',
+                ],
+            ],
+            'Improvement' => [
+                [
+                    'title'       => '[DeliveryTime] Updated vendor delivery time UI.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Added delivery type (Home Delivery/Store Pickup) settings for admin',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Added store pickup time section under vendor dashboard order details page, also under the wooCommerce order details page store pickup-related information is displayed.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Now vendors’ will be able to switch Delivery Time to Store location pickup from the order details page.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Added `Full Day` support for delivery time for both admin and vendors.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Added email notification support for customers after modifying order delivery time from the vendor dashboard.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[DeliveryTime] Added email notification support for customers & vendors after admin updates order delivery time from the wooCommerce admin dashboard order panel.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'First day of the delivery time widget was set according to the site settings.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Express] Added support for SEPA Direct Debit payment method to be used in favor of iDEAL during recurring vendor subscription',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Express] Removed Wallet payment methods from Add payment method page as they are not needed there',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Express] Removed Dokan prefix/postfix from customer/vendor end',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Express] Added theme-changing option for Stripe payment element',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[MangoPay] Updated the MangoPay API library to the latest version.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[MangoPay] Set card payin with 3ds2 as mandatory.',
+                    'description' => '',
+                ],
+            ],
+            'Fix'         => [
+                [
+                    'title'       => '[DeliveryTime] Custom date format isn’t working if the suffix is applied `eg: 1st` now has been fixed',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VariableProduct] Some fields and options are missing for the variations section under the vendor dashboard product edit page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RequestForQuotation] When there are multiple requests for quotation rules, rules priority wasn’t considered and all the applicable rules were merged.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Refund] Tax Amount Box takes 3 Decimal Places under vendor dashboard order details page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Shipping] Fixed shipping cache wasn\'t removed after a shipping method has been enabled or disabled from the vendor dashboard.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StripeConnect] `No such customer found` error after changing API credentials of Stripe modules for Dokan Stripe Connect(non-3ds)',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RMA] Fixes when a customer sends a refund request for multiple products, the amount of products shown in the quantity dropdown does not decrease accordingly',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Geolocation] The geolocation map\'s pop-up on the shop page and the store listing page is not working fixes',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '**fix:** [VendorAnalytics] Tracking number is not being added to the source file when the Add Tracking Code setting is enabled.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[TableRateShipping/WPML] table rate shipping vendor settings page wasn\'t accessible if the site language wasn\'t set to English.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[TableRateShipping] Shipping Class column hides after switching to a secondary language.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Spaces between paragraphs are too large under the store terms and condition page.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Stripe Express] UI conflict of payment request button with Astra theme in the single product page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'For all payment gateways, announcements and notices to non-connected sellers were showing for inactive withdrawal methods.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.7',
+        'released' => '2022-10-11',
+        'changes'  => [
+            'Update' => [
+                [
+                    'title'       => '[ColorSchemeCustomizer] Product create popup modal color aligned with the selected theme color.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreReview] Moved bulk action fields to the top of the store review lists under the vendor dashboard',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[SellerVacation/Auction] Added vacation mode support for Auction products',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[SellerVacation] Added vacation message fields as a required field under the vendor dashboard store settings page.  Previously it was displaying an empty box on the store page if this field was empty.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Hide Accommodation Addon types checkboxes from the regular products\' edit product page/form',
+                    'description' => '',
+                ],
+            ],
+            'Fix'    => [
+                [
+                    'title'       => '[RMA] Fixed the Store Credit Coupon does not include any products at the time of coupon creation',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Booking] Fixed PHP Notice: Undefined index: add_resource_name while creating booking resource with empty resource person',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[TableRateShipping] Fixed Vendor Table Rate Shipping\'s > Method Title does not work correctly',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreReview] Fixed unable to translate Guest string',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[SellerVacation] Fixed product status doesn\'t show on the booking product listing page if the vendor enables vacation mode',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fixed store banner and profile images are not showing on the single store page after updating to Dokan Pro 3.7.6',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fixed a deprecation warning that shows up in Query Monitor on the front end of the site',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[StoreOpenCloseTime] Fixed console error on shop page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Auction] Fixed needed to save permalinks for the auction module to work after the WooCommerce Auction plugin is activated',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[RequestAQuote] Fixed template files NewQuote.php and UpdateQuote.php have the same ID: dokan_request_new_quote',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription] Fixed the dropdown list of subscription packs on the vendor registration form is not working',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription] Fixed customer becomes vendor form ( showing all subscription packs) while the Dokan subscription module is enabled',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorShipping] Fixed after changing the shipping cost from the vendor dashboard, it does not update on the cart by reloading the page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorShipping] Prevent vendors from inputting currency in the "Flat Rate" shipping method\'s cost fields.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
+        'version'  => 'Version 3.7.6',
+        'released' => '2022-09-27',
+        'changes'  => [
+            'Fix' => [
+                [
+                    'title'       => '[SPMV] Fixed magnify popup style broken in SPMV search result page',
+                    'description' => '',
+                ],
+                [
+                    'title'       => 'Fixed some warning while bulk publishing products',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Coupons]: Dokan coupon is not applying for the variations if the parent product is selected for that coupon.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Geolocation] Fixed Map is not loading on some pages',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Vendor Subscription] Some deprecated warnings while creating renewal order for Vendor Subscription.',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[Elementor] Fatal error on elementor update when dokan container is not set',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[PayPal Marketplace] Smart payment button was not loading',
+                    'description' => '',
+                ],
+                [
+                    'title'       => '[VendorSubscription] Selecting a child category doesn’t work on child category children.',
+                    'description' => '',
+                ],
+            ],
+        ],
+    ],
+    [
         'version'  => 'Version 3.7.5',
         'released' => '2022-08-25',
         'changes'  => [
@@ -17,7 +435,7 @@ $changelog = [
                     'description' => '',
                 ],
             ],
-            'Improvement'         => [
+            'Improvement' => [
                 [
                     'title'       => 'No message after clicking the `save changes` button on the vendor dashboard Ship Station settings',
                     'description' => '',

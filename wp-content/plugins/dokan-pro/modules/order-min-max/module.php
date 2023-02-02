@@ -1,6 +1,8 @@
 <?php
 namespace WeDevs\DokanPro\Modules\OrderMinMax;
 
+use WeDevs\DokanPro\Modules\OrderMinMax\SettingsApi\Store;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -66,6 +68,8 @@ class Module {
         }
         new Vendor();
         new FrontEnd();
+        new BlockData();
+        new Store();
     }
 
     /**

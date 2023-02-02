@@ -544,7 +544,14 @@ class Method extends WC_Shipping_Method {
 
                     // Rate matched class
                     if ( $rate_match ) {
-                        $rate_label = ! empty( $rate->rate_label ) ? $rate->rate_label : $this->title;
+                        if ( ! empty( $rate->rate_label ) ) {
+                            $rate_label = $rate->rate_label;
+                        } elseif ( ! empty( $method['title'] ) ) {
+                            $rate_label = $method['title'];
+                        } else {
+                            $rate_label = $this->title;
+                        }
+
                         $class_cost = 0;
                         $class_cost += (float) $rate->rate_cost;
                         $class_cost += (float) $rate->rate_cost_per_item * $class->items_in_class;

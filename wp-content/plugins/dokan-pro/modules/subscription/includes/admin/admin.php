@@ -606,7 +606,6 @@ class DPS_Admin {
         $r['value']         = 'id';
         $r['selected']      = ! empty( $selected_cat ) ? array_map( 'absint', $selected_cat ) : '';
         $r['orderby']       = 'name';
-        $r['parent']        = 0;
 
         $categories = get_terms( 'product_cat', $r );
         include_once WC()->plugin_path() . '/includes/walkers/class-product-cat-dropdown-walker.php';
@@ -900,8 +899,8 @@ class DPS_Admin {
             ),
             'enable_pricing' => array(
                 'name'  => 'enable_pricing',
-                'label' => __( 'Enable Product Subscription', 'dokan' ),
-                'desc'  => __( 'Enable product subscription for vendor', 'dokan' ),
+                'label' => __( 'Enable Vendor Subscription', 'dokan' ),
+                'desc'  => __( 'Enable subscription for vendor', 'dokan' ),
                 'type'  => 'switcher',
             ),
             'enable_subscription_pack_in_reg' => [

@@ -74,6 +74,7 @@ new WPCOM_JSON_API_Site_Settings_V1_4_Endpoint(
 			'disallowed_keys'                         => '(string) Words or phrases that mark comment spam, one per line',
 			'lang_id'                                 => '(int) ID for language blog is written in',
 			'locale'                                  => '(string) locale code for language blog is written in',
+			'site_vertical_id'                        => '(string) The site vertical ID',
 			'wga'                                     => '(array) Google Analytics Settings',
 			'jetpack_cloudflare_analytics'            => '(array) Cloudflare Analytics Settings',
 			'disabled_likes'                          => '(bool) Are likes globally disabled (they can still be turned on per post)?',
@@ -111,6 +112,15 @@ new WPCOM_JSON_API_Site_Settings_V1_4_Endpoint(
 			'posts_per_page'                          => '(int) Number of posts to show on blog pages',
 			'posts_per_rss'                           => '(int) Number of posts to show in the RSS feed',
 			'rss_use_excerpt'                         => '(bool) Whether the RSS feed will use post excerpts',
+			'wpcom_publish_posts_with_markdown'       => '(bool) Whether markdown is enabled for posts',
+			'wpcom_publish_comments_with_markdown'    => '(bool) Whether markdown is enabled for comments',
+			'launchpad_screen'                        => '(string) Whether or not launchpad is presented and what size it will be',
+			'wpcom_featured_image_in_email'           => '(bool) Whether the Featured image is displayed in the New Post email template or not',
+			'wpcom_gifting_subscription'              => '(bool) Whether gifting is enabled for non auto-renew sites',
+			'jetpack_blogging_prompts_enabled'        => '(bool) Whether writing prompts are shown in the editor when starting a new post.',
+			'wpcom_subscription_emails_use_excerpt'   => '(bool) Whether site subscription emails (e.g. New Post email notification) will use post excerpts',
+			'show_on_front'                           => '(string) Whether homepage should display related posts or a static page. The expected value is \'posts\' or \'page\'.',
+			'page_on_front'                           => '(string) The page ID of the page to use as the site\'s homepage. It will apply only if \'show_on_front\' is set to \'page\'.',
 		),
 
 		'response_format' => array(
@@ -135,6 +145,7 @@ class WPCOM_JSON_API_Site_Settings_V1_4_Endpoint extends WPCOM_JSON_API_Site_Set
 		return array(
 			'code'                          => '',
 			'anonymize_ip'                  => false,
+			'honor_dnt'                     => false,
 			'ec_track_purchases'            => false,
 			'ec_track_add_to_cart'          => false,
 			'enh_ec_tracking'               => false,

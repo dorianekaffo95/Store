@@ -142,7 +142,8 @@ class Notifications implements IntegrationInterface {
 		$email_domain = substr( strrchr( $email, '@' ), 1 );
 		$site_domain  = wp_parse_url( get_bloginfo( 'wpurl' ) )['host'];
 
-		return $email_domain === $site_domain;
+		// Check if From email domain ends with site domain.
+		return ! empty( $email_domain ) && preg_match( "/\b{$email_domain}$/", $site_domain ) === 1;
 	}
 
 	/**

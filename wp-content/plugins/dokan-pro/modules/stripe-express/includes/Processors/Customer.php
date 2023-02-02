@@ -5,14 +5,15 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\Processors;
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use WP_Error;
-use Exception;
 use WeDevs\Dokan\Exceptions\DokanException;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
+use WeDevs\DokanPro\Modules\StripeExpress\Api\SetupIntent;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\UserMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Api\PaymentMethod;
+use WeDevs\DokanPro\Modules\StripeExpress\PaymentMethods\Card;
+use WeDevs\DokanPro\Modules\StripeExpress\PaymentMethods\Sepa;
+use WeDevs\DokanPro\Modules\StripeExpress\PaymentMethods\Ideal;
 use WeDevs\DokanPro\Modules\StripeExpress\Api\Customer as CustomerApi;
-use WeDevs\DokanPro\Modules\StripeExpress\PaymentTokens\Card as PaymentTokenCC;
-use WeDevs\DokanPro\Modules\StripeExpress\PaymentTokens\Sepa as PaymentTokenSepa;
 
 /**
  * Class for processing customers.
@@ -77,7 +78,7 @@ class Customer {
      *
      * @param int|string $user_id
      *
-     * @return object
+     * @return static
      */
     public static function set( $user_id = 0 ) {
         if ( ! static::$instance ) {
@@ -103,10 +104,11 @@ class Customer {
      *
      * @param int|string $user_id
      *
-     * @return void
+     * @return static
      */
     public function set_user_id( $user_id ) {
         $this->user_id = $user_id;
+        return $this;
     }
 
     /**
@@ -127,10 +129,11 @@ class Customer {
      *
      * @param int|string $id
      *
-     * @return void
+     * @return static
      */
     public function set_id( $id ) {
         $this->id = $id;
+        return $this;
     }
 
     /**
@@ -162,10 +165,333 @@ class Customer {
      *
      * @param array $data
      *
-     * @return void
+     * @return static
      */
     public function set_data( $data ) {
         $this->customer_data = $data;
+        return $this;
+    }
+
+    /**
+     * Creates a customer via API.
+     *
+     * @since 3.6.1
+     *
+     * @param array $args
+     *
+     * @return WP_Error|int
+     */
+    public function create( $args = [] ) {
+        $args = $this->generate_request( $args );
+
+        try {
+            $response = CustomerApi::create( $args );
+        } catch ( DokanException $e ) {
+            return new WP_Error( 'dokan-stripe-customer-create-error', $e->getMessage() );
+        }
+
+        $this->set_id( $response->id );
+        $this->set_data( $response );
+
+        if ( $this->get_user_id() ) {
+            UserMeta::update_stripe_customer_id( $this->get_user_id(), $response->id );
+        }
+
+        return $response->id;
+    }
+
+    /**
+     * Updates the Stripe customer through the API.
+     *
+     * @since 3.6.1
+     *
+     * @param array $args     Additional arguments for the request (optional).
+     * @param bool  $is_retry Whether the current call is a retry (optional, defaults to false). If true, then an exception will be thrown instead of further retries on error.
+     *
+     * @return string|WP_Error
+     */
+    public function update( $args = [], $is_retry = false ) {
+        if ( empty( $this->get_id() ) ) {
+            return new WP_Error( 'id_required_to_update_user', __( 'Attempting to update a Stripe customer without a customer ID.', 'dokan' ) );
+        }
+
+        $args = $this->generate_request( $args );
+
+        try {
+            $response = CustomerApi::update( $this->get_id(), $args );
+        } catch ( DokanException $e ) {
+            if ( Helper::is_no_such_customer_error( $e->get_message() ) && ! $is_retry ) {
+                /*
+                 * This can happen when switching the main Stripe account
+                 * or importing users from another site.
+                 * If not already retrying, recreate the customer
+                 * and then try updating it again.
+                 */
+                $this->recreate();
+                return $this->update( $args, true );
+            }
+
+            return new WP_Error( 'customer_update_failed', $e->getMessage() );
+        }
+
+        $this->set_data( $response );
+
+        return $this->get_id();
+    }
+
+    /**
+     * Updates existing Stripe customer or creates new customer for User through API.
+     *
+     * @since 3.6.1
+     *
+     * @param array $args Additional arguments for the request (optional).
+     *
+     * @return string|WP_Error
+     */
+    public function update_or_create( $args = [] ) {
+        if ( empty( $this->get_id() ) ) {
+            return $this->recreate();
+        } else {
+            return $this->update( $args, true );
+        }
+    }
+
+    /**
+     * Recreates the customer for this user.
+     *
+     * @since 3.6.1
+     *
+     * @return string ID of the new Customer object.
+     */
+    private function recreate() {
+        UserMeta::delete_stripe_customer_id( $this->get_user_id() );
+        return $this->create();
+    }
+
+    /**
+     * Gets saved payment methods for a customer using Intentions API.
+     *
+     * @since 3.6.1
+     *
+     * @param string $payment_method_type Stripe ID of payment method type
+     *
+     * @return \Stripe\PaymentMethod[]
+     */
+    public function get_payment_methods( $payment_method_type ) {
+        if ( ! $this->get_id() ) {
+            return [];
+        }
+
+        $args = [
+            'type'  => $payment_method_type,
+            'limit' => 100,                    // Maximum allowed value.
+        ];
+
+        if ( Sepa::STRIPE_ID === $payment_method_type ) {
+            $args['expand'] = [
+                "data.$payment_method_type.generated_from.charge",
+                "data.$payment_method_type.generated_from.setup_attempt",
+            ];
+        }
+
+        return PaymentMethod::get_by_customer( $this->get_id(), $args );
+    }
+
+    /**
+     * Attaches a payment method to the customer in Stripe.
+     *
+     * @since 3.7.8
+     *
+     * @param string $payment_method_id
+     *
+     * @return \Stripe\PaymentMethod|WP_Error
+     */
+    public function attach_payment_method( $payment_method_id ) {
+        if ( empty( $payment_method_id ) ) {
+            return new WP_Error( 'dokan_no_payment_method', __( 'No payment method provided', 'dokan' ) );
+        }
+
+        // If customer doesn't exist, create one.
+        if ( ! $this->get_id() ) {
+            $id = $this->create();
+
+            if ( is_wp_error( $id ) ) {
+                return $id;
+            }
+
+            $this->set_id( $id );
+        }
+
+        try {
+            $payment_method = PaymentMethod::attach( $payment_method_id, $this->get_id() );
+        } catch ( DokanException $e ) {
+            if ( Helper::is_no_such_customer_error( $e->getMessage() ) ) {
+                $customer_id = $this->recreate();
+                if ( is_wp_error( $customer_id ) ) {
+                    return $customer_id;
+                }
+
+                return $this->attach_payment_method( $payment_method_id );
+            } else {
+                return new WP_Error( 'dokan_unable_to_attach_payment_method', $e->getMessage() );
+            }
+        }
+
+        if ( ! empty( $payment_method->error ) ) {
+            return new WP_Error( 'dokan_unable_to_attach_payment_method', Helper::get_error_message_from_response( $payment_method ) );
+        }
+
+        // Set the newly attached Payment Method as default.
+        $this->set_default_payment_method( $payment_method->id );
+
+        /**
+         * Fires after a payment method is attached to a customer.
+         *
+         * @param string                $stripe_customer_id
+         * @param \Stripe\PaymentMethod $payment_method
+         */
+        do_action( 'dokan_stripe_express_attach_payment_method', $this->get_id(), $payment_method );
+
+        // Process further to save the payment method in WooCommerce.
+        if ( $this->get_user_id() && class_exists( 'WC_Payment_Token_CC' ) ) {
+            switch ( $payment_method->type ) {
+                case Sepa::STRIPE_ID:
+                    // In this case, Sepa Debit will be handles by iDeal payment mathod
+                    $ideal = new Ideal();
+                    $ideal->create_payment_token_for_user( $this->get_user_id(), $payment_method );
+                    break;
+
+                case Card::STRIPE_ID:
+                    $card = new Card();
+                    $card->create_payment_token_for_user( $this->get_user_id(), $payment_method );
+                    break;
+            }
+        }
+
+        return $payment_method;
+    }
+
+    /**
+     * Detaches a payment method from stripe.
+     *
+     * @since 3.6.1
+     *
+     * @param string $payment_method_id
+     *
+     * @return boolean
+     */
+    public function detach_payment_method( $payment_method_id ) {
+        if ( ! $this->get_id() ) {
+            return false;
+        }
+
+        try {
+            $response = PaymentMethod::detach( $payment_method_id );
+        } catch ( DokanException $e ) {
+            return false;
+        }
+
+        if ( empty( $response->error ) ) {
+
+            /**
+             * Fires after a payment method is detached from a customer.
+             *
+             * @param string                $stripe_customer_id
+             * @param \Stripe\PaymentMethod $payment_method
+             */
+            do_action( 'dokan_stripe_express_detach_payment_method', $this->get_id(), $response );
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets default payment method in Stripe.
+     *
+     * @since 3.6.1
+     *
+     * @param string $payment_method_id
+     *
+     * @return boolean
+     */
+    public function set_default_payment_method( $payment_method_id ) {
+        $customer = $this->update(
+            [
+                'invoice_settings' => [
+                    'default_payment_method' => $payment_method_id,
+                ],
+            ]
+        );
+
+        if ( is_wp_error( $customer ) ) {
+            return false;
+        }
+
+        do_action( 'dokan_stripe_express_set_default_payment_method', $this->get_id(), $payment_method_id );
+
+        return true;
+    }
+
+    /**
+     * Creates setup intent for a customer.
+     *
+     * @since 3.7.8
+     *
+     * @param array $data (Optional)
+     *
+     * @return \Stripe\SetupIntent
+     * @throws DokanException
+     */
+    public function setup_intent( $data = [] ) {
+        try {
+            $customer_id = $this->get_id();
+            // Create customer on Stripe end if not exists
+            if ( empty( $customer_id ) ) {
+                $customer_data = $this->map_data( null, new \WC_Customer( $this->get_user_id() ) );
+                $customer_id   = $this->create( $customer_data );
+
+                if ( is_wp_error( $customer_id ) ) {
+                    throw new DokanException(
+                        'setup-intent-error',
+                        sprintf(
+                            /* translators: error message */
+                            __( 'We\'re not able to add this payment method. Error: %s', 'dokan' ),
+                            $customer_id->get_error_message()
+                        )
+                    );
+                }
+            }
+
+            $setup_intent = SetupIntent::create(
+                wp_parse_args(
+                    $data,
+                    [
+                        'customer'             => $this->get_id(),
+                        'confirm'              => 'false',
+                        'payment_method_types' => Helper::get_enabled_payment_methods_at_checkout(),
+                    ]
+                )
+            );
+
+            if ( ! empty( $setup_intent->error ) ) {
+                $error_code = 'setup-intent-error';
+                if ( Helper::is_no_such_customer_error( $setup_intent->error->message ) ) {
+                    $error_code = 'error_setup-intent_no-such-customer';
+                }
+                throw new DokanException( $error_code, $setup_intent->error->message );
+            }
+
+            return $setup_intent;
+        } catch ( DokanException $e ) {
+            if ( Helper::is_no_such_customer_error( $e ) ) {
+                $this->set_id( 0 );
+                return $this->setup_intent();
+            }
+
+            throw new DokanException( 'setup-intent-error', $e->get_message() );
+        }
     }
 
     /**
@@ -226,269 +552,11 @@ class Customer {
             }
         }
 
-        $defaults['preferred_locales'] = $this->get_preferred_locale( $user );
+        $defaults['preferred_locales'] = $this->get_preferred_locale();
         $defaults['metadata']          = apply_filters( 'dokan_stripe_express_customer_metadata', [], $user );
 
         return wp_parse_args( $args, $defaults );
         // phpcs:enable WordPress.Security.NonceVerification.Missing
-    }
-
-    /**
-     * Creates a customer via API.
-     *
-     * @since 3.6.1
-     *
-     * @param array $args
-     *
-     * @return WP_Error|int
-     */
-    public function create( $args = [] ) {
-        $args = $this->generate_request( $args );
-
-        try {
-            $response = CustomerApi::create( $args );
-        } catch ( DokanException $e ) {
-            return new WP_Error( 'dokan-stripe-customer-create-error', $e->getMessage() );
-        }
-
-        $this->set_id( $response->id );
-        $this->set_data( $response );
-
-        if ( $this->get_user_id() ) {
-            UserMeta::update_stripe_customer_id( $this->get_user_id(), $response->id );
-        }
-
-        return $response->id;
-    }
-
-    /**
-     * Updates the Stripe customer through the API.
-     *
-     * @since 3.6.1
-     *
-     * @param array $args     Additional arguments for the request (optional).
-     * @param bool  $is_retry Whether the current call is a retry (optional, defaults to false). If true, then an exception will be thrown instead of further retries on error.
-     *
-     * @return string|WP_Error
-     */
-    public function update( $args = [], $is_retry = false ) {
-        if ( empty( $this->get_id() ) ) {
-            return new WP_Error( 'id_required_to_update_user', __( 'Attempting to update a Stripe customer without a customer ID.', 'dokan' ) );
-        }
-
-        $args = $this->generate_request( $args );
-
-        try {
-            $response = CustomerApi::update( $this->get_id(), $args );
-        } catch ( DokanException $e ) {
-            if ( Helper::is_no_such_customer_error( $response->error ) && ! $is_retry ) {
-                /*
-                 * This can happen when switching the main Stripe account
-                 * or importing users from another site.
-                 * If not already retrying, recreate the customer
-                 * and then try updating it again.
-                 */
-                $this->recreate();
-                return $this->update( $args, true );
-            }
-
-            return new WP_Error( 'customer_update_failed', $e->getMessage() );
-        }
-
-        $this->set_data( $response );
-
-        return $this->get_id();
-    }
-
-    /**
-     * Updates existing Stripe customer or creates new customer for User through API.
-     *
-     * @param array $args Additional arguments for the request (optional).
-     *
-     * @return string|WP_Error
-     */
-    public function update_or_create( $args = [] ) {
-        if ( empty( $this->get_id() ) ) {
-            return $this->recreate();
-        } else {
-            return $this->update( $args, true );
-        }
-    }
-
-    /**
-     * Add a source for this stripe customer.
-     *
-     * @since 3.6.1
-     *
-     * @param string $source_id
-     *
-     * @return WP_Error|int
-     */
-    public function add_source( $source_id ) {
-        $response = $this->attach_source( $source_id );
-        if ( is_wp_error( $response ) ) {
-            return $response;
-        }
-
-        // Add token to WooCommerce.
-        $wc_token = false;
-
-        if ( $this->get_user_id() && class_exists( 'WC_Payment_Token_CC' ) ) {
-            switch ( $response->type ) {
-                case 'alipay':
-                    break;
-                case Helper::get_sepa_payment_method_type():
-                    $wc_token = new PaymentTokenSepa();
-                    $wc_token->set_token( $response->id );
-                    $wc_token->set_gateway_id( Helper::get_gateway_id() );
-                    $wc_token->set_last4( $response->sepa_debit->last4 );
-                    break;
-                default:
-                    if ( 'source' === $response->object && 'card' === $response->type ) {
-                        $wc_token = new PaymentTokenCC();
-                        $wc_token->set_token( $response->id );
-                        $wc_token->set_gateway_id( Helper::get_gateway_id() );
-                        $wc_token->set_card_type( strtolower( $response->card->brand ) );
-                        $wc_token->set_last4( $response->card->last4 );
-                        $wc_token->set_expiry_month( $response->card->exp_month );
-                        $wc_token->set_expiry_year( $response->card->exp_year );
-                    }
-                    break;
-            }
-
-            $wc_token->set_user_id( $this->get_user_id() );
-            $wc_token->save();
-        }
-
-        return $response->id;
-    }
-
-    /**
-     * Attaches a source to the Stripe customer.
-     *
-     * @since 3.6.1
-     *
-     * @param string $source_id The ID of the new source.
-     *
-     * @return object|WP_Error Either a source object, or a WP error.
-     */
-    public function attach_source( $source_id ) {
-        if ( ! $this->get_id() ) {
-            $id = $this->create();
-
-            if ( is_wp_error( $id ) ) {
-                return $id;
-            }
-
-            $this->set_id( $id );
-        }
-
-        if ( empty( $source_id ) ) {
-            return new WP_Error( 'dokan_no_source_id', __( 'No source id provided', 'dokan' ) );
-        }
-
-        try {
-            $response = CustomerApi::create_source( $this->get_id(), [ 'source' => $source_id ] );
-            //make this source as default
-            $this->set_default_source( $response->id );
-        } catch ( Exception $e ) {
-            if ( Helper::is_no_such_customer_error( $e->getMessage() ) ) {
-                $created = $this->recreate();
-                if ( is_wp_error( $created ) ) {
-                    return $created;
-                }
-
-                return $this->attach_source( $source_id );
-            } elseif ( Helper::is_source_already_attached_error( $e->getMessage() ) ) {
-                try {
-                    $source = CustomerApi::get_source( $this->get_id(), $source_id );
-                    if ( $source->id ) {
-                        return $source;
-                    }
-                } catch ( Exception $e ) {
-                    return new WP_Error( 'dokan_unable_to_get_source', $e->getMessage() );
-                }
-            } else {
-                return new WP_Error( 'dokan_unable_to_add_source', $e->getMessage() );
-            }
-        }
-
-        return $response;
-    }
-
-    /**
-     * Get a customers saved sources using their Stripe ID.
-     *
-     * @since 3.6.1
-     *
-     * @return array
-     */
-    public function get_sources() {
-        if ( ! $this->get_id() ) {
-            return [];
-        }
-
-        try {
-            $response = CustomerApi::get_sources( $this->get_id() );
-        } catch ( DokanException $e ) {
-            return [];
-        }
-
-        return ! empty( $response->data ) ? $response->data : [];
-    }
-
-    /**
-     * Delete a source from stripe.
-     *
-     * @since 3.6.1
-     *
-     * @param string $source_id
-     *
-     * @return boolean
-     */
-    public function delete_source( $source_id ) {
-        if ( ! $this->get_id() ) {
-            return false;
-        }
-
-        try {
-            CustomerApi::delete_source( $this->get_id(), $source_id );
-            return true;
-        } catch ( DokanException $e ) {
-            return false;
-        }
-    }
-
-    /**
-     * Set default source in Stripe
-     *
-     * @param string $source_id
-     *
-     * @return boolean
-     */
-    public function set_default_source( $source_id ) {
-        if ( ! $this->get_id() ) {
-            return false;
-        }
-
-        try {
-            CustomerApi::update( $this->get_id(), [ 'default_source' => $source_id ] );
-            return true;
-        } catch ( DokanException $e ) {
-            return false;
-        }
-    }
-
-    /**
-     * Recreates the customer for this user.
-     *
-     * @since 3.6.1
-     *
-     * @return string ID of the new Customer object.
-     */
-    private function recreate() {
-        UserMeta::delete_stripe_customer_id( $this->get_user_id() );
-        return $this->create();
     }
 
     /**
@@ -554,96 +622,14 @@ class Customer {
     }
 
     /**
-     * Gets saved payment methods for a customer using Intentions API.
-     *
-     * @since 3.6.1
-     *
-     * @param string $payment_method_type Stripe ID of payment method type
-     *
-     * @return array
-     */
-    public function get_payment_methods( $payment_method_type ) {
-        if ( ! $this->get_id() ) {
-            return [];
-        }
-
-        $args = [
-            'type'  => $payment_method_type,
-            'limit' => 100,                    // Maximum allowed value.
-        ];
-
-        if ( Helper::get_sepa_payment_method_type() === $payment_method_type ) {
-            $args['expand'] = [
-                "data.$payment_method_type.generated_from.charge",
-                "data.$payment_method_type.generated_from.setup_attempt",
-            ];
-        }
-
-        return PaymentMethod::get_by_customer( $this->get_id(), $args );
-    }
-
-    /**
-     * Detach a payment method from stripe.
-     *
-     * @since 3.6.1
-     *
-     * @param string $payment_method_id
-     *
-     * @return boolean
-     */
-    public function detach_payment_method( $payment_method_id ) {
-        if ( ! $this->get_id() ) {
-            return false;
-        }
-
-        $response = PaymentMethod::detach( $payment_method_id );
-
-        if ( empty( $response->error ) ) {
-            do_action( 'dokan_stripe_express_detach_payment_method', $this->get_id(), $response );
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Sets default payment method in Stripe.
-     *
-     * @since 3.6.1
-     *
-     * @param string $payment_method_id
-     *
-     * @return boolean
-     */
-    public function set_default_payment_method( $payment_method_id ) {
-        $customer = $this->create(
-            [
-                'invoice_settings' => [
-                    'default_payment_method' => sanitize_text_field( $payment_method_id ),
-                ],
-            ]
-        );
-
-        if ( is_wp_error( $customer ) ) {
-            return false;
-        }
-
-        do_action( 'dokan_stripe_express_set_default_payment_method', $this->get_id(), $payment_method_id );
-
-        return true;
-    }
-
-    /**
      * Get the customer's preferred locale based on the user or site setting.
      *
      * @since 3.6.1
      *
-     * @param WP_User $user The user being created/modified.
-     *
      * @return array The matched locale string wrapped in an array, or empty default.
      */
-    public function get_preferred_locale( $user ) {
+    public function get_preferred_locale() {
+        $user           = $this->get_user();
         $locale         = Helper::get_locale( $user );
         $stripe_locales = Helper::get_stripe_locale_options();
         $preferred      = isset( $stripe_locales[ $locale ] ) ? $stripe_locales[ $locale ] : 'en-US';

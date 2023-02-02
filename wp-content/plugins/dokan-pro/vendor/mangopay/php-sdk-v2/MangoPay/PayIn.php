@@ -9,7 +9,7 @@ class PayIn extends Transaction
 {
     /**
      * Credited wallet Id
-     * @var int
+     * @var string
      */
     public $CreditedWalletId;
 
@@ -36,6 +36,12 @@ class PayIn extends Transaction
      * @var object
      */
     public $ExecutionDetails;
+
+    /**
+     * Recurring PayIn Registration Id
+     * @var string
+     */
+    public $RecurringPayinRegistrationId;
 
     /**
      * Get array with mapping which property depends on other property

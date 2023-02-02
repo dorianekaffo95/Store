@@ -2,6 +2,11 @@
 
 namespace WeDevs\DokanPro\Modules\Wholesale;
 
+use WeDevs\DokanPro\Modules\Wholesale\BlockData;
+use WeDevs\DokanPro\Modules\Wholesale\WholesaleCache;
+
+defined( 'ABSPATH' ) || exit;
+
 class Module {
 
     /**
@@ -55,7 +60,6 @@ class Module {
         }
 
         // Load all helper functions
-        require_once DOKAN_WHOLESALE_INC_DIR . '/DokanWholesaleCache.php';
         require_once DOKAN_WHOLESALE_INC_DIR . '/class-customer.php';
         require_once DOKAN_WHOLESALE_INC_DIR . '/class-vendor.php';
         require_once DOKAN_WHOLESALE_INC_DIR . '/class-cart-checkout.php';
@@ -73,7 +77,8 @@ class Module {
             new \Dokan_Wholesale_Admin();
         }
 
-        new \DokanWholesaleCache();
+        new BlockData();
+        new WholesaleCache();
         new \Dokan_Wholesale_Customer();
         new \Dokan_Wholesale_Vendor();
         new \Dokan_Wholesale_Cart_Checkout();

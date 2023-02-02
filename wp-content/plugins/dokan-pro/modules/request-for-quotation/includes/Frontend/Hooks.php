@@ -20,7 +20,6 @@ class Hooks {
      * @var mixed $quote_rules
      */
     public $quote_rules;
-
     /**
      * @var mixed $single_quote_rule
      */
@@ -117,13 +116,21 @@ class Hooks {
             $this->quote_rules = Helper::get_all_quote_rules();
         }
 
+        $applicable_rule = null;
+
         foreach ( $this->quote_rules as $rule ) {
-            if ( false === apply_filters( 'dokan_request_a_quote_apply_rules', true, $product, $rule ) ) {
+            if ( false === apply_filters( 'dokan_request_a_quote_apply_rules', true, $product, $rule ) || ! $this->check_rule_for_product( $rule, $product->get_id() ) ) {
                 continue;
             }
-            if ( $rule->hide_price && $this->check_rule_for_product( $rule, $product->get_id() ) ) {
-                return $rule->hide_price_text;
+
+            // Checking if there are no capable rule is set or current loop rule priority is less or lower then the previous rule.
+            if ( null === $applicable_rule || $applicable_rule->rule_priority >= $rule->rule_priority ) {
+                $applicable_rule = $rule;
             }
+        }
+
+        if ( null !== $applicable_rule && $applicable_rule->hide_price ) {
+            return $applicable_rule->hide_price_text;
         }
 
         return $price;
@@ -169,6 +176,8 @@ class Hooks {
             $this->quote_rules = Helper::get_all_quote_rules();
         }
 
+        $applicable_rule = null;
+
         foreach ( $this->quote_rules as $rule ) {
             if ( ! $this->check_rule_for_product( $rule, $product->get_id() ) ) {
                 continue;
@@ -178,14 +187,19 @@ class Hooks {
                 continue;
             }
 
-            if ( 'replace' === $rule->hide_cart_button ) {
-                return '<a href="javascript:void(0)" rel="nofollow" data-quantity="1" class="dokan_request_button button product_type_' . esc_attr( $product->get_type() ) . ' dokan_add_to_quote_button" data-product_id="' . intval( $product->get_id() ) . '" data-product_sku="' . esc_attr( $product->get_sku() ) . '" aria-label="Add &ldquo;' . esc_attr( $product->get_title() ) . '&rdquo; to your quote" >' . esc_html( $rule->button_text ) . '</a>';
+            // Checking if there are no capable rule is set or current loop rule priority is less or lower then the previous rule.
+            if ( null === $applicable_rule || $applicable_rule->rule_priority >= $rule->rule_priority ) {
+                $applicable_rule = $rule;
             }
+        }
 
-            if ( $this->check_required_addons( $product->get_id() ) ) {
-                //WooCommerce Product Add-ons compatibility
-                return $html;
-            }
+        if ( null !== $applicable_rule && 'replace' === $applicable_rule->hide_cart_button ) {
+            return '<a href="javascript:void(0)" rel="nofollow" data-quantity="1" class="dokan_request_button button product_type_' . esc_attr( $product->get_type() ) . ' dokan_add_to_quote_button" data-product_id="' . intval( $product->get_id() ) . '" data-product_sku="' . esc_attr( $product->get_sku() ) . '" aria-label="Add &ldquo;' . esc_attr( $product->get_title() ) . '&rdquo; to your quote" >' . esc_html( $applicable_rule->button_text ) . '</a>';
+        }
+
+        if ( $this->check_required_addons( $product->get_id() ) ) {
+            //WooCommerce Product Add-ons compatibility
+            return $html;
         }
 
         return $cart_txt;
@@ -274,12 +288,10 @@ class Hooks {
             $this->quote_rules = Helper::get_all_quote_rules();
         }
 
+        $applicable_rule = null;
+
         foreach ( $this->quote_rules as $rule ) {
             if ( ! $this->check_rule_for_product( $rule, $product->get_id() ) ) {
-                continue;
-            }
-
-            if ( 'replace' === $rule->hide_cart_button ) {
                 continue;
             }
 
@@ -291,11 +303,19 @@ class Hooks {
                 continue;
             }
 
-            if ( 'simple' === $product->get_type() ) {
-                echo '<a href="javascript:void(0)" rel="nofollow" data-product_id="' . esc_attr( $product->get_id() ) . '" data-product_sku="' . esc_attr( $product->get_sku() ) . '" class="button dokan_request_button add_to_cart_button product_type_' . esc_attr( $product->get_type() ) . '">' . esc_html( $rule->button_text ) . '</a>';
-            } elseif ( 'keep_and_add_new' === $rule->hide_cart_button && ! empty( $rule->button_text ) ) {
-                echo '<a href="javascript:void(0)" rel="nofollow" data-product_id="' . esc_attr( $product->get_id() ) . '" data-product_sku="' . esc_attr( $product->get_sku() ) . '" class="button dokan_request_button add_to_cart_button product_type_' . esc_attr( $product->get_type() ) . '">' . esc_html( $rule->button_text ) . '</a>';
+            if ( null === $applicable_rule || $applicable_rule->rule_priority >= $rule->rule_priority ) {
+                $applicable_rule = $rule;
             }
+        }
+
+        if ( null === $applicable_rule || 'replace' === $applicable_rule->hide_cart_button  ) {
+            return;
+        }
+
+        if ( 'simple' === $product->get_type() ) {
+            echo '<a href="javascript:void(0)" rel="nofollow" data-product_id="' . esc_attr( $product->get_id() ) . '" data-product_sku="' . esc_attr( $product->get_sku() ) . '" class="button dokan_request_button add_to_cart_button product_type_' . esc_attr( $product->get_type() ) . '">' . esc_html( $applicable_rule->button_text ) . '</a>';
+        } elseif ( 'keep_and_add_new' === $applicable_rule->hide_cart_button && ! empty( $applicable_rule->button_text ) ) {
+            echo '<a href="javascript:void(0)" rel="nofollow" data-product_id="' . esc_attr( $product->get_id() ) . '" data-product_sku="' . esc_attr( $product->get_sku() ) . '" class="button dokan_request_button add_to_cart_button product_type_' . esc_attr( $product->get_type() ) . '">' . esc_html( $applicable_rule->button_text ) . '</a>';
         }
     }
 
@@ -336,7 +356,6 @@ class Hooks {
         }
 
         foreach ( $this->quote_rules as $rule ) {
-            $this->single_quote_rule = $rule;
             if ( ! $this->check_rule_for_product( $rule, $product->get_id() ) ) {
                 continue;
             }
@@ -348,6 +367,13 @@ class Hooks {
             if ( false === apply_filters( 'dokan_request_a_quote_apply_rules', true, $product, $rule ) ) {
                 continue;
             }
+
+            // Checking if already there is an applied rule and if current loop rule priority if higher then the old rule loop priority then skip.
+            if ( ! empty( $this->single_quote_rule ) && $this->single_quote_rule->rule_priority < $rule->rule_priority ) {
+                continue;
+            }
+
+            $this->single_quote_rule = $rule;
 
             if ( 'variable' === $product->get_type() ) {
                 remove_action( 'woocommerce_single_variation', 'woocommerce_single_variation_add_to_cart_button', 20 );

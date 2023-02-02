@@ -19,30 +19,18 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 class ChargeFailed extends WebhookEvent {
 
     /**
-     * Class constructor.
-     *
-     * @since 3.6.1
-     *
-     * @param object $event
-     */
-    public function __construct( $event ) {
-        $this->set( $event );
-    }
-
-    /**
      * Handles the event.
      *
      * @since 3.6.1
      *
-     * @param object $charge
-     *
      * @return void
      */
-    public function handle( $charge ) {
-        $order = Order::get_order_by_charge_id( $charge->id );
+    public function handle() {
+        $charge = $this->get_payload();
+        $order  = Order::get_order_by_charge_id( $charge->id );
 
         if ( ! $order ) {
-            Helper::log( 'Could not find order via charge ID: ' . $charge->id );
+            $this->log( 'Could not find order via charge ID: ' . $charge->id );
             return;
         }
 

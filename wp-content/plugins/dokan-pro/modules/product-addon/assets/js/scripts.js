@@ -156,6 +156,7 @@ jQuery( function( $ ) {
 
 			if ( ! is_booking_product ) {
 				$( '.show_if_booking.hide_initial_booking_addon_options' ).hide();
+				$( '.show_if_accommodation-booking.hide_initial_booking_addon_options' ).hide();
 			}
 			else if ( is_booking_product ) {
                 $( '.show_if_booking.hide_initial_booking_addon_options' ).show();

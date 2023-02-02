@@ -2,6 +2,8 @@
 
 namespace WeDevs\DokanPro\Modules\MangoPay\Processor;
 
+defined( 'ABSPATH' ) || exit; // Exit if called directly
+
 use WP_Error;
 use Exception;
 use MangoPay\Money;
@@ -52,7 +54,7 @@ class Transfer extends Processor {
      *
      * @param int|string $order_id
      * @param int|string $transaction_id
-     * @param int|string $wp_user_id
+     * @param int|string $customer_id
      * @param int|string $vendor_id
      * @param int|float  $amount
      * @param int|float  $fees
@@ -60,44 +62,44 @@ class Transfer extends Processor {
      *
      * @return object
      */
-    public static function create( $order_id, $transaction_id, $wp_user_id, $vendor_id, $amount, $fees, $currency ) {
+    public static function create( $order_id, $transaction_id, $customer_id, $vendor_id, $amount, $fees, $currency ) {
         try {
-            $mp_user_id	= Meta::get_mangopay_account_id( $wp_user_id );
-            if ( empty( $mp_user_id ) ) {
-                $mp_user_id = User::create( $wp_user_id );
+            $mangopay_customer_id	= Meta::get_mangopay_account_id( $customer_id );
+            if ( empty( $mangopay_customer_id ) ) {
+                $mangopay_customer_id = User::create( $customer_id );
             }
 
-            $mp_vendor_id = Meta::get_mangopay_account_id( $vendor_id );
-            if ( empty( $mp_vendor_id ) ) {
-                $mp_vendor_id = User::create( $vendor_id );
+            $mangopay_vendor_id = Meta::get_mangopay_account_id( $vendor_id );
+            if ( empty( $mangopay_vendor_id ) ) {
+                $mangopay_vendor_id = User::create( $vendor_id );
             }
 
             // Get the user wallet that was used for the transaction
-            $transaction    = PayIn::get( $transaction_id );
-            $user_wallet_id = $transaction->CreditedWalletId;
+            $transaction        = PayIn::get( $transaction_id );
+            $customer_wallet_id = $transaction->CreditedWalletId;
 
             // Get the vendor wallet
-            $wallet = Wallet::create( $mp_vendor_id );
+            $vendor_wallet = Wallet::create( $mangopay_vendor_id );
 
             // Go for the transfer
-            $transfer					      = new MangoTransfer();
-            $transfer->AuthorId				  = $mp_user_id;
-            $transfer->DebitedFunds			  = new Money();
+            $transfer                         = new MangoTransfer();
+            $transfer->AuthorId               = $mangopay_customer_id;
+            $transfer->DebitedFunds           = new Money();
             $transfer->DebitedFunds->Currency = $currency;
-            $transfer->DebitedFunds->Amount	  = round( $amount * 100 );
-            $transfer->Fees					  = new Money();
-            $transfer->Fees->Currency		  = $currency;
-            $transfer->Fees->Amount			  = round( $fees * 100 );
-            $transfer->DebitedWalletID		  = $user_wallet_id;
-            $transfer->CreditedWalletId		  = $wallet->Id;
-            $transfer->Tag					  = "WC Order #$order_id";
+            $transfer->DebitedFunds->Amount   = round( $amount * 100 );
+            $transfer->Fees                   = new Money();
+            $transfer->Fees->Currency         = $currency;
+            $transfer->Fees->Amount           = round( $fees * 100 );
+            $transfer->DebitedWalletID        = $customer_wallet_id;
+            $transfer->CreditedWalletId       = $vendor_wallet->Id;
+            $transfer->Tag                    = "WC Order #$order_id";
 
             $response = static::config()->mangopay_api->Transfers->Create( $transfer );
         } catch( Exception $e ) {
             Helper::log(
                 sprintf(
                     'Could not process the wallet transfer of the amount: %s to the wallet: %s of the user: %s. Message: %s',
-                    $amount, $wallet->Id, $vendor_id, $e->getMessage()
+                    $amount, $vendor_wallet->Id, $vendor_id, $e->getMessage()
                 ),
                 'Transfer'
             );
@@ -106,7 +108,7 @@ class Transfer extends Processor {
                 'dokan-mangopay-transfer-error',
                 sprintf(
                     __( 'Could not process the wallet transfer of the amount: %s to the wallet: %s. Message: %s', 'dokan' ),
-                    $amount, $wallet->Id, $vendor_id, $e->getMessage()
+                    $amount, $vendor_wallet->Id, $vendor_id, $e->getMessage()
                 )
             );
         }

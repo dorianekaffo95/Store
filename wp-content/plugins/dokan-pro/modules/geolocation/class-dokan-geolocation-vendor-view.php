@@ -159,13 +159,13 @@ class Dokan_Geolocation_Vendor_View {
             return;
         }
 
-        $vendor = new Dokan_Vendor( $seller );
+        $vendor = new WeDevs\Dokan\Vendor\Vendor( $seller );
 
         $info_window_data = array(
             'title'   => $vendor->get_shop_name(),
-            'link'    => dokan_get_store_url( $seller->ID ),
+            'link'    => dokan_get_store_url( $vendor->get_id() ),
             'image'   => $vendor->get_avatar(),
-            'address' => $vendor->data->data->dokan_geo_address,
+            'address' => get_user_meta( $vendor->get_id(), 'dokan_geo_address', true ),
         );
 
         /**
@@ -180,9 +180,9 @@ class Dokan_Geolocation_Vendor_View {
 
         $args = array(
             'id'                  => $seller->ID,
-            'dokan_geo_latitude'  => $vendor->data->data->dokan_geo_latitude,
-            'dokan_geo_longitude' => $vendor->data->data->dokan_geo_longitude,
-            'dokan_geo_address'   => $vendor->data->data->dokan_geo_address,
+            'dokan_geo_latitude'  => get_user_meta( $vendor->get_id(), 'dokan_geo_latitude', true ),
+            'dokan_geo_longitude' => get_user_meta( $vendor->get_id(), 'dokan_geo_longitude', true ),
+            'dokan_geo_address'   => get_user_meta( $vendor->get_id(), 'dokan_geo_address', true ),
             'info'                => wp_json_encode( $info ),
         );
 
@@ -200,10 +200,10 @@ class Dokan_Geolocation_Vendor_View {
         $show_filters = dokan_get_option( 'show_filters_before_locations_map', 'dokan_geolocation', 'on' );
 
         if ( 'on' === $show_filters ) {
-            /** 
+            /**
              * Since here we removing top bar search filter which one comes from dokan lite
              * because when geolocation use left or right then here we adding new search
-             * filter and removing top search area  
+             * filter and removing top search area
              */
             add_filter( 'dokan_load_store_lists_filter_search_bar', '__return_false', 99 );
         }

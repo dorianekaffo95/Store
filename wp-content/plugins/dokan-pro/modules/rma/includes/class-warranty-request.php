@@ -26,7 +26,10 @@ class Dokan_RMA_Warranty_Request {
 
         if ( $requests ) {
             foreach ( $requests as $request ) {
-                $results[] = $this->transform_warranty_requests( $request );
+                $warranty_request_data = $this->transform_warranty_requests( $request );
+                if ( ! is_wp_error( $warranty_request_data ) ) {
+                    $results[] = $warranty_request_data;
+                }
             }
         }
 

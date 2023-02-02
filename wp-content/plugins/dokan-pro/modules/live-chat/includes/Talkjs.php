@@ -91,7 +91,7 @@ class Talkjs {
     public function dokan_include_scripts() {
         if ( dokan_is_store_page() ) {
             wp_enqueue_style( 'dokan-magnific-popup' );
-            wp_enqueue_script( 'dokan-popup' );
+            wp_enqueue_script( 'dokan-magnific-popup' );
         }
     }
 

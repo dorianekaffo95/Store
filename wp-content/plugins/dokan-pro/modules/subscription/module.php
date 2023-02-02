@@ -94,7 +94,10 @@ class Module {
         add_filter( 'woocommerce_add_to_cart_validation', [ __CLASS__, 'maybe_empty_cart' ], 10, 3 );
         add_filter( 'woocommerce_add_to_cart_validation', [ __CLASS__, 'remove_addons_validation' ], 1, 3 );
 
-        add_action( 'woocommerce_order_status_changed', array( $this, 'process_order_pack_product' ), 10, 3 );
+        add_filter( 'woocommerce_checkout_order_processed', [ $this, 'process_subscription_ordermeta' ], 10, 1 );
+        add_filter( 'woocommerce_available_payment_gateways', [ $this, 'filter_payment_gateways' ] );
+        add_action( 'woocommerce_order_status_changed', [ $this, 'process_order_pack_product' ], 10, 3 );
+        add_action( 'woocommerce_after_checkout_validation', [ $this, 'validate_billing_email' ], 10, 2 );
 
         add_action( 'template_redirect', array( $this, 'maybe_cancel_or_activate_subscription' ) );
         add_action( 'dps_cancel_recurring_subscription', array( $this, 'cancel_recurring_subscription' ), 10, 2 );
@@ -287,11 +290,15 @@ class Module {
             $is_subscription_page = true;
         }
 
-        if ( $is_subscription_page || 'product' === $typenow || $is_new_product_page || ( is_account_page() && ! is_user_logged_in() ) ) {
+        if ( ! $is_subscription_page && is_a( $post, 'WP_Post' ) && has_shortcode( $post->post_content, 'dokan-vendor-registration' ) ) {
+            $is_subscription_page = true;
+        }
+
+        if ( $is_subscription_page || 'product' === $typenow || $is_new_product_page || is_account_page() ) {
             wp_enqueue_style( 'dps-custom-style' );
         }
 
-        if ( $is_subscription_page || ( is_account_page() && ! is_user_logged_in() ) ) {
+        if ( $is_subscription_page || is_account_page() ) {
             wp_enqueue_script( 'dps-custom-js' );
         }
     }
@@ -746,65 +753,258 @@ class Module {
     }
 
     /**
+     * Adds order metadata for subscription product.
+     *
+     * @since 3.7.10
+     *
+     * @param int $order_id
+     *
+     * @return void
+     */
+    public function process_subscription_ordermeta( $order_id ) {
+        $order = wc_get_order( $order_id );
+        if ( ! $order ) {
+            return;
+        }
+
+        $product = Helper::get_vendor_subscription_product_by_order( $order );
+        if ( ! $product ) {
+            return;
+        }
+
+        // We need to make sure the order meta data gets saved only once
+        $pack_validity = $product->get_meta( '_pack_validity', true );
+        $pack_validity = empty( $pack_validity ) || ! is_numeric( $pack_validity )
+            ? 'unlimited'
+            : dokan_current_datetime()->modify( "+$pack_validity days" )->format( 'Y-m-d H:i:s' );
+
+        $order->update_meta_data( '_pack_validity', $pack_validity );
+        $order->update_meta_data( '_no_of_product', $product->get_meta( '_no_of_product', true ) );
+        $order->update_meta_data(
+            '_subscription_product_admin_commission',
+            $product->get_meta( '_subscription_product_admin_commission', true )
+        );
+        $order->update_meta_data(
+            '_subscription_product_admin_additional_fee',
+            $product->get_meta( '_subscription_product_admin_additional_fee', true )
+        );
+        $order->update_meta_data(
+            '_subscription_product_admin_commission_type',
+            $product->get_meta( '_subscription_product_admin_commission_type', true )
+        );
+        $order->save_meta_data();
+    }
+
+    /**
      * Process order for specific package
      *
      * @param integer $order_id
      * @param string  $old_status
      * @param string  $new_status
+     *
+     * @return void
      */
-    function process_order_pack_product( $order_id, $old_status, $new_status ) {
-        $customer_id = get_post_meta( $order_id, '_customer_user', true );
+    public function process_order_pack_product( $order_id, $old_status, $new_status ) {
+        if ( $old_status === $new_status ) {
+            return;
+        }
 
-        if ( $new_status == 'completed' ) {
-            $order = new \WC_Order( $order_id );
+        $order = wc_get_order( $order_id );
+        if ( ! $order ) {
+            return;
+        }
 
-            $product_items = $order->get_items();
+        $product = Helper::get_vendor_subscription_product_by_order( $order );
+        if ( ! $product ) {
+            return;
+        }
 
-            $product    = reset( $product_items );
-            $product_id = $product['product_id'];
+        if ( 'completed' !== $new_status ) {
+            return;
+        }
 
-            if ( Helper::is_subscription_product( $product_id ) ) {
-                if ( ! Helper::has_used_trial_pack( $customer_id ) ) {
-                    Helper::add_used_trial_pack( $customer_id, $product_id );
-                }
+        $customer_id = $order->get_customer_id();
 
-                if ( Helper::is_recurring_pack( $product_id ) ) {
+        // While the user doesn't exist, create it as a vendor
+        if ( empty( $customer_id ) ) {
+            $user_data = [
+                'first_name' => $order->get_billing_first_name(),
+                'last_name'  => $order->get_billing_last_name(),
+            ];
+
+            $email = $order->get_billing_email();
+
+            /*
+             * The user could already be created with the
+             * billing email but is not just logged in.
+             * So, we should avoid recreating the user.
+             */
+            $user = get_user_by( 'email', $email );
+
+            if ( ! $user ) {
+                $user_data['user_login']    = wc_create_new_customer_username( $email, $user_data );
+                $user_data['email']         = $email;
+                $user_data['phone']         = $order->get_billing_phone();
+                $user_data['notify_vendor'] = true;
+                $user_data['enabled']       = true;
+                $user_data['store_name']    = $order->get_formatted_billing_full_name();
+                $user_data['address']       = [
+                    'street_1' => $order->get_billing_address_1(),
+                    'street_2' => $order->get_billing_address_2(),
+                    'city'     => $order->get_billing_city(),
+                    'zip'      => $order->get_billing_postcode(),
+                    'state'    => $order->get_billing_state(),
+                    'country'  => $order->get_billing_country(),
+                ];
+
+                $vendor = dokan()->vendor->create( $user_data );
+
+                if ( is_wp_error( $vendor ) ) {
                     return;
                 }
 
-                $pack_validity = get_post_meta( $product_id, '_pack_validity', true );
-                update_user_meta( $customer_id, 'product_package_id', $product_id );
-                update_user_meta( $customer_id, 'product_order_id', $order_id );
-                update_user_meta( $customer_id, 'product_no_with_pack', get_post_meta( $product_id, '_no_of_product', true ) );
-                update_user_meta( $customer_id, 'product_pack_startdate', dokan_current_datetime()->format( 'Y-m-d H:i:s' ) );
-
-                if ( empty( $pack_validity ) ) {
-                    update_user_meta( $customer_id, 'product_pack_enddate', 'unlimited' );
-                } else {
-                    update_user_meta( $customer_id, 'product_pack_enddate', dokan_current_datetime()->modify( "+$pack_validity days" )->format( 'Y-m-d H:i:s' ) );
-                }
-
-                update_user_meta( $customer_id, 'can_post_product', '1' );
-                update_user_meta( $customer_id, '_customer_recurring_subscription', '' );
-
-                $admin_commission      = get_post_meta( $product_id, '_subscription_product_admin_commission', true );
-                $admin_additional_fee  = get_post_meta( $product_id, '_subscription_product_admin_additional_fee', true );
-                $admin_commission_type = get_post_meta( $product_id, '_subscription_product_admin_commission_type', true );
-
-                if ( ! empty( $admin_commission ) && ! empty( $admin_additional_fee ) && ! empty( $admin_commission_type ) ) {
-                    update_user_meta( $customer_id, 'dokan_admin_percentage', $admin_commission );
-                    update_user_meta( $customer_id, 'dokan_admin_additional_fee', $admin_additional_fee );
-                    update_user_meta( $customer_id, 'dokan_admin_percentage_type', $admin_commission_type );
-                } elseif ( ! empty( $admin_commission ) && ! empty( $admin_commission_type ) ) {
-                    update_user_meta( $customer_id, 'dokan_admin_percentage', $admin_commission );
-                    update_user_meta( $customer_id, 'dokan_admin_percentage_type', $admin_commission_type );
-                } else {
-                    update_user_meta( $customer_id, 'dokan_admin_percentage', '' );
-                }
-
-                do_action( 'dokan_vendor_purchased_subscription', $customer_id );
+                $customer_id = $vendor->get_id();
+            } else {
+                $customer_id = $user->ID;
             }
+
+            /*
+             * As the user didn't exist earlier, we need
+             * to set the customer id as we have created
+             * the user by now.
+             */
+            $order->set_customer_id( $customer_id );
+            $order->save();
         }
+
+        // Register the user as vendor if it is already not.
+        if ( ! dokan_is_user_seller( $customer_id ) ) {
+            $user = get_userdata( $customer_id );
+            if ( ! $user ) {
+                return;
+            }
+
+            $user_data = [
+                'fname'    => ! empty( $user->first_name ) ? $user->first_name : $order->get_billing_first_name(),
+                'lname'    => ! empty( $user->last_name ) ? $user->last_name : $order->get_billing_last_name(),
+                'shopurl'  => $user->user_nicename,
+                'shopname' => ! empty( $user->display_name ) ? $user->display_name : $order->get_formatted_billing_full_name(),
+                'phone'    => $order->get_billing_phone(),
+                'address'  => [
+                    'street_1' => $order->get_billing_address_1(),
+                    'street_2' => $order->get_billing_address_2(),
+                    'city'     => $order->get_billing_city(),
+                    'zip'      => $order->get_billing_postcode(),
+                    'state'    => $order->get_billing_state(),
+                    'country'  => $order->get_billing_country(),
+                ],
+            ];
+
+            dokan_user_update_to_seller( $user, $user_data );
+        }
+
+        $product_id = $product->get_id();
+
+        if ( ! Helper::has_used_trial_pack( $customer_id ) ) {
+            Helper::add_used_trial_pack( $customer_id, $product_id );
+        }
+
+        if ( Helper::is_recurring_pack( $product_id ) ) {
+            return;
+        }
+
+        // If order has pack validity get it, or get validity from product and format it as Y-m-d H:i:s otherwise validity will be unlimited.
+        if ( $order->meta_exists( '_pack_validity' ) ) {
+            $pack_validity = $order->get_meta( '_pack_validity', true  );
+        } else {
+            $product_pack_validity = $product->get_meta( '_pack_validity', true  );
+
+            $pack_validity = empty( $product_pack_validity ) || ! is_numeric( $product_pack_validity )
+                ? 'unlimited'
+                : dokan_current_datetime()->modify( "+$product_pack_validity days" )->format( 'Y-m-d H:i:s' );
+        }
+
+        $num_product           = $order->meta_exists( '_no_of_product' ) ? $order->get_meta( '_no_of_product', true ) : $product->get_meta( '_no_of_product', true );
+        $admin_commission      = $order->meta_exists( '_subscription_product_admin_commission' ) ? $order->get_meta( '_subscription_product_admin_commission', true ) : $product->get_meta( '_subscription_product_admin_commission', true );
+        $admin_additional_fee  = $order->meta_exists( '_subscription_product_admin_additional_fee' ) ? $order->get_meta( '_subscription_product_admin_additional_fee', true ) : $product->get_meta( '_subscription_product_admin_additional_fee', true );
+        $admin_commission_type = $order->meta_exists( '_subscription_product_admin_commission_type' ) ? $order->get_meta( '_subscription_product_admin_commission_type', true ) : $product->get_meta( '_subscription_product_admin_commission_type', true );
+
+        update_user_meta( $customer_id, 'product_pack_enddate', $pack_validity );
+        update_user_meta( $customer_id, 'product_package_id', $product_id );
+        update_user_meta( $customer_id, 'product_order_id', $order_id );
+        update_user_meta( $customer_id, 'product_no_with_pack', $num_product );
+        update_user_meta( $customer_id, 'product_pack_startdate', dokan_current_datetime()->format( 'Y-m-d H:i:s' ) );
+        update_user_meta( $customer_id, 'can_post_product', '1' );
+        update_user_meta( $customer_id, '_customer_recurring_subscription', '' );
+
+        if ( ! empty( $admin_commission ) && ! empty( $admin_additional_fee ) && ! empty( $admin_commission_type ) ) {
+            update_user_meta( $customer_id, 'dokan_admin_percentage', $admin_commission );
+            update_user_meta( $customer_id, 'dokan_admin_additional_fee', $admin_additional_fee );
+            update_user_meta( $customer_id, 'dokan_admin_percentage_type', $admin_commission_type );
+        } elseif ( ! empty( $admin_commission ) && ! empty( $admin_commission_type ) ) {
+            update_user_meta( $customer_id, 'dokan_admin_percentage', $admin_commission );
+            update_user_meta( $customer_id, 'dokan_admin_percentage_type', $admin_commission_type );
+        } else {
+            update_user_meta( $customer_id, 'dokan_admin_percentage', '' );
+        }
+
+        do_action( 'dokan_vendor_purchased_subscription', $customer_id );
+    }
+
+    /**
+     * Validates billing email before checkout.
+     *
+     * This applies for vendor subscription when the user
+     * is not logged in. As the user will be created using
+     * the billing email after a successful checkout, we
+     * need to make sure the billing email does not belong
+     * to any existing user.
+     *
+     * @since 3.7.10
+     *
+     * @param array $data
+     * @param object $errors
+     *
+     * @return void
+     */
+    public function validate_billing_email( $data, $errors ) {
+        if ( ! Helper::cart_contains_subscription() ) {
+            return;
+        }
+
+        if ( empty( $data['billing_email'] ) ) {
+            return;
+        }
+
+        if ( is_user_logged_in() ) {
+            return;
+        }
+
+        $user = get_user_by( 'email', $data['billing_email'] );
+        if ( $user ) {
+            $errors->add(
+                'dokan-duplicate-email',
+                __( 'A user already exists associated with the billing email. If this email belongs to you, please log in to your account first. Otherwise try using another email.', 'dokan' )
+            );
+        }
+    }
+
+    /**
+     * Filters available payment gateways as needed.
+     * For example, COD should not be available for recurring subscription.
+     *
+     * @since 3.7.10
+     *
+     * @param array $available_gateways
+     *
+     * @return array
+     */
+    public function filter_payment_gateways( $available_gateways ) {
+        if ( Helper::cart_contains_recurring_subscription_product() ) {
+            unset( $available_gateways['cod'] );
+        }
+
+        return $available_gateways;
     }
 
     /**
@@ -814,15 +1014,34 @@ class Module {
      * @return string $url
      */
     public static function add_to_cart_redirect( $url ) {
-        $product_id = isset( $_REQUEST['add-to-cart'] ) ? (int) $_REQUEST['add-to-cart'] : 0;
+        $product_id = isset( $_REQUEST['add-to-cart'] ) ? intval( $_REQUEST['add-to-cart'] ) : 0;
 
         if ( ! $product_id ) {
             return $url;
         }
 
         // If product is of the subscription type
-        if ( Helper::is_subscription_product( $product_id ) ) {
-            $url = wc_get_checkout_url();
+        if ( ! Helper::is_subscription_product( $product_id ) ) {
+            return $url;
+        }
+
+        $url = wc_get_checkout_url();
+
+        if ( Helper::is_recurring_pack( $product_id ) && ! is_user_logged_in() ) {
+            WC()->cart->empty_cart();
+
+            wc_clear_notices();
+            wc_add_notice(
+                __( 'You need to be logged in to buy a recurring subscription pack. Please log in or create an account to proceed to the checkout.', 'dokan' ),
+                'notice'
+            );
+
+            $url = add_query_arg(
+                [
+                    'redirect_to' => $url, // redirect to checkout page after logging in
+                ],
+                get_permalink( get_option( 'woocommerce_myaccount_page_id' ) )
+            );
         }
 
         return $url;
@@ -1674,25 +1893,39 @@ class Module {
             return $categories;
         }
 
-        if ( ( self::can_post_product() ) && $vendor->has_subscription() ) {
-            $override_cat = get_user_meta( $user_id, 'vendor_allowed_categories', true );
-            $selected_cat = ! empty( $override_cat ) ? $override_cat : $vendor->get_allowed_product_categories();
-
-            if ( empty( $selected_cat ) ) {
-                return $categories;
-            }
-
-            $to_return = $categories;
-            $selected_cat = array_map( 'absint', $selected_cat );
-
-            foreach ( $categories as $key => $category ) {
-                if ( absint( $category['parent_id'] ) === 0 && ! in_array( $key, $selected_cat ) ) {
-                    unset( $to_return[ $key ] );
-                }
-            }
-            return $to_return;
+        if ( ! self::can_post_product() || ! $vendor->has_subscription() ) {
+            return $categories;
         }
 
-        return $categories;
+        $override_cat = get_user_meta( $user_id, 'vendor_allowed_categories', true );
+        $selected_cat = ! empty( $override_cat ) ? $override_cat : $vendor->get_allowed_product_categories();
+
+        if ( empty( $selected_cat ) ) {
+            return $categories;
+        }
+
+        $selected_cat     = array_map( 'absint', $selected_cat );
+        $to_return        = [];
+
+        // We are allowing all the ancestors and grand children of the selected category.
+        $category_object = new \WeDevs\Dokan\ProductCategory\Categories();
+        $category_object->set_categories( $categories );
+
+        foreach ( $selected_cat as $cat ) {
+            $parent_categories = ! empty( $categories[ $cat ]['parents'] ) ? $categories[ $cat ]['parents'] : [];
+            $child_categories  = ! empty( $category_object->get_children( $cat ) ) ? $category_object->get_children( $cat ) : [];
+            $selected_cat      = array_merge(
+                $selected_cat, $parent_categories, $child_categories
+            );
+        }
+
+        foreach ( $selected_cat as $category_id ) {
+            if ( empty( $categories[ $category_id ] ) ) {
+                continue;
+            }
+            $to_return[ $category_id ] = $categories[ $category_id ];
+        }
+
+        return $to_return;
     }
 }

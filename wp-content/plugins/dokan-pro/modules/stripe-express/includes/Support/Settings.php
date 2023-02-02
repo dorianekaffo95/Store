@@ -88,7 +88,7 @@ class Settings {
     }
 
     /**
-     * Retrieves mangopay client id
+     * Retrieves Stripe publishable key.
      *
      * @since 3.6.1
      *
@@ -102,7 +102,7 @@ class Settings {
     }
 
     /**
-     * Retrieves mangopay api key
+     * Retrieves Stripe secret key.
      *
      * @since 3.6.1
      *
@@ -134,7 +134,7 @@ class Settings {
      *
      * @since 3.6.1
      *
-     * @return array
+     * @return string[]
      */
     public static function get_enabled_payment_methods() {
         $enabled_methods = self::get( 'enabled_payment_methods' );

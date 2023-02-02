@@ -22,8 +22,8 @@ class Module {
         // Define constants
         $this->constants();
 
+        // Verify rank math seo plugin and other dependency at the first place
         $dependency = new DependencyNotice();
-
         if ( $dependency->is_missing_dependency() ) {
             return;
         }
@@ -33,13 +33,8 @@ class Module {
             return;
         }
 
-        // Check if rank math setup is completed
-        if ( rank_math()->registration->invalid ) {
-            return;
-        }
-
         // Initialize the module
-        add_action( 'init', array( $this, 'hooks' ) );
+        add_action( 'init', array( $this, 'init' ) );
     }
 
     /**
@@ -52,7 +47,29 @@ class Module {
     private function constants() {
         define( 'DOKAN_RANK_MATH_FILE', __FILE__ );
         define( 'DOKAN_RANK_MATH_PATH', dirname( DOKAN_RANK_MATH_FILE ) );
-        define( 'DOKAN_RANK_MATH_TEMPLATE_PATH', dirname( DOKAN_RANK_MATH_FILE ) . '/templates/' );
+        define( 'DOKAN_RANK_MATH_INC', dirname( DOKAN_RANK_MATH_FILE ) . '/includes' );
+        define( 'DOKAN_RANK_MATH_TEMPLATE_PATH', dirname( DOKAN_RANK_MATH_FILE ) . '/templates' );
+    }
+
+    /**
+     * Initializes all processing.
+     *
+     * @since 3.7.6
+     *
+     * @return void
+     */
+    public function init() {
+        /*
+         * Load SEO content after inventory variants widget on the edit product page.
+         * All other hooks and processes will be initialized inside the execution of
+         * this hook to make sure the processing happens only when a product is being
+         * edited from vendor dashboard.
+         */
+        add_action( 'dokan_product_edit_after_inventory_variants', [ $this, 'load_product_seo_content' ], 6, 2 );
+        // Map meta cap for `vendor_staff` to bypass some primitive capability requirements.
+        add_filter( 'map_meta_cap', [ $this, 'map_meta_cap_for_rank_math' ], 10, 4 );
+        // Initiates Rank math's own rest api.
+        add_action( 'rest_api_init', [ $this, 'init_rest_api' ] );
     }
 
     /**
@@ -62,15 +79,15 @@ class Module {
      *
      * @return void
      */
-    public function hooks() {
-        $this->register_scripts();
+    private function hooks() {
+       // Load product sections with ID inside vendor-dashboard footer.
+        add_action( 'dokan_vendor_dashboard_after_footer', [ $this, 'load_hidden_product_sections' ] );
 
-        // Map meta cap for `vendor_staff` to bypass some primitive capability requirements.
-        add_filter( 'map_meta_cap', array( $this, 'map_meta_cap_for_rank_math' ), 10, 4 );
-        // Load SEO content after inventory variants widget on the edit product page
-        add_action( 'dokan_product_edit_after_inventory_variants', array( $this, 'load_product_seo_content' ), 6, 2 );
-        // Initiates rest api
-        add_action( 'rest_api_init', array( $this, 'init_rest_api' ) );
+        // New Vendor dashboard product edit page load.
+        add_action( 'dokan_vendor_dashboard_script_loaded', [ $this, 'load_product_scripts_for_blocks' ] );
+
+        // Initiates Rest API for dokan-rank-math module.
+        add_filter( 'dokan_rest_api_class_map', [ $this, 'rest_api_class_map' ] );
     }
 
     /**
@@ -129,7 +146,7 @@ class Module {
 
                 // Bypass the primitive caps only if the user is `vendor_staff`
                 if ( ! empty( $user->allcaps['vendor_staff'] ) ) {
-                    return array();
+                    return [];
                 }
 
                 break;
@@ -139,11 +156,15 @@ class Module {
                     break;
                 }
 
+                if ( ! dokan_is_user_seller( dokan_get_current_user_id() ) ) {
+                    break;
+                }
+
                 /*
                  * For Redirection user need to have the capability
                  * of `rank_math_redirections`. So here the users
                  * who can edit dokan products are given that
-                 * capability so that they can edit redierct settings.
+                 * capability so that they can edit redirect settings.
                  */
                 add_filter(
                     'user_has_cap', function( $all_caps ) use ( $cap ) {
@@ -162,22 +183,65 @@ class Module {
      * @since 3.4.0
      *
      * @param object $product
-     * @param int $product_id
+     * @param int    $product_id
      *
      * @return void
      */
     public function load_product_seo_content( $product, $product_id ) {
+        $this->hooks();
 
-        /*
-         * Process the required functionality
-         * for frontend application including
-         * all the styles and scripts
-         */
-        $frontend = new Frontend();
-        $frontend->process();
+        // Load frontend scripts.
+        $this->load_frontend();
 
         // Require the template for rank math seo content
-        require_once DOKAN_RANK_MATH_TEMPLATE_PATH . 'product-seo-content.php';
+        require_once DOKAN_RANK_MATH_TEMPLATE_PATH . '/product-seo-content.php';
+    }
+
+    /**
+     * Load hidden product content in vendor dashboard.
+     *
+     * It's used to fix as if React DOM will through an exception
+     * that it could not get valid DOM element.
+     *
+     * @since 3.7.13
+     *
+     * @return void
+     */
+    public function load_hidden_product_sections() {
+        require_once DOKAN_RANK_MATH_TEMPLATE_PATH . '/product-seo-hidden-content.php';
+    }
+
+    /**
+     * Load rank math's scripts in product-edit page.
+     *
+     * @since 3.7.13
+     *
+     * This will be only applied to new Vendor-Dashboard's
+     * product edit page.
+     *
+     * @return void
+     */
+    public function load_product_scripts_for_blocks() {
+        $cmb2 = \CMB2_Bootstrap_2101::initiate();
+        $cmb2->include_cmb();
+
+        // Load frontend scripts.
+        $this->load_frontend();
+    }
+
+    /**
+     * Load rank-math scripts and styles.
+     *
+     * Process the required functionality for frontend application
+     * including all the styles and scripts
+     *
+     * @since 3.7.13
+     *
+     * @return void
+     */
+    private function load_frontend() {
+        $frontend = new Frontend();
+        $frontend->process();
     }
 
     /**
@@ -193,83 +257,15 @@ class Module {
     }
 
     /**
-     * Register scripts
+     * Registers rank maths rest routes in dokan rest class-maps.
      *
-     * @since 3.7.4
+     * @since 3.7.13
+     *
+     * @return array
      */
-    public function register_scripts() {
-        wp_register_style(
-            'rank-math-common',
-            rank_math()->plugin_url() . 'assets/admin/css/common.css',
-            array(),
-            rank_math()->version
-        );
+    public function rest_api_class_map( $classes ) {
+        $class[ DOKAN_RANK_MATH_INC . '/REST/RankMathController.php' ] = '\WeDevs\DokanPro\Modules\RankMath\REST\RankMathController';
 
-        wp_register_style(
-            'rank-math-content-ai',
-            rank_math()->plugin_url() . 'includes/modules/content-ai/assets/css/content-ai.css',
-            [ 'rank-math-common' ],
-            rank_math()->version
-        );
-
-        wp_register_script(
-            'rank-math-content-ai',
-            rank_math()->plugin_url() . 'includes/modules/content-ai/assets/js/content-ai.js',
-            [ 'rank-math-editor' ],
-            rank_math()->version,
-            true
-        );
-
-        wp_register_style(
-            'rank-math-metabox',
-            rank_math()->plugin_url() . 'assets/admin/css/metabox.css',
-            array(
-                'rank-math-common',
-                'rank-math-cmb2',
-                'rank-math-editor',
-                'wp-components',
-            ),
-            rank_math()->version
-        );
-
-        wp_register_script(
-            'rank-math-editor',
-            rank_math()->plugin_url() . 'assets/admin/js/classic.js',
-            array(
-                'clipboard',
-                'wp-hooks',
-                'moment',
-                'wp-date',
-                'wp-data',
-                'wp-api-fetch',
-                'wp-components',
-                'wp-element',
-                'wp-i18n',
-                'wp-url',
-                'wp-media-utils',
-                'rank-math-common',
-                'rank-math-analyzer',
-                'rank-math-validate',
-                'wp-block-editor',
-                'rank-math-app',
-            ),
-            rank_math()->version,
-            true
-        );
-
-        wp_register_style(
-            'rank-math-schema',
-            rank_math()->plugin_url() . 'includes/modules/schema/assets/css/schema.css',
-            array( 'wp-components', 'rank-math-metabox' ),
-            rank_math()->version
-        );
-
-        wp_register_script(
-            'rank-math-schema',
-            rank_math()->plugin_url() . 'includes/modules/schema/assets/js/schema-gutenberg.js',
-            array( 'rank-math-editor' ),
-            rank_math()->version,
-            true
-        );
+        return array_merge( $classes, $class );
     }
 }

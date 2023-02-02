@@ -5,12 +5,13 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\WebhookEvents;
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
-use WeDevs\DokanPro\Modules\StripeExpress\Processors\Order;
+use WeDevs\DokanPro\Modules\StripeExpress\Support\UserMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\OrderMeta;
+use DokanPro\Modules\Subscription\Helper as SubscriptionHelper;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 
 /**
- * Class to handle `charge.disput.closed` webhook.
+ * Class to handle `charge.dispute.closed` webhook.
  *
  * @since 3.6.1
  *
@@ -19,47 +20,54 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 class ChargeDisputeClosed extends WebhookEvent {
 
     /**
-     * Class constructor.
-     *
-     * @since 3.6.1
-     *
-     * @param object $event
-     */
-    public function __construct( $event ) {
-        $this->set( $event );
-    }
-
-    /**
      * Handles the event.
      *
      * @since 3.6.1
      *
-     * @param object $disput
-     *
      * @return void
      */
-    public function handle( $disput ) {
-        $order = Order::get_order_by_charge_id( $disput->charge );
+    public function handle() {
+        $dispute = $this->get_payload();
+        $order   = $this->get_order_from_stripe_object( $dispute );
 
         if ( ! $order ) {
-            Helper::log( 'Could not find order via charge ID: ' . $disput->charge );
             return;
         }
 
         $order_status = OrderMeta::get_status_before_hold( $order );
 
-        switch ( $disput->status ) {
+        switch ( $dispute->status ) {
             case 'won':
-                $message = __( 'The dispute was resolved in your favor.', 'dokan' );
+                $message = sprintf(
+                    /* translators: 1) gateway title */
+                    __( '[%s] The dispute was resolved in your favor for this order. The order status has been updated.', 'dokan' ),
+                    Helper::get_gateway_title()
+                );
+
+                if ( $this->vendor_subscription ) {
+                    UserMeta::update_post_product( $this->user_id );
+                }
                 break;
 
             case 'lost':
-                $message      = __( 'The dispute was lost or accepted.', 'dokan' );
+                $message = sprintf(
+                    /* translators: 1) gateway title */
+                    __( '[%s] The dispute was lost or accepted.', 'dokan' ),
+                    Helper::get_gateway_title()
+                );
                 $order_status = 'failed';
+
+                if ( $this->vendor_subscription ) {
+                    SubscriptionHelper::delete_subscription_pack( $this->user_id, $order->get_id() );
+                }
                 break;
 
             case 'warning_closed':
-                $message = __( 'The inquiry or retrieval was closed.', 'dokan' );
+                $message = sprintf(
+                    /* translators: 1) gateway title */
+                    __( '[%s] The inquiry or retrieval was closed. The order status has been updated.', 'dokan' ),
+                    Helper::get_gateway_title()
+                );
                 break;
 
             default:

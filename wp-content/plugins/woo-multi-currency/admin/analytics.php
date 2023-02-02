@@ -92,17 +92,17 @@ class WOOMULTI_CURRENCY_F_Admin_Analytics {
 		$currency   = get_post_meta( $order_id, '_order_currency', true );
 		$rate       = 1;
 		if ( isset( $order_info[ $currency ], $order_info[ $default_currency ], $order_info[ $default_currency ]['is_main'] ) && $order_info[ $default_currency ]['is_main'] == 1 && $order_info[ $currency ]['rate'] > 0 ) {
-			$rate = $order_info[ $currency ]['rate'];
+			$rate = floatval( $order_info[ $currency ]['rate'] );
 		}
 		$converted_order = array(
 			'date_created' => strtotime( $order_data['date_created'] ),
 			'gross_sales'  => 0,
 			'refunds'      => 0,
-			'net_revenue'  => self::format_price( $order_data['net_total'] / $rate ),
+			'net_revenue'  => self::format_price( floatval( $order_data['net_total'] ) / $rate ),
 			'coupons'      => 0,
 			'taxes'        => 0,
 			'shipping'     => 0,
-			'total_sales'  => self::format_price( $order_data['total_sales'] / $rate ),
+			'total_sales'  => self::format_price( floatval( $order_data['total_sales'] ) / $rate ),
 		);
 
 		$order = wc_get_order( $order_id );
@@ -110,9 +110,9 @@ class WOOMULTI_CURRENCY_F_Admin_Analytics {
 			if ( $order_data['net_total'] < 0 ) {
 				$converted_order['refunds'] = abs( $converted_order['net_revenue'] );
 			}
-			$converted_order['coupons']  = self::format_price( $order->get_total_discount() / $rate );
-			$converted_order['taxes']    = self::format_price( $order->get_total_tax() / $rate );
-			$converted_order['shipping'] = self::format_price( $order->get_shipping_total() / $rate );
+			$converted_order['coupons']  = self::format_price( floatval( $order->get_total_discount() ) / $rate );
+			$converted_order['taxes']    = self::format_price( floatval( $order->get_total_tax() ) / $rate );
+			$converted_order['shipping'] = self::format_price( floatval( $order->get_shipping_total() ) / $rate );
 		}
 		$converted_order['gross_sales'] = $converted_order['total_sales'] + $converted_order['coupons'] - $converted_order['taxes'] - $converted_order['shipping'] + $converted_order['refunds'];
 

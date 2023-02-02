@@ -1,11 +1,11 @@
-<fieldset <?php echo $force_checked ? 'style="display:none;"' : ''; /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */ ?>>
+<fieldset <?php echo $force_checked ? 'style="display:none;"' : ''; ?>>
     <p class="form-row woocommerce-SavedPaymentMethods-saveNew">
         <input id="<?php echo esc_attr( $id ); ?>"
             name="<?php echo esc_attr( $id ); ?>"
             type="checkbox"
             value="true"
             style="width:auto;"
-            <?php echo $force_checked ? 'checked' : ''; /* phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped */ ?>
+            <?php echo $force_checked ? 'checked' : ''; ?>
         />
         <label for="<?php echo esc_attr( $id ); ?>" style="display:inline;">
             <?php

@@ -2,14 +2,103 @@
 # This file is distributed under the same license as the Plugins - Spectra &#8211; WordPress Gutenberg Blocks - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-08-26 07:24:33+0000\n"
+"PO-Revision-Date: 2022-12-27 18:05:43+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: GlotPress/4.0.0-alpha.1\n"
+"X-Generator: GlotPress/4.0.0-alpha.3\n"
 "Language: fr\n"
 "Project-Id-Version: Plugins - Spectra &#8211; WordPress Gutenberg Blocks - Stable (latest release)\n"
+
+#: includes/blocks/modal/block.php:17 dist/blocks.js:17
+msgid "This block allows you to add modal popup."
+msgstr "Ce bloc vous autorise à ajouter une fenêtre surgissante modale."
+
+#: includes/blocks/modal/block.php:16 dist/blocks-placeholder.js:26
+#: dist/blocks.js:17
+msgid "Modal"
+msgstr "Fenêtre modale"
+
+#: includes/blocks/register/block.php:17
+msgid "This block lets you add a user register form."
+msgstr "Ce bloc vous permet d’ajouter un formulaire d’inscription des comptes."
+
+#: includes/blocks/register/block.php:16
+msgid "Registration Form"
+msgstr "Formulaire d’inscription"
+
+#: includes/blocks/login/block.php:17
+msgid "This block lets you add a user login form."
+msgstr "Ce bloc permet d’ajouter un formulaire de connexion au compte."
+
+#: includes/blocks/login/block.php:16
+msgid "Login Form"
+msgstr "Formulaire de connexion"
+
+#: includes/blocks/image-gallery/block.php:17 dist/blocks.js:17
+msgid "Create a highly customizable image gallery"
+msgstr "Créez une galerie d’images hautement personnalisable"
+
+#: includes/blocks/image-gallery/block.php:16 dist/blocks-placeholder.js:20
+#: dist/blocks.js:17
+msgid "Image Gallery"
+msgstr "Galerie d’images"
+
+#: includes/blocks/counter/block.php:17 dist/blocks.js:17
+msgid "This block allows you to add number counter."
+msgstr "Ce bloc vous permet d’ajouter un compteur de nombres."
+
+#: includes/blocks/counter/block.php:16 dist/blocks-placeholder.js:14
+#: dist/blocks.js:17
+msgid "Counter"
+msgstr "Compteur"
+
+#: includes/blocks/counter/attributes.php:29 dist/blocks.js:1
+msgid "Add Your Title Here…"
+msgstr "Ajoutez votre titre ici…"
+
+#: classes/class-uagb-init-blocks.php:633
+msgid ""
+"Use custom class added in block's advanced settings to target your desired block. Examples:\n"
+"\t\t\t\t.my-class {text-align: center;} // my-class is a custom selector"
+msgstr ""
+"Utilisez la classe personnalisée ajoutée dans les réglages avancés du bloc pour cibler le bloc souhaité. Exemples :\n"
+"\t\t\t\t.my-class {text-align: center;} // my-class is a custom selector"
+
+#: blocks-config/image-gallery/class-spectra-image-gallery.php:1140
+#: dist/blocks.js:17
+msgid "Unable to load image"
+msgstr "Impossible de charger l’image"
+
+#: blocks-config/image-gallery/class-spectra-image-gallery.php:409
+#: includes/blocks/image-gallery/attributes.php:118 dist/blocks.js:1
+#: dist/blocks.js:17
+msgid "Load More Images"
+msgstr "Charger plus d’images"
+
+#: blocks-config/image-gallery/class-spectra-image-gallery.php:178
+#: includes/blocks/image-gallery/attributes.php:56 dist/blocks.js:1
+#: dist/blocks.js:17
+msgid "No Caption"
+msgstr "Aucune légende"
+
+#: includes/blocks/how-to/block.php:16 dist/blocks-placeholder.js:18
+#: dist/blocks.js:17
+msgid "How To"
+msgstr "Comment faire"
+
+#: lib/wp-background-processing/class-uagb-wp-background-process.php:426
+msgid "Every %d Minutes"
+msgstr "Toutes les %d minutes"
+
+#: includes/blocks/forms-upload/block.php:15
+msgid "Add a attachment in your form."
+msgstr "Ajouter un fichier joint dans le formulaire."
+
+#: includes/blocks/forms-upload/block.php:14
+msgid "Upload"
+msgstr "Téléverser"
 
 #. translators: %s: PHP version
 #: ultimate-addons-for-gutenberg.php:38
@@ -68,7 +157,7 @@ msgstr "Rangée avancée"
 msgid "Add reviews to items with Schema support."
 msgstr "Ajoutez des avis aux éléments avec la prise en charge de Schema."
 
-#: includes/blocks/review/block.php:16 dist/blocks-placeholder.js:27
+#: includes/blocks/review/block.php:16 dist/blocks-placeholder.js:30
 #: dist/blocks.js:17
 msgid "Review"
 msgstr "Avis"
@@ -129,20 +218,20 @@ msgstr "Personnaliser ce bouton de publication."
 msgid "Display your core gallery in a masonary layout."
 msgstr "Afficher votre galerie de base dans une mise en page maçonnée."
 
-#: includes/blocks/marketing-button/block.php:17 dist/blocks.js:13
+#: includes/blocks/marketing-button/block.php:17 dist/blocks.js:17
 msgid "Add a marketing call to action button with a short description."
 msgstr "Ajouter un bouton d’appel à l’action marketing avec une courte description."
 
-#: includes/blocks/lottie/block.php:17 dist/blocks.js:13
+#: includes/blocks/lottie/block.php:17 dist/blocks.js:17
 msgid "Add customizable lottie animation on your page."
 msgstr "Ajouter une animation lottie personnalisable sur votre page."
 
-#: includes/blocks/lottie/block.php:16 dist/blocks-placeholder.js:22
-#: dist/blocks.js:13
+#: includes/blocks/lottie/block.php:16 dist/blocks-placeholder.js:24
+#: dist/blocks.js:17
 msgid "Lottie Animation"
 msgstr "Animation Lottie"
 
-#: includes/blocks/inline-notice/block.php:17 dist/blocks.js:13
+#: includes/blocks/inline-notice/block.php:17 dist/blocks.js:17
 msgid "Highlight important information using inline notice block."
 msgstr "Surligner les informations importantes à l’aide du bloc de notification en ligne."
 
@@ -154,32 +243,27 @@ msgstr "Ajouter une image/icône, un séparateur et une description textuelle à
 msgid "Add images on your webpage with multiple customization options."
 msgstr "Ajouter des images sur votre page avec plusieurs options de personnalisation."
 
-#: includes/blocks/icon-list/block.php:17 dist/blocks.js:13
+#: includes/blocks/icon-list/block.php:17 dist/blocks.js:17
 msgid "Create a list highlighted with icons/images."
 msgstr "Créer une liste mise en évidence avec des icônes/images."
 
-#: includes/blocks/icon-list-child/block.php:15 dist/blocks.js:13
+#: includes/blocks/icon-list-child/block.php:15 dist/blocks.js:17
 msgid "Add and customize content for this list component."
 msgstr "Ajouter et personnaliser le contenu de ce composant de liste."
 
-#: includes/blocks/how-to/block.php:17 dist/blocks.js:13
+#: includes/blocks/how-to/block.php:17 dist/blocks.js:17
 msgid "Add instructions/steps on processes using how to block."
 msgstr "Ajouter des instructions/étapes sur les processus en utilisant comment bloquer."
 
-#: includes/blocks/how-to/block.php:16 dist/blocks-placeholder.js:17
-#: dist/blocks.js:13
-msgid "How-to"
-msgstr "Comment faire"
-
-#: includes/blocks/how-to-step/block.php:14
+#: includes/blocks/how-to-step/block.php:14 dist/blocks.js:17
 msgid "Add relevant content for this step."
 msgstr "Ajouter du contenu pertinent pour cette étape."
 
-#: includes/blocks/how-to-step/block.php:13 dist/blocks.js:1
+#: includes/blocks/how-to-step/block.php:13 dist/blocks.js:1 dist/blocks.js:17
 msgid "Step"
 msgstr "Étape"
 
-#: includes/blocks/google-map/block.php:17 dist/blocks.js:13
+#: includes/blocks/google-map/block.php:17 dist/blocks.js:17
 msgid "Show a Google Map location on your website."
 msgstr "Afficher un emplacement Google Map sur votre site."
 
@@ -191,13 +275,12 @@ msgstr "Personnalisez fortement et stylisez vos formulaires créés par Gravity 
 msgid "Gravity Form Designer"
 msgstr "Gravity Form Designer"
 
-#: includes/blocks/forms/block.php:17 dist/blocks.js:13
+#: includes/blocks/forms/block.php:17 dist/blocks.js:17
 msgid "Add easily customizable forms to gather information."
 msgstr "Ajouter des formulaires facilement personnalisables pour recueillir des informations."
 
-#: includes/blocks/forms/block.php:16
-#: admin-core/assets/build/dashboard-app.js:1 dist/blocks-placeholder.js:15
-#: dist/blocks.js:13
+#: includes/blocks/forms/block.php:16 dist/blocks-placeholder.js:16
+#: dist/blocks.js:17
 msgid "Form"
 msgstr "Formulaire"
 
@@ -205,11 +288,11 @@ msgstr "Formulaire"
 msgid "Spectra Form"
 msgstr "Formulaire Spectra"
 
-#: includes/blocks/forms-url/block.php:16 dist/blocks.js:13
+#: includes/blocks/forms-url/block.php:16 dist/blocks.js:17
 msgid "Add a URL input field in your form."
 msgstr "Ajoutez un champ de saisie d’URL dans votre formulaire."
 
-#: includes/blocks/forms-toggle/block.php:15 dist/blocks.js:13
+#: includes/blocks/forms-toggle/block.php:15 dist/blocks.js:17
 msgid "Add a toggle button in your form."
 msgstr "Ajoutez un bouton bascule dans votre formulaire."
 
@@ -217,11 +300,11 @@ msgstr "Ajoutez un bouton bascule dans votre formulaire."
 msgid "Add a text field in your form"
 msgstr "Ajouter un champ de texte dans le formulaire."
 
-#: includes/blocks/forms-select/block.php:16 dist/blocks.js:13
+#: includes/blocks/forms-select/block.php:16 dist/blocks.js:17
 msgid "Add a select dropdown to list choices."
 msgstr "Ajoutez une liste déroulante pour lister les choix."
 
-#: includes/blocks/forms-radio/block.php:15 dist/blocks.js:13
+#: includes/blocks/forms-radio/block.php:15 dist/blocks.js:17
 msgid "Add radio select boxes to allow a single choice from options."
 msgstr "Ajouter des cases de sélection radio pour autoriser un choix unique parmi les options."
 
@@ -241,7 +324,7 @@ msgstr "Ajouter un champ masqué dans votre formulaire pour transmettre des donn
 msgid "Add an email address field in your form"
 msgstr "Ajouter un champ d’adresse e-mail dans votre formulaire"
 
-#: includes/blocks/forms-date/block.php:15 dist/blocks.js:13
+#: includes/blocks/forms-date/block.php:15 dist/blocks.js:17
 msgid "Add a calendar based date picker in your form."
 msgstr "Ajoutez un sélecteur de date basé sur le calendrier dans votre formulaire."
 
@@ -249,16 +332,16 @@ msgstr "Ajoutez un sélecteur de date basé sur le calendrier dans votre formula
 msgid "Add checkboxes to allow mulitple choices from optons."
 msgstr "Ajoutez des cases à cocher pour autoriser plusieurs choix parmi les options."
 
-#: includes/blocks/forms-accept/block.php:15 dist/blocks.js:13
+#: includes/blocks/forms-accept/block.php:15 dist/blocks.js:17
 msgid "Add a consent statement with a checkbox in your form."
 msgstr "Ajouter une déclaration de consentement avec une case à cocher dans votre formulaire."
 
-#: includes/blocks/faq/block.php:17 dist/blocks.js:13
+#: includes/blocks/faq/block.php:17 dist/blocks.js:17
 msgid "Add accordions/FAQ schema to your page."
 msgstr "Ajouter le schéma accordéons/FAQ à votre page."
 
-#: includes/blocks/faq/block.php:16 dist/blocks-placeholder.js:14
-#: dist/blocks.js:13
+#: includes/blocks/faq/block.php:16 dist/blocks-placeholder.js:15
+#: dist/blocks.js:17
 msgid "FAQ"
 msgstr "FAQ"
 
@@ -266,7 +349,7 @@ msgstr "FAQ"
 msgid "Add a frequently asked question/accordian to display information."
 msgstr "Ajouter une foire aux questions/accordéon pour afficher des informations."
 
-#: includes/blocks/faq-child/block.php:14 dist/blocks.js:13
+#: includes/blocks/faq-child/block.php:14 dist/blocks.js:17
 msgid "FAQ Child"
 msgstr "FAQ enfant"
 
@@ -283,7 +366,7 @@ msgid "Create beautiful layouts with flexbox powered container block."
 msgstr "Créer de belles mises en page avec le bloc de conteneur alimenté par flexbox."
 
 #: includes/blocks/container/block.php:16 dist/blocks-placeholder.js:13
-#: dist/blocks.js:11 dist/blocks.js:13
+#: dist/blocks.js:11 dist/blocks.js:17
 msgid "Container"
 msgstr "Conteneur"
 
@@ -333,7 +416,7 @@ msgid "Spectra <p>Rollback to Previous Version</p>"
 msgstr "Spectra <p>Revenir à la version précédente</p>"
 
 #. translators: %s: html tags
-#: classes/class-uagb-loader.php:287
+#: classes/class-uagb-loader.php:431
 msgid "The %1$sSpectra%2$s plugin requires %1$sGutenberg%2$s plugin installed & activated."
 msgstr "L’extension %1$sSpectra%2$s nécessite l’extension %1$sGutenberg%2$s installé et activé."
 
@@ -341,85 +424,86 @@ msgstr "L’extension %1$sSpectra%2$s nécessite l’extension %1$sGutenberg%2$s
 msgid "Wow! The Spectra has already powered over 5 pages on your website!"
 msgstr "Ouah ! Spectra a déjà propulsé plus de 5 pages sur votre site !"
 
-#: classes/class-uagb-admin-helper.php:335
+#: classes/class-uagb-admin-helper.php:406
 msgid "Filter added through any 3rd Party Theme/Plugin."
 msgstr "Filtre ajouté via n’importe quel thème/extension tiers."
 
-#: classes/class-uagb-admin-helper.php:331
+#: classes/class-uagb-admin-helper.php:402
 msgid "Astra Theme"
 msgstr "Thème Astra"
-
-#: blocks-config/post/class-uagb-post.php:1516
-msgid "class=uagb-post__inner-wrap"
-msgstr "class=uagb-post__inner-wrap"
 
 #: blocks-config/forms/class-uagb-forms.php:100
 #: blocks-config/forms/class-uagb-forms.php:116
 msgid "Please try logging in again to verify that you are not a robot."
 msgstr "Veuillez réessayer de vous connecter pour vérifier que vous n’êtes pas un robot."
 
-#: admin-core/api/common-settings.php:99
+#: admin-core/api/common-settings.php:99 classes/class-uagb-rest-api.php:325
 msgid "Sorry, you cannot list resources."
 msgstr "Désolé, vous ne pouvez pas lister les ressources."
 
-#: admin-core/ajax/common-settings.php:114
-#: admin-core/ajax/common-settings.php:148
-#: admin-core/ajax/common-settings.php:182
-#: admin-core/ajax/common-settings.php:217
-#: admin-core/ajax/common-settings.php:295
-#: admin-core/ajax/common-settings.php:330
-#: admin-core/ajax/common-settings.php:365
-#: admin-core/ajax/common-settings.php:400
-#: admin-core/ajax/common-settings.php:435
-#: admin-core/ajax/common-settings.php:470
-#: admin-core/ajax/common-settings.php:504
-#: admin-core/ajax/common-settings.php:539
-#: admin-core/ajax/common-settings.php:573
-#: admin-core/ajax/common-settings.php:607
-#: admin-core/ajax/common-settings.php:641
-#: admin-core/ajax/common-settings.php:675
-#: admin-core/ajax/common-settings.php:709
-#: admin-core/ajax/common-settings.php:743
-#: admin-core/ajax/common-settings.php:777
-#: admin-core/ajax/common-settings.php:811
-#: admin-core/ajax/common-settings.php:852
-#: admin-core/ajax/common-settings.php:889
-#: admin-core/ajax/common-settings.php:926
-#: admin-core/ajax/common-settings.php:964
-#: admin-core/ajax/common-settings.php:1018
-#: admin-core/ajax/common-settings.php:1076
-#: admin-core/ajax/common-settings.php:1111
-#: classes/class-uagb-init-blocks.php:388
+#: admin-core/ajax/common-settings.php:164
+#: admin-core/ajax/common-settings.php:198
+#: admin-core/ajax/common-settings.php:232
+#: admin-core/ajax/common-settings.php:267
+#: admin-core/ajax/common-settings.php:345
+#: admin-core/ajax/common-settings.php:380
+#: admin-core/ajax/common-settings.php:415
+#: admin-core/ajax/common-settings.php:450
+#: admin-core/ajax/common-settings.php:485
+#: admin-core/ajax/common-settings.php:520
+#: admin-core/ajax/common-settings.php:554
+#: admin-core/ajax/common-settings.php:589
+#: admin-core/ajax/common-settings.php:623
+#: admin-core/ajax/common-settings.php:657
+#: admin-core/ajax/common-settings.php:691
+#: admin-core/ajax/common-settings.php:725
+#: admin-core/ajax/common-settings.php:781
+#: admin-core/ajax/common-settings.php:810
+#: admin-core/ajax/common-settings.php:845
+#: admin-core/ajax/common-settings.php:879
+#: admin-core/ajax/common-settings.php:913
+#: admin-core/ajax/common-settings.php:948
+#: admin-core/ajax/common-settings.php:983
+#: admin-core/ajax/common-settings.php:1024
+#: admin-core/ajax/common-settings.php:1061
+#: admin-core/ajax/common-settings.php:1098
+#: admin-core/ajax/common-settings.php:1136
+#: admin-core/ajax/common-settings.php:1190
+#: admin-core/ajax/common-settings.php:1248
+#: admin-core/ajax/common-settings.php:1283
+#: classes/class-uagb-init-blocks.php:404
 msgid "Successfully saved data!"
 msgstr "Données bien enregistrées !"
 
-#: admin-core/ajax/common-settings.php:107
-#: admin-core/ajax/common-settings.php:141
-#: admin-core/ajax/common-settings.php:175
-#: admin-core/ajax/common-settings.php:210
-#: admin-core/ajax/common-settings.php:288
-#: admin-core/ajax/common-settings.php:323
-#: admin-core/ajax/common-settings.php:358
-#: admin-core/ajax/common-settings.php:393
-#: admin-core/ajax/common-settings.php:428
-#: admin-core/ajax/common-settings.php:463
-#: admin-core/ajax/common-settings.php:497
-#: admin-core/ajax/common-settings.php:531
-#: admin-core/ajax/common-settings.php:566
-#: admin-core/ajax/common-settings.php:600
-#: admin-core/ajax/common-settings.php:634
-#: admin-core/ajax/common-settings.php:668
-#: admin-core/ajax/common-settings.php:702
-#: admin-core/ajax/common-settings.php:736
-#: admin-core/ajax/common-settings.php:770
-#: admin-core/ajax/common-settings.php:804
-#: admin-core/ajax/common-settings.php:839
-#: admin-core/ajax/common-settings.php:879
-#: admin-core/ajax/common-settings.php:916
-#: admin-core/ajax/common-settings.php:953
-#: admin-core/ajax/common-settings.php:991
-#: admin-core/ajax/common-settings.php:1069
-#: admin-core/ajax/common-settings.php:1104
+#: admin-core/ajax/common-settings.php:157
+#: admin-core/ajax/common-settings.php:191
+#: admin-core/ajax/common-settings.php:225
+#: admin-core/ajax/common-settings.php:260
+#: admin-core/ajax/common-settings.php:338
+#: admin-core/ajax/common-settings.php:373
+#: admin-core/ajax/common-settings.php:408
+#: admin-core/ajax/common-settings.php:443
+#: admin-core/ajax/common-settings.php:478
+#: admin-core/ajax/common-settings.php:513
+#: admin-core/ajax/common-settings.php:547
+#: admin-core/ajax/common-settings.php:581
+#: admin-core/ajax/common-settings.php:616
+#: admin-core/ajax/common-settings.php:650
+#: admin-core/ajax/common-settings.php:684
+#: admin-core/ajax/common-settings.php:718
+#: admin-core/ajax/common-settings.php:752
+#: admin-core/ajax/common-settings.php:838
+#: admin-core/ajax/common-settings.php:872
+#: admin-core/ajax/common-settings.php:906
+#: admin-core/ajax/common-settings.php:941
+#: admin-core/ajax/common-settings.php:976
+#: admin-core/ajax/common-settings.php:1011
+#: admin-core/ajax/common-settings.php:1051
+#: admin-core/ajax/common-settings.php:1088
+#: admin-core/ajax/common-settings.php:1125
+#: admin-core/ajax/common-settings.php:1163
+#: admin-core/ajax/common-settings.php:1241
+#: admin-core/ajax/common-settings.php:1276
 msgid "No post data found!"
 msgstr "Aucune donnée de publication trouvée !"
 
@@ -436,17 +520,17 @@ msgid "Sorry, you are not allowed to do this operation."
 msgstr "Désolé, vous n’êtes pas autorisé à effectuer cette opération."
 
 #. Plugin Name of the plugin
-#: admin-core/inc/admin-menu.php:201 classes/class-uagb-admin-helper.php:323
-#: classes/class-uagb-init-blocks.php:425
+#: admin-core/inc/admin-menu.php:224 classes/class-uagb-admin-helper.php:394
+#: classes/class-uagb-init-blocks.php:441
 msgid "Spectra"
 msgstr "Spectra"
 
 #: lib/class-uagb-ast-block-templates.php:65
-#: lib/gutenberg-templates/classes/class-ast-block-templates.php:403
+#: lib/gutenberg-templates/classes/class-ast-block-templates.php:404
 msgid "Template Kits"
 msgstr "Kits de modèles"
 
-#: includes/blocks/star-rating/block.php:16 dist/blocks-placeholder.js:29
+#: includes/blocks/star-rating/block.php:16 dist/blocks-placeholder.js:32
 #: dist/blocks.js:17
 msgid "Star Ratings"
 msgstr "Notes par étoile"
@@ -456,52 +540,52 @@ msgstr "Notes par étoile"
 msgid "Masonry Gallery"
 msgstr "Galerie masonry"
 
-#: includes/blocks/forms-accept/block.php:14 dist/blocks.js:13
+#: includes/blocks/forms-accept/block.php:14 dist/blocks.js:17
 msgid "Accept"
 msgstr "Accepter"
 
-#: includes/blocks/forms-date/block.php:14 dist/blocks.js:13
+#: includes/blocks/forms-date/block.php:14 dist/blocks.js:17
 msgid "Datepicker"
 msgstr "Sélecteur de date"
 
-#: includes/blocks/forms-toggle/block.php:14 dist/blocks.js:13
+#: includes/blocks/forms-toggle/block.php:14 dist/blocks.js:1 dist/blocks.js:17
 msgid "Toggle"
 msgstr "Permuter"
 
-#: includes/blocks/forms-select/block.php:15 dist/blocks.js:13
+#: includes/blocks/forms-select/block.php:15 dist/blocks.js:17
 msgid "Select"
 msgstr "Sélectionner"
 
-#: includes/blocks/forms-radio/block.php:14 dist/blocks.js:13
+#: includes/blocks/forms-radio/block.php:14 dist/blocks.js:17
 msgid "Radio"
 msgstr "Boutons radio"
 
-#: includes/blocks/forms-checkbox/block.php:14 dist/blocks.js:13
+#: includes/blocks/forms-checkbox/block.php:14 dist/blocks.js:17
 msgid "Checkbox"
 msgstr "Case à cocher"
 
-#: includes/blocks/forms-textarea/block.php:14 dist/blocks.js:13
+#: includes/blocks/forms-textarea/block.php:14 dist/blocks.js:17
 msgid "Textarea"
 msgstr "Zone de texte"
 
-#: includes/blocks/forms-phone/block.php:14 dist/blocks.js:13
+#: includes/blocks/forms-phone/block.php:14 dist/blocks.js:17
 msgid "Phone"
 msgstr "Téléphone"
 
 #: includes/blocks/forms-hidden/block.php:14 dist/blocks.js:11
-#: dist/blocks.js:13
+#: dist/blocks.js:17
 msgid "Hidden"
 msgstr "Masqué"
 
-#: includes/blocks/forms/attributes.php:166 dist/blocks.js:1 dist/blocks.js:13
+#: includes/blocks/forms/attributes.php:168 dist/blocks.js:1 dist/blocks.js:17
 msgid "Please fill up the above captcha."
 msgstr "Veuillez remplir le captcha ci-dessus."
 
-#: includes/blocks/forms/attributes.php:119 dist/blocks.js:1 dist/blocks.js:13
+#: includes/blocks/forms/attributes.php:121 dist/blocks.js:1 dist/blocks.js:17
 msgid "There has been some error while submitting the form. Please verify all form fields again."
 msgstr "Une erreur s’est produite lors de l’envoi du formulaire. Veuillez vérifier à nouveau tous les champs du formulaire."
 
-#: includes/blocks/forms/attributes.php:67 dist/blocks.js:1 dist/blocks.js:13
+#: includes/blocks/forms/attributes.php:69 dist/blocks.js:1 dist/blocks.js:17
 msgid "Form Submission"
 msgstr "Soumission du formulaire"
 
@@ -509,7 +593,7 @@ msgstr "Soumission du formulaire"
 msgid "The form has been submitted Successfully!"
 msgstr "Le formulaire a bien été envoyé !"
 
-#: includes/blocks/forms/attributes.php:34 dist/blocks.js:1 dist/blocks.js:13
+#: includes/blocks/forms/attributes.php:34 dist/blocks.js:1 dist/blocks.js:17
 msgid "Submit"
 msgstr "Envoyer"
 
@@ -517,7 +601,7 @@ msgstr "Envoyer"
 msgid "Tabs child"
 msgstr "Onglets fils"
 
-#: includes/blocks/tabs/block.php:16 dist/blocks-placeholder.js:31
+#: includes/blocks/tabs/block.php:16 dist/blocks-placeholder.js:34
 #: dist/blocks.js:17
 msgid "Tabs"
 msgstr "Onglets"
@@ -564,11 +648,11 @@ msgid "Price List-Child"
 msgstr "Liste enfant de prix"
 
 #. translators: %s Product title
-#: admin/bsf-analytics/class-bsf-analytics.php:408
+#: admin/bsf-analytics/class-bsf-analytics.php:410
 msgid "Allow %s products to track non-sensitive usage tracking data."
 msgstr "Autoriser aux produits %s de suivre les données de suivi d’utilisation non sensibles."
 
-#: includes/blocks/taxonomy-list/block.php:16 dist/blocks-placeholder.js:32
+#: includes/blocks/taxonomy-list/block.php:16 dist/blocks-placeholder.js:35
 #: dist/blocks.js:17
 msgid "Taxonomy List"
 msgstr "Liste des taxonomies"
@@ -582,15 +666,15 @@ msgstr "Taxonomie non disponible."
 msgid "Search"
 msgstr "Rechercher"
 
-#: admin/bsf-analytics/class-bsf-analytics.php:416
+#: admin/bsf-analytics/class-bsf-analytics.php:418
 msgid "Learn More."
 msgstr "En savoir plus."
 
-#: admin/bsf-analytics/class-bsf-analytics.php:411
+#: admin/bsf-analytics/class-bsf-analytics.php:413
 msgid " This will be applicable for all sites from the network."
 msgstr " Ce sera applicable pour tous les sites de ce réseau."
 
-#: admin/bsf-analytics/class-bsf-analytics.php:364
+#: admin/bsf-analytics/class-bsf-analytics.php:366
 msgid "Usage Tracking"
 msgstr "Suivi d’utilisation"
 
@@ -616,8 +700,8 @@ msgstr "Cela sera applicable pour tous les sites du réseau."
 msgid "Want to help make <strong>%1s</strong> even more awesome? Allow us to collect non-sensitive diagnostic data and usage information. "
 msgstr "Vous souhaitez aider à rendre <strong>%1s</strong> encore plus génial ? Autorisez nous à collecter des données de diagnostic et des informations d’utilisation non sensibles. "
 
-#: includes/blocks/inline-notice/block.php:16 dist/blocks-placeholder.js:21
-#: dist/blocks.js:13
+#: includes/blocks/inline-notice/block.php:16 dist/blocks-placeholder.js:23
+#: dist/blocks.js:17
 msgid "Inline Notice"
 msgstr "Notification en ligne"
 
@@ -625,22 +709,23 @@ msgstr "Notification en ligne"
 msgid "Social Share Child"
 msgstr "Partage social enfant"
 
-#: blocks-config/table-of-content/class-uagb-table-of-content.php:570
-#: blocks-config/table-of-content/class-uagb-table-of-content.php:574
-#: includes/blocks/table-of-contents/attributes.php:18 dist/blocks.js:1
-#: dist/blocks.js:17
+#: blocks-config/table-of-content/class-uagb-table-of-content.php:637
+#: blocks-config/table-of-content/class-uagb-table-of-content.php:641
+#: includes/blocks/table-of-contents/attributes.php:18
+#: dist/blocks-placeholder.js:33 dist/blocks.js:1 dist/blocks.js:17
 msgid "Table Of Contents"
 msgstr "Table des matières"
 
-#: includes/blocks/forms-email/block.php:14 dist/blocks.js:13 dist/blocks.js:17
+#: includes/blocks/forms-email/block.php:14 dist/blocks.js:1 dist/blocks.js:17
 msgid "Email"
 msgstr "E-mail"
 
-#: includes/blocks/forms-url/block.php:15 dist/blocks.js:13 dist/blocks.js:17
+#: includes/blocks/forms-url/block.php:15 dist/blocks.js:1 dist/blocks.js:13
+#: dist/blocks.js:17
 msgid "URL"
 msgstr "URL"
 
-#: includes/blocks/forms-name/block.php:14 dist/blocks.js:13 dist/blocks.js:17
+#: includes/blocks/forms-name/block.php:14 dist/blocks.js:1 dist/blocks.js:17
 msgid "Name"
 msgstr "Nom"
 
@@ -649,7 +734,7 @@ msgstr "Nom"
 msgid "Icon"
 msgstr "Icône"
 
-#: admin-core/inc/admin-menu.php:90 admin-core/assets/build/dashboard-app.js:1
+#: admin-core/inc/admin-menu.php:93 admin-core/assets/build/dashboard-app.js:1
 msgid "Settings"
 msgstr "Réglages"
 
@@ -658,17 +743,17 @@ msgstr "Réglages"
 msgid "Button"
 msgstr "Bouton"
 
-#: includes/blocks/image/block.php:16 dist/blocks-placeholder.js:19
+#: includes/blocks/image/block.php:16 dist/blocks-placeholder.js:21
 #: dist/blocks.js:11 dist/blocks.js:13 dist/blocks.js:17
 msgid "Image"
 msgstr "Image"
 
-#: classes/class-uagb-init-blocks.php:542 dist/blocks.js:11 dist/blocks.js:13
+#: classes/class-uagb-init-blocks.php:563 dist/blocks.js:11 dist/blocks.js:13
 #: dist/blocks.js:17
 msgid "Default"
 msgstr "Par défaut"
 
-#: classes/class-uagb-init-blocks.php:636 dist/blocks.js:11 dist/blocks.js:13
+#: classes/class-uagb-init-blocks.php:663 dist/blocks.js:11 dist/blocks.js:13
 #: dist/blocks.js:17
 msgid "None"
 msgstr "Aucune"
@@ -678,7 +763,7 @@ msgstr "Aucune"
 msgid "Heading"
 msgstr "En-tête"
 
-#: blocks-config/table-of-content/class-uagb-table-of-content.php:858
+#: blocks-config/table-of-content/class-uagb-table-of-content.php:925
 #: includes/blocks/table-of-contents/attributes.php:19 dist/blocks.js:1
 #: dist/blocks.js:17
 msgid "Add a header to begin generating the table of contents"
@@ -688,12 +773,11 @@ msgstr "Ajoutez un titre pour commencer la génération de la table des matière
 msgid "WordPress Nonce not validated."
 msgstr "Nonce WordPress non validé."
 
-#: includes/blocks/table-of-contents/block.php:16 dist/blocks-placeholder.js:30
-#: dist/blocks.js:17
+#: includes/blocks/table-of-contents/block.php:16
 msgid "Table of Contents"
 msgstr "Table des matières"
 
-#: classes/class-uagb-init-blocks.php:712
+#: classes/class-uagb-init-blocks.php:739
 msgid "You have not added any Gravity Forms yet."
 msgstr "Vous n’avez pas encore ajouté de formulaire Gravity Forms."
 
@@ -701,29 +785,29 @@ msgstr "Vous n’avez pas encore ajouté de formulaire Gravity Forms."
 msgid "Would you please mind sharing your views and give it a 5 star rating on the WordPress repository?"
 msgstr "Souhaitez-vous partager votre avis et lui attribuer une note de 5 étoiles dans le référentiel WordPress ?"
 
-#: classes/class-uagb-init-blocks.php:366
+#: classes/class-uagb-init-blocks.php:382
 msgid "Please select a valid Gravity Form."
 msgstr "Veuillez sélectionner un formulaire Gravity Form."
 
-#: includes/blocks/marketing-button/block.php:16 dist/blocks-placeholder.js:23
-#: dist/blocks.js:13
+#: includes/blocks/marketing-button/block.php:16 dist/blocks-placeholder.js:25
+#: dist/blocks.js:17
 msgid "Marketing Button"
 msgstr "Bouton marketing"
 
-#: classes/class-uagb-init-blocks.php:408
+#: classes/class-uagb-init-blocks.php:424
 msgid "Please select a valid Contact Form 7."
 msgstr "Veuillez sélectionner un formulaire Contact Form 7."
 
-#: classes/class-uagb-init-blocks.php:679
+#: classes/class-uagb-init-blocks.php:706
 msgid "You have not added any Contact Form 7 yet."
 msgstr "Vous n’avez pas encore ajouté de formulaire Contact Form 7."
 
-#: classes/class-uagb-init-blocks.php:665
-#: classes/class-uagb-init-blocks.php:698 dist/blocks.js:17
+#: classes/class-uagb-init-blocks.php:692
+#: classes/class-uagb-init-blocks.php:725 dist/blocks.js:17
 msgid "Select Form"
 msgstr "Sélectionner un formulaire"
 
-#: classes/class-uagb-helper.php:407 dist/blocks.js:13 dist/blocks.js:17
+#: classes/class-uagb-helper.php:409 dist/blocks.js:17
 msgid "Full"
 msgstr "Plein"
 
@@ -737,12 +821,16 @@ msgstr "Citation"
 msgid "Spectra requires&nbsp;%3$sBlock Editor%4$s. You can change your editor settings to Block Editor from&nbsp;%1$shere%2$s. Plugin is currently NOT RUNNING."
 msgstr "Spectra nécessite  %3$sl’éditeur de blocs%4$s. Vous pouvez modifier les réglages de votre éditeur dans l’éditeur de bloc par %1$sici%2$s. L’extension n’est pas en fonctionnement pour le moment."
 
+#: admin-core/ajax/common-settings.php:130
+msgid "Plugin Successfully Activated"
+msgstr "Extension bien activée"
+
 #. translators: %s: WordPress version
 #: ultimate-addons-for-gutenberg.php:55
 msgid "Spectra requires WordPress version %s+. Because you are using an earlier version, the plugin is currently NOT RUNNING."
 msgstr "Spectra nécessite WordPress version  %s ou supérieure. Comme vous utilisez une version antérieure, l’extension ne peut pas fonctionner."
 
-#: includes/blocks/restaurant-menu/block.php:16 dist/blocks-placeholder.js:26
+#: includes/blocks/restaurant-menu/block.php:16 dist/blocks-placeholder.js:29
 #: dist/blocks.js:17
 msgid "Price List"
 msgstr "Liste de prix"
@@ -768,7 +856,7 @@ msgid "Ok, you deserve it"
 msgstr "Ok, vous le méritez"
 
 #: includes/blocks/call-to-action/block.php:16 dist/blocks-placeholder.js:12
-#: dist/blocks.js:13
+#: dist/blocks.js:1 dist/blocks.js:13 dist/blocks.js:17
 msgid "Call To Action"
 msgstr "Appel à l’action"
 
@@ -776,17 +864,17 @@ msgstr "Appel à l’action"
 msgid "Post Masonry"
 msgstr "Publications Masonry"
 
-#: includes/blocks/post-carousel/block.php:16 dist/blocks-placeholder.js:24
+#: includes/blocks/post-carousel/block.php:16 dist/blocks-placeholder.js:27
 #: dist/blocks.js:17
 msgid "Post Carousel"
 msgstr "Carrousel de publications"
 
-#: includes/blocks/post-timeline/block.php:16 dist/blocks-placeholder.js:36
+#: includes/blocks/post-timeline/block.php:16 dist/blocks-placeholder.js:39
 #: dist/blocks.js:17
 msgid "Post Timeline"
 msgstr "Chronologie de publications"
 
-#: blocks-config/post-timeline/class-uagb-post-timeline.php:859
+#: blocks-config/post-timeline/class-uagb-post-timeline.php:885
 msgid "No posts found"
 msgstr "Aucune publication trouvée"
 
@@ -794,7 +882,7 @@ msgstr "Aucune publication trouvée"
 msgid "The Spectra extends the Gutenberg functionality with several unique and feature-rich blocks that help build websites faster."
 msgstr "Spectra étend les fonctionnalités de Gutenberg avec plusieurs blocs uniques et riches en fonctionnalités qui permettent de créer des sites web plus rapidement."
 
-#: includes/blocks/testimonial/block.php:16 dist/blocks-placeholder.js:34
+#: includes/blocks/testimonial/block.php:16 dist/blocks-placeholder.js:37
 #: dist/blocks.js:17
 msgid "Testimonials"
 msgstr "Témoignage"
@@ -803,48 +891,48 @@ msgstr "Témoignage"
 msgid "Label #1"
 msgstr "Libellé N°1"
 
-#: includes/blocks/icon-list/block.php:16 dist/blocks-placeholder.js:18
-#: dist/blocks.js:13
+#: includes/blocks/icon-list/block.php:16 dist/blocks-placeholder.js:19
+#: dist/blocks.js:17
 msgid "Icon List"
 msgstr "Liste avec icônes"
 
-#: includes/blocks/team/block.php:16 dist/blocks-placeholder.js:33
+#: includes/blocks/team/block.php:16 dist/blocks-placeholder.js:36
 #: dist/blocks.js:17
 msgid "Team"
 msgstr "Équipe"
 
-#: includes/blocks/social-share/block.php:16 dist/blocks-placeholder.js:28
+#: includes/blocks/social-share/block.php:16 dist/blocks-placeholder.js:31
 #: dist/blocks.js:17
 msgid "Social Share"
 msgstr "Partage social"
 
-#: includes/blocks/content-timeline/block.php:16 dist/blocks-placeholder.js:35
+#: includes/blocks/content-timeline/block.php:16 dist/blocks-placeholder.js:38
 #: dist/blocks.js:13
 msgid "Content Timeline"
 msgstr "Chronologie de contenu"
 
-#: includes/blocks/post-grid/block.php:16 dist/blocks-placeholder.js:25
+#: includes/blocks/post-grid/block.php:16 dist/blocks-placeholder.js:28
 #: dist/blocks.js:17
 msgid "Post Grid"
 msgstr "Grille de publications"
 
 #: blocks-config/post-timeline/class-uagb-post-timeline.php:523
-#: blocks-config/post/class-uagb-post.php:512
-#: blocks-config/post/class-uagb-post.php:1979
-#: includes/blocks/post-carousel/attributes.php:113
-#: includes/blocks/post-grid/attributes.php:105
-#: includes/blocks/post-masonry/attributes.php:108 dist/blocks.js:1
+#: blocks-config/post/class-uagb-post.php:540
+#: blocks-config/post/class-uagb-post.php:2066
+#: includes/blocks/post-carousel/attributes.php:116
+#: includes/blocks/post-grid/attributes.php:107
+#: includes/blocks/post-masonry/attributes.php:110 dist/blocks.js:1
 #: dist/blocks.js:13 dist/blocks.js:17
 msgid "Read More"
 msgstr "Lire la suite"
 
-#: includes/blocks/google-map/block.php:16 dist/blocks-placeholder.js:16
-#: dist/blocks.js:13
+#: includes/blocks/google-map/block.php:16 dist/blocks-placeholder.js:17
+#: dist/blocks.js:17
 msgid "Google Maps"
 msgstr "Google Maps"
 
-#: includes/blocks/info-box/block.php:16 dist/blocks-placeholder.js:20
-#: dist/blocks.js:13
+#: includes/blocks/info-box/block.php:16 dist/blocks-placeholder.js:22
+#: dist/blocks.js:1 dist/blocks.js:13
 msgid "Info Box"
 msgstr "Boîte d’info"
 
@@ -857,6 +945,6 @@ msgstr "https://www.brainstormforce.com"
 msgid "Brainstorm Force"
 msgstr "Brainstorm Force"
 
-#: classes/class-uagb-loader.php:290
+#: classes/class-uagb-loader.php:434
 msgid "Install Gutenberg"
 msgstr "Installer Gutenberg"

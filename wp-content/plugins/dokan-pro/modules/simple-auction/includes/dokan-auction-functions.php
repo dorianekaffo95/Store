@@ -45,6 +45,11 @@ function dokan_count_auction_posts( $post_type, $user_id ) {
     }
 
     $term = get_term_by( 'slug', 'auction', 'product_type' );
+    if ( ! $term instanceof WP_Term ) {
+        return [
+            'total' => 0,
+        ];
+    }
 
     $query   = "SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts} INNER JOIN {$wpdb->prefix}term_relationships ON ({$wpdb->prefix}posts.ID = {$wpdb->prefix}term_relationships.object_id) AND ( {$wpdb->prefix}term_relationships.term_taxonomy_id IN ( %s ) ) AND {$wpdb->prefix}posts.post_author = %s AND {$wpdb->prefix}posts.post_type = %s GROUP BY post_status";
     $results = $wpdb->get_results( $wpdb->prepare( $query, $term->term_id, $user_id, $post_type ), ARRAY_A );

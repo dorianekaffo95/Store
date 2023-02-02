@@ -73,6 +73,7 @@ abstract class ApiBase
         'payins_recurring_registration_get' => ['/recurringpayinregistrations/%s', RequestType::GET],
         'payins_recurring_registration_put' => ['/recurringpayinregistrations/%s', RequestType::PUT],
         'payins_recurring_card_direct' => ['/payins/recurring/card/direct', RequestType::POST],
+        'payins_create_card_pre_authorized_deposit' => ['/payins/deposit-preauthorized/direct/full-capture', RequestType::POST],
 
         'repudiation_get' => ['/repudiations/%s', RequestType::GET],
 
@@ -201,8 +202,14 @@ abstract class ApiBase
 
         'transactions_get_for_mandate' => ['/mandates/%s/transactions', RequestType::GET],
         'transactions_get_for_card' => ['/cards/%s/transactions', RequestType::GET],
-        'transactions_get_for_bank_account' => ['/bankaccounts/%s/transactions', RequestType::GET]
+        'transactions_get_for_bank_account' => ['/bankaccounts/%s/transactions', RequestType::GET],
 
+        'country_authorization_get' => ['/countries/%s/authorizations', RequestType::GET],
+        'country_authorization_all' => ['/countries/authorizations', RequestType::GET],
+
+        'deposits_create' => ['/deposit-preauthorizations/card/direct', RequestType::POST],
+        'deposits_get' => ['/deposit-preauthorizations/%s', RequestType::GET],
+        'deposits_cancel' => ['/deposit-preauthorizations/%s', RequestType::PUT]
     ];
 
     /**
@@ -278,7 +285,7 @@ abstract class ApiBase
      * @return object Response data
      * @throws Exception
      */
-    protected function GetObject($methodKey, $responseClassName, $firstEntityId = null, $secondEntityId = null, $thirdEntityId = null)
+    protected function GetObject($methodKey, $responseClassName, $firstEntityId = null, $secondEntityId = null, $thirdEntityId = null, $clientIdRequired = true)
     {
         if (!is_null($thirdEntityId)) {
             $urlMethod = sprintf($this->GetRequestUrl($methodKey), $firstEntityId, $secondEntityId, $thirdEntityId);
@@ -289,7 +296,7 @@ abstract class ApiBase
         } else {
             $urlMethod = $this->GetRequestUrl($methodKey);
         }
-        $rest = new RestTool($this->_root, true);
+        $rest = new RestTool($this->_root, true, $clientIdRequired);
         $response = $rest->Request($urlMethod, $this->GetRequestType($methodKey));
 
         if (!is_null($responseClassName)) {
@@ -308,7 +315,7 @@ abstract class ApiBase
      * @param \MangoPay\Sorting $sorting Object to sorting data
      * @return object[] Response data
      */
-    protected function GetList($methodKey, & $pagination, $responseClassName = null, $entityId = null, $filter = null, $sorting = null, $secondEntityId = null)
+    protected function GetList($methodKey, & $pagination, $responseClassName = null, $entityId = null, $filter = null, $sorting = null, $secondEntityId = null, $clientIdRequired = true)
     {
         $urlMethod = sprintf($this->GetRequestUrl($methodKey), $entityId, $secondEntityId);
 
@@ -316,7 +323,7 @@ abstract class ApiBase
             $pagination = new \MangoPay\Pagination();
         }
 
-        $rest = new RestTool($this->_root, true);
+        $rest = new RestTool($this->_root, true, $clientIdRequired);
         $additionalUrlParams = [];
         if (!is_null($filter)) {
             $additionalUrlParams["filter"] = $filter;

@@ -24,29 +24,13 @@ class Transaction extends Api {
      *
      * @param string $id
      *
-     * @return object|false
+     * @return \Stripe\BalanceTransaction|false
      */
     public static function get( $id ) {
         try {
             return static::api()->balanceTransactions->retrieve( $id );
         } catch ( Exception $e ) {
-            Helper::log( sprintf( 'Could not retrieve balance transaction for id: %1$s. Error: %2$s', $id, $e->getMessage() ), 'setup Intent' );
-            return false;
-        }
-    }
-
-    /**
-     * Retrieve balance data.
-     *
-     * @since 3.6.1
-     *
-     * @return object|false
-     */
-    public static function get_balance() {
-        try {
-            return static::api()->balance->retrieve();
-        } catch ( Exception $e ) {
-            Helper::log( sprintf( 'Could not retrieve balance. Error: %s', $e->getMessage() ), 'Balance' );
+            Helper::log( sprintf( 'Could not retrieve balance transaction for id: %1$s. Error: %2$s', $id, $e->getMessage() ), 'Balance Transaction' );
             return false;
         }
     }

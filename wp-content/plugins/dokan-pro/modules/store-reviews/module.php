@@ -46,7 +46,7 @@ class Module {
         list( $suffix, $version ) = dokan_get_script_suffix_and_version();
 
         wp_register_style( 'dsr-styles', plugins_url( 'assets/css/style' . $suffix . '.css', __FILE__ ), false, $version );
-        wp_register_script( 'dsr-scripts', plugins_url( 'assets/js/script' . $suffix . '.js', __FILE__ ), array( 'jquery', 'dokan-popup' ), $version, true );
+        wp_register_script( 'dsr-scripts', plugins_url( 'assets/js/script' . $suffix . '.js', __FILE__ ), array( 'jquery', 'dokan-magnific-popup' ), $version, true );
         wp_register_style( 'dsr-scripts', plugins_url( 'assets/css/script' . $suffix . '.css', __FILE__ ), false, $version );
     }
 

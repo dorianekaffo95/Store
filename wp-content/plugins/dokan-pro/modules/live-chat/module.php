@@ -2,6 +2,7 @@
 
 namespace WeDevs\DokanPro\Modules\LiveChat;
 
+use WeDevs\DokanPro\Modules\LiveChat\SettingsApi\Store;
 use WP_Error;
 use WeDevs\Dokan\Traits\ChainableContainer;
 
@@ -52,6 +53,7 @@ class Module {
         if ( ! isset( $this->container['vendor_inbox'] ) ) {
             $this->container['vendor_inbox'] = new VendorInbox();
         }
+        new Store();
     }
 
     /**

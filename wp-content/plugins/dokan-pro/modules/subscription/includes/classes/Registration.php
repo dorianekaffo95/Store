@@ -215,10 +215,22 @@ class Registration {
         }
 
         $redirect_url             = get_site_url() . '/?page=dokan-seller-setup';
-        $is_setup_wizard_disabled = dokan_get_option( 'disable_welcome_wizard', 'dokan_selling', 'off' );
-        $is_setup_wizard_disabled = 'on' === $is_setup_wizard_disabled ? true : false;
+        $is_setup_wizard_disabled = 'on' === dokan_get_option( 'disable_welcome_wizard', 'dokan_selling', 'off' );
 
-        if ( $is_setup_wizard_disabled || $this->vendor_has_seen_setup_wizard() ) {
+        if ( $is_setup_wizard_disabled ) {
+            return;
+        }
+
+        $user_id = dokan_get_current_user_id();
+        if ( empty( $user_id ) ) {
+            return;
+        }
+
+        if ( ! dokan_is_user_seller( $user_id ) ) {
+            return;
+        }
+
+        if ( $this->vendor_has_seen_setup_wizard( $user_id ) ) {
             return;
         }
 
@@ -255,10 +267,16 @@ class Registration {
      *
      * @since  DOKAN_PLUGIN_SINCE
      *
+     * @param int $vendor_id
+     *
      * @return boolean
      */
-    public function vendor_has_seen_setup_wizard() {
-        return get_user_meta( dokan_get_current_user_id(), 'dokan_vendor_seen_setup_wizard', true );
+    public function vendor_has_seen_setup_wizard( $vendor_id = null ) {
+        if ( empty( $vendor_id ) ) {
+            $vendor_id = dokan_get_current_user_id();
+        }
+
+        return wc_string_to_bool( get_user_meta( $vendor_id, 'dokan_vendor_seen_setup_wizard', true ) );
     }
 }
 

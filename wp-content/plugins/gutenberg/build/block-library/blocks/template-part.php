@@ -33,7 +33,7 @@ function gutenberg_render_block_core_template_part( $attributes ) {
 				'tax_query'      => array(
 					array(
 						'taxonomy' => 'wp_theme',
-						'field'    => 'slug',
+						'field'    => 'name',
 						'terms'    => $attributes['theme'],
 					),
 				),
@@ -105,8 +105,7 @@ function gutenberg_render_block_core_template_part( $attributes ) {
 
 	// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
 	// is set in `wp_debug_mode()`.
-	$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
-		defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+	$is_debug = WP_DEBUG && WP_DEBUG_DISPLAY;
 
 	if ( is_null( $content ) && $is_debug ) {
 		if ( ! isset( $attributes['slug'] ) ) {
@@ -189,6 +188,15 @@ function gutenberg_build_template_part_block_area_variations() {
  * @return array Array containing the block variation objects.
  */
 function gutenberg_build_template_part_block_instance_variations() {
+	// Block themes are unavailable during installation.
+	if ( wp_installing() ) {
+		return array();
+	}
+
+	if ( ! current_theme_supports( 'block-templates' ) && ! current_theme_supports( 'block-template-parts' ) ) {
+		return array();
+	}
+
 	$variations     = array();
 	$template_parts = get_block_templates(
 		array(

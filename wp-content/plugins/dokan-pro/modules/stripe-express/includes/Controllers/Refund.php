@@ -29,7 +29,7 @@ class Refund {
      * @return void
      */
     public function __construct() {
-        $this->hooks();
+        add_action( 'init', [ $this, 'hooks' ] );
     }
 
     /**
@@ -39,7 +39,7 @@ class Refund {
      *
      * @return void
      */
-    protected function hooks() {
+    public function hooks() {
         add_action( 'dokan_refund_request_created', [ $this, 'process_refund' ] );
         add_action( 'dokan_refund_approve_before_insert', [ $this, 'process_vendor_withdraw_entry' ], 10, 3 );
         add_filter( 'dokan_refund_approve_vendor_refund_amount', [ $this, 'process_vendor_refund_amount' ], 10, 3 );
@@ -139,7 +139,7 @@ class Refund {
      * @since 3.6.1
      *
      * @param \WC_Order $order
-     * @param float     $gateway_fee_refunded
+     * @param float      $gateway_fee_refunded
      *
      * @return void
      */
@@ -166,7 +166,7 @@ class Refund {
      *
      * @since 3.6.1
      *
-     * @param float  $amount
+     * @param float   $amount
      * @param array  $args
      * @param object $refund
      *
@@ -195,7 +195,7 @@ class Refund {
         // Check gateway fee is refunded, if not we need to calculate this value manually
         if ( $gateway_fee_refunded === 0 ) {
             $order_total          = $order->get_total( 'edit' );
-            $gateway_fee          = wc_format_decimal( OrderMeta::get_dokan_gateway_fee( $order ), 2 );
+            $gateway_fee          = wc_format_decimal( OrderMeta::get_stripe_fee( $order ), 2 );
             $gateway_fee_refunded = $gateway_fee > 0 ? ( ( $gateway_fee / $order_total ) * $refund->get_refund_amount() ) : 0;
             $refund_amount        = $amount - $gateway_fee_refunded;
         } else {
@@ -252,10 +252,23 @@ class Refund {
         }
 
         try {
+            $stripe_amount = Helper::get_stripe_amount( $amount );
+
+            // An amount less than 1 cannot be reversed
+            if ( $stripe_amount < 1 ) {
+                throw new DokanException(
+                    'invalid-reverse-transfer-amount',
+                    __( 'The amount for reverse transfer must be greater than or equal to 1.', 'dokan' )
+                );
+            }
+
             $reverse_transfer = Transfer::reverse(
                 $args['transfer_id'],
                 [
-                    'amount' => Helper::get_stripe_amount( $amount ),
+                    'amount'   => $stripe_amount,
+                    'metadata' => [
+                        'order_id' => $order->get_id(),
+                    ],
                 ]
             );
 

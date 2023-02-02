@@ -42,6 +42,20 @@ class DependencyNotice {
             if ( current_user_can( 'activate_plugins' ) ) {
                 add_filter( 'dokan_admin_notices', array( $this, 'rank_math_update_notice' ) );
             }
+
+            return;
+        }
+
+        /*
+         * Check if rank math setup is completed as it'sneeded
+         * to be completed for further processing in the frontend.
+         */
+        if ( class_exists( 'RankMath\Helper' ) && \RankMath\Helper::is_invalid_registration() ) {
+            $this->missing_dependency = true;
+
+            if ( current_user_can( 'manage_options' ) ) {
+                add_filter( 'dokan_admin_notices', array( $this, 'rank_math_setup_needed_notice' ) );
+            }
         }
     }
 
@@ -127,13 +141,41 @@ class DependencyNotice {
             'type'        => 'success',
             'title'       => __( 'Dokan Rank Math SEO module is almost ready!', 'dokan' ),
             'description' => sprintf(
-                /* translators: %1$s: Activation link of the Rank Math SEO plugin, %2$s: Rank math plugin version */
+                /* translators: %1$s: Rank Math SEO plugin title, %2$s: Rank math plugin version */
                 __( 'You just need to update the %1$s plugin to the version %2$s or later to make it functional.', 'dokan' ),
-                '<strong>Rank Math SEO</strong>', '<strong>1.0.80</strong>'
+                '<strong>Rank Math SEO</strong>',
+                '<strong>1.0.80</strong>'
             ),
             'priority'    => 10,
             'actions'     => array(),
         );
+
+        return $notices;
+    }
+
+    /**
+     * Adds notice to configure the Rank Math SEO.
+     *
+     * @since 3.7.6
+     *
+     * @param array $notices
+     *
+     * @return array
+     */
+    public function rank_math_setup_needed_notice( $notices ) {
+        $notices[] = [
+            'type'        => 'success',
+            'title'       => __( 'Dokan Rank Math SEO module is almost ready!', 'dokan' ),
+            'priority'    => 10,
+            'actions'     => [],
+            'description' => sprintf(
+                /* translators: %1$s: opening anchor tag with link, %2$s: closing anchor tag, %3$s: Rank Math SEO plugin title */
+                __( 'You just need to %1$sconfigure%2$s the %3$s plugin to make it functional.', 'dokan' ),
+                sprintf( '<strong><a href="%s">', \RankMath\Helper::get_admin_url( 'registration' ) ),
+                '</a></strong>',
+                '<strong>Rank Math SEO</strong>'
+            ),
+        ];
 
         return $notices;
     }

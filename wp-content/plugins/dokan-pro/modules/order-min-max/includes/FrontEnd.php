@@ -887,6 +887,9 @@ class FrontEnd {
     public function dokan_global_min_max_settings( $product_id, $context, $product_quantity, $return_type_number ) {
         $error                    = '';
         $dokan_settings           = $this->dokan_get_store_settings_by_product_id( $product_id );
+        if ( ! isset( $dokan_settings['order_min_max'] ) ) {
+            return $error;
+        }
         $this->{"max_{$context}"} = $dokan_settings['order_min_max'][ "max_{$context}_to_order" ];
         $this->{"min_{$context}"} = $dokan_settings['order_min_max'][ "min_{$context}_to_order" ];
 

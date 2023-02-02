@@ -29,12 +29,18 @@ class WOOMULTI_CURRENCY_F_Frontend_Cache {
 	 * @return string
 	 */
 	public function compatible_cache_plugin( $price, $product ) {
+		if ( wp_doing_ajax() ) {
+			return $price;
+		}
+
 		$wrap = 'span';
 		if ( strpos( $price, '<div' ) !== false || strpos( $price, '<p' ) !== false ) {
 			$wrap = 'div';
 		}
 
-		return "<{$wrap} class='wmc-cache-pid' data-wmc_product_id='{$product->get_id()}'>" . $price . "</{$wrap}>";
+		$loading = $this->settings->get_param( 'loading_price_mask' ) ? 'wmc-cache-loading' : '';
+
+		return "<{$wrap} class='wmc-cache-pid {$loading}' data-wmc_product_id='{$product->get_id()}'>" . $price . "</{$wrap}>";
 	}
 
 	/**

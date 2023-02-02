@@ -15,8 +15,7 @@
 <div id="dokan_table_rate_class_priorities">
     <h3 class="dokan-text-left"><?php esc_html_e( 'Class Priorities', 'dokan' ); ?></h3>
 
-    <?php if ( count( WC()->shipping->get_shipping_classes() ) ) : ?>
-        <?php
+    <?php
         dokan_get_template_part(
             'classes-settings', '', [
                 'is_table_rate_shipping' => true,
@@ -27,5 +26,4 @@
             ]
         );
         ?>
-    <?php endif; ?>
 </div>

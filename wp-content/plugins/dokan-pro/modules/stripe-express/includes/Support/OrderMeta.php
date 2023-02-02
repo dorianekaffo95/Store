@@ -7,26 +7,13 @@ defined( 'ABSPATH' ) || exit; // Exit if called directly
 use WC_Order;
 
 /**
- * Helper class for Stripe gateway.
+ * Order meta data handler class for Stripe gateway.
  *
  * @since 3.6.1
  *
  * @package WeDevs\DokanPro\Modules\StripeExpress\Support
  */
 class OrderMeta {
-
-    /**
-     * Generates meta key with prefix.
-     *
-     * @since 3.6.1
-     *
-     * @param string $key
-     *
-     * @return string
-     */
-    public static function key( $key ) {
-        return '_' . Helper::get_gateway_id() . '_' . $key;
-    }
 
     /**
      * Saves the order.
@@ -44,6 +31,17 @@ class OrderMeta {
     }
 
     /**
+     * Retrieves meta key for charge captured flag.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function charge_captured_key() {
+        return Helper::meta_key( 'charge_captured' );
+    }
+
+    /**
      * Updates the status of charge captured.
      *
      * @since 3.6.1
@@ -54,7 +52,7 @@ class OrderMeta {
      * @return void
      */
     public static function update_charge_captured( WC_Order $order, $is_captured = 'yes' ) {
-        $order->update_meta_data( self::key( 'charge_captured' ), $is_captured );
+        $order->update_meta_data( self::charge_captured_key(), $is_captured );
     }
 
     /**
@@ -67,7 +65,7 @@ class OrderMeta {
      * @return boolean
      */
     public static function is_charge_captured( WC_Order $order ) {
-        return 'yes' === $order->get_meta( self::key( 'charge_captured' ), true );
+        return 'yes' === $order->get_meta( self::charge_captured_key(), true );
     }
 
     /**
@@ -78,7 +76,7 @@ class OrderMeta {
      * @return string
      */
     public static function transaction_id_key() {
-        return self::key( 'transaction_id' );
+        return Helper::meta_key( 'transaction_id' );
     }
 
     /**
@@ -117,7 +115,7 @@ class OrderMeta {
      * @return string
      */
     public static function transfer_id_key() {
-        return self::key( 'transfer_id' );
+        return Helper::meta_key( 'transfer_id' );
     }
 
     /**
@@ -158,7 +156,26 @@ class OrderMeta {
      */
     public static function intent_id_key( $is_setup = false ) {
         $intent_type = $is_setup ? 'setup' : 'payment';
-        return self::key( "{$intent_type}_intent_id" );
+        return Helper::meta_key( "{$intent_type}_intent_id" );
+    }
+
+    /**
+     * Updates intent id of an order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $intent_id
+     * @param boolean  $is_setup
+     *
+     * @return void
+     */
+    public static function update_intent( WC_Order $order, $intent_id, $is_setup = false ) {
+        if ( ! $is_setup ) {
+            self::add_payment_intent( $order, $intent_id );
+        } else {
+            self::add_setup_intent( $order, $intent_id );
+        }
     }
 
     /**
@@ -204,6 +221,19 @@ class OrderMeta {
     }
 
     /**
+     * Deletes intent id of an order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return void
+     */
+    public static function delete_payment_intent( WC_Order $order ) {
+        $order->delete_meta_data( self::intent_id_key() );
+    }
+
+    /**
      * Adds setup intent to order.
      *
      * @since 3.6.1
@@ -231,68 +261,188 @@ class OrderMeta {
     }
 
     /**
+     * Retrieves payment/setup intent debug id key.
+     *
+     * @since 3.7.8
+     *
+     * @param boolean $is_setup
+     *
+     * @return string
+     */
+    public static function debug_intent_id_key( $is_setup = false ) {
+        $intent_type = $is_setup ? 'setup' : 'payment';
+        return Helper::meta_key( "{$intent_type}_intent_debug_id" );
+    }
+
+    /**
+     * Updates debug payment intent to order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $intent_id
+     *
+     * @return void
+     */
+    public static function update_debug_payment_intent( WC_Order $order, $intent_id ) {
+        $order->update_meta_data( self::debug_intent_id_key(), $intent_id );
+    }
+
+    /**
+     * Retrieves setup intent id.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string
+     */
+    public static function get_debug_payment_intent( WC_Order $order ) {
+        return $order->get_meta( self::debug_intent_id_key(), true );
+    }
+
+    /**
+     * Updates debug setup intent to order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $intent_id
+     *
+     * @return void
+     */
+    public static function update_debug_setup_intent( WC_Order $order, $intent_id ) {
+        $order->update_meta_data( self::debug_intent_id_key( true ), $intent_id );
+    }
+
+    /**
+     * Retrieves debug setup intent id.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string
+     */
+    public static function get_debug_setup_intent( WC_Order $order ) {
+        return $order->get_meta( self::debug_intent_id_key( true ), true );
+    }
+
+    /**
      * Retrieves source id key.
      *
      * @since 3.6.1
      *
+     * @deprecated 3.7.8
+     *
      * @return string
      */
     public static function source_id_key() {
-        return self::key( 'source_id' );
+        return Helper::meta_key( 'source_id' );
     }
 
     /**
-     * Retrieves stripe source id.
+     * Retrieves payment method id key.
      *
-     * @since 3.6.1
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function payment_method_id_key() {
+        return Helper::meta_key( 'payment_method_id' );
+    }
+
+    /**
+     * Retrieves stripe payment method id.
+     *
+     * @since 3.7.8
      *
      * @param WC_Order $order
      *
      * @return mixed
      */
-    public static function get_source_id( WC_Order $order ) {
-        return $order->get_meta( self::source_id_key(), true );
+    public static function get_payment_method_id( WC_Order $order ) {
+        $payment_method_id = $order->get_meta( self::payment_method_id_key(), true );
+
+        if ( empty( $payment_method_id ) ) {
+            /*
+             * Previously the payment method was stored as source id.
+             * As of 3.7.8 the Source will be completely replaced
+             * by Payment Method.
+             * So for backward compatibility, if payment method is not found,
+             * we need to search for it in the source meta and update it if found.
+             */
+            $payment_method_id = $order->get_meta( self::source_id_key(), true );
+            if ( ! empty( $payment_method_id ) ) {
+                $order->delete_meta_data( self::source_id_key() );
+                self::update_payment_method_id( $order, $payment_method_id );
+                self::save( $order );
+            }
+        }
+
+        return $payment_method_id;
     }
 
     /**
-     * Updates stripe source id.
+     * Updates stripe payment method id.
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
      * @param WC_Order $order
-     * @param string $source_id
+     * @param string   $payment_method_id
      *
      * @return void
      */
-    public static function update_source_id( WC_Order $order, $source_id ) {
-        $order->update_meta_data( self::source_id_key(), $source_id );
+    public static function update_payment_method_id( WC_Order $order, $payment_method_id ) {
+        $order->update_meta_data( self::payment_method_id_key(), $payment_method_id );
+    }
+
+    /**
+     * Deletes payment method id of an order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return void
+     */
+    public static function delete_payment_method_id( WC_Order $order ) {
+        $order->delete_meta_data( self::payment_method_id_key() );
+        // Delete source id as well to maintain the backward compatibility.
+        $order->delete_meta_data( self::source_id_key() );
+    }
+
+    /**
+     * Retrieves meta key for customer id.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function customer_id_key() {
+        return Helper::meta_key( 'customer_id' );
     }
 
     /**
      * Retrieves stripe customer id.
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
-     * @param WC_Order $order
-     *
-     * @return mixed
+     * @return string
      */
     public static function get_customer_id( WC_Order $order ) {
-        return $order->get_meta( self::key( 'customer_id' ), true );
+        return $order->get_meta( self::customer_id_key(), true );
     }
 
     /**
      * Updates stripe customer id.
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
-     * @param WC_Order $order
-     * @param string   $customer_id
-     *
-     * @return void
+     * @return string
      */
     public static function update_customer_id( WC_Order $order, $customer_id ) {
-        $order->update_meta_data( self::key( 'customer_id' ), $customer_id );
+        $order->update_meta_data( self::customer_id_key(), $customer_id );
     }
 
     /**
@@ -302,37 +452,21 @@ class OrderMeta {
      *
      * @param WC_Order $order
      *
-     * @return void
-     */
-    public static function delete_customer_id( WC_Order $order ) {
-        $order->delete_meta_data( self::key( 'customer_id' ) );
-    }
-
-    /**
-     * Retrieves stripe card id.
-     *
-     * @since 3.6.1
-     *
-     * @param WC_Order $order
-     *
      * @return mixed
      */
-    public static function get_card_id( WC_Order $order ) {
-        return $order->get_meta( self::key( 'card_id' ), true );
+    public static function delete_customer_id( WC_Order $order ) {
+        $order->delete_meta_data( self::customer_id_key() );
     }
 
     /**
-     * Updates stripe card id.
+     * Retrieves meta key for payment type
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
-     * @param WC_Order $order
-     * @param string $card_id
-     *
-     * @return void
+     * @return string
      */
-    public static function update_card_id( WC_Order $order, $card_id ) {
-        $order->update_meta_data( self::key( 'card_id' ), $card_id );
+    public static function payment_type_key() {
+        return Helper::meta_key( 'payment_type' );
     }
 
     /**
@@ -345,7 +479,7 @@ class OrderMeta {
      * @return mixed
      */
     public static function get_payment_type( WC_Order $order ) {
-        $payment_type = $order->get_meta( self::key( 'payment_type' ), true );
+        $payment_type = $order->get_meta( self::payment_type_key(), true );
         if ( ! empty( $payment_type ) ) {
             return $payment_type;
         }
@@ -368,7 +502,18 @@ class OrderMeta {
      * @return void
      */
     public static function update_payment_type( WC_Order $order, $payment_type ) {
-        $order->update_meta_data( self::key( 'payment_type' ), $payment_type );
+        $order->update_meta_data( self::payment_type_key(), $payment_type );
+    }
+
+    /**
+     * Retrieves meta key for redirect processed flag.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function redirect_processed_key() {
+        return Helper::meta_key( 'redirect_processed' );
     }
 
     /**
@@ -381,7 +526,7 @@ class OrderMeta {
      * @return boolean
      */
     public static function is_redirect_processed( WC_Order $order ) {
-        return $order->get_meta( self::key( 'redirect_processed' ), true );
+        return $order->get_meta( self::redirect_processed_key(), true );
     }
 
     /**
@@ -395,7 +540,7 @@ class OrderMeta {
      * @return void
      */
     public static function update_redirect_processed( WC_Order $order, $is_processed = 'yes' ) {
-        $order->update_meta_data( self::key( 'redirect_processed' ), $is_processed );
+        $order->update_meta_data( self::redirect_processed_key(), $is_processed );
     }
 
     /**
@@ -406,7 +551,7 @@ class OrderMeta {
      * @return string
      */
     public static function disburse_mode_key() {
-        return self::key( 'disburse_mode' );
+        return Helper::meta_key( 'disburse_mode' );
     }
 
     /**
@@ -437,16 +582,27 @@ class OrderMeta {
     }
 
     /**
+     * Retrieves meta key for stripe fee.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function stripe_fee_key() {
+        return Helper::meta_key( 'fee' );
+    }
+
+    /**
      * Gets the Stripe fee for order.
      *
      * @since 3.6.1
      *
      * @param WC_Order $order
      *
-     * @return string
+     * @return float
      */
     public static function get_stripe_fee( WC_Order $order ) {
-        return $order->get_meta( self::key( 'fee' ), true );
+        return wc_format_decimal( $order->get_meta( self::stripe_fee_key(), true ), 2 );
     }
 
     /**
@@ -460,7 +616,31 @@ class OrderMeta {
      * @return void
      */
     public static function update_stripe_fee( WC_Order $order, $amount = 0.0 ) {
-        $order->update_meta_data( self::key( 'fee' ), $amount );
+        $order->update_meta_data( self::stripe_fee_key(), $amount );
+    }
+
+    /**
+     * Deletes Stripe gateway fee.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return void
+     */
+    public static function delete_stripe_fee( WC_Order $order ) {
+        $order->delete_meta_data( self::stripe_fee_key() );
+    }
+
+    /**
+     * Retrives meta key for withdraw data.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function withdraw_data_key() {
+        return Helper::meta_key( 'withdraw_data' );
     }
 
     /**
@@ -473,7 +653,7 @@ class OrderMeta {
      * @return array
      */
     public static function get_withdraw_data( WC_Order $order ) {
-        return $order->get_meta( self::key( 'withdraw_data' ), true );
+        return $order->get_meta( self::withdraw_data_key(), true );
     }
 
     /**
@@ -487,7 +667,18 @@ class OrderMeta {
      * @return void
      */
     public static function update_withdraw_data( WC_Order $order, $withdraw_data ) {
-        $order->update_meta_data( self::key( 'withdraw_data' ), $withdraw_data );
+        $order->update_meta_data( self::withdraw_data_key(), $withdraw_data );
+    }
+
+    /**
+     * Retrives meta key for withdraw balance added flag.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function withdraw_balance_added_key() {
+        return Helper::meta_key( 'withdraw_balance_added' );
     }
 
     /**
@@ -500,7 +691,7 @@ class OrderMeta {
      * @return boolean
      */
     public static function is_withdraw_balance_added( WC_Order $order ) {
-        return 'yes' === $order->get_meta( self::key( 'withdraw_balance_added' ), true );
+        return 'yes' === $order->get_meta( self::withdraw_balance_added_key(), true );
     }
 
     /**
@@ -514,7 +705,18 @@ class OrderMeta {
      * @return void
      */
     public static function update_if_withdraw_balance_added( $order, $is_added = 'yes' ) {
-        $order->update_meta_data( self::key( 'withdraw_balance_added' ), $is_added );
+        $order->update_meta_data( self::withdraw_balance_added_key(), $is_added );
+    }
+
+    /**
+     * Retrives meta key for refund id.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function refund_id_key() {
+        return Helper::meta_key( 'refund_ids' );
     }
 
     /**
@@ -527,7 +729,7 @@ class OrderMeta {
      * @return array
      */
     public static function get_refund_ids( WC_Order $order ) {
-        return (array) $order->get_meta( self::key( 'refund_ids' ), true );
+        return (array) $order->get_meta( self::refund_id_key(), true );
     }
 
     /**
@@ -549,7 +751,18 @@ class OrderMeta {
             $refund_ids = [ $refund_id ];
         }
 
-        $order->update_meta_data( self::key( 'refund_ids' ), $refund_ids );
+        $order->update_meta_data( self::refund_id_key(), $refund_ids );
+    }
+
+    /**
+     * Retrives meta key for last refund id.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function last_refund_id_key() {
+        return Helper::meta_key( 'last_refund_id' );
     }
 
     /**
@@ -562,7 +775,7 @@ class OrderMeta {
      * @return array
      */
     public static function get_last_refund_id( WC_Order $order ) {
-        return (array) $order->get_meta( self::key( 'last_refund_id' ), true );
+        return (array) $order->get_meta( self::last_refund_id_key(), true );
     }
 
     /**
@@ -576,8 +789,377 @@ class OrderMeta {
      * @return void
      */
     public static function update_last_refund_id( WC_Order $order, $refund_id ) {
-        $order->update_meta_data( self::key( 'last_refund_id' ), $refund_id );
+        $order->update_meta_data( self::last_refund_id_key(), $refund_id );
     }
+
+    /**
+     * Retrieves meta key for payment capture id.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function payment_capture_id_key() {
+        return Helper::meta_key( 'payment_capture_id' );
+    }
+
+    /**
+     * Retrievs payment capture id.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string|false
+     */
+    public static function get_payment_capture_id( WC_Order $order ) {
+        return $order->get_meta( self::payment_capture_id_key(), true );
+    }
+
+    /**
+     * Updates payment capture id.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $payment_capture_id
+     *
+     * @return void
+     */
+    public static function update_payment_capture_id( WC_Order $order, $payment_capture_id ) {
+        $order->update_meta_data( self::payment_capture_id_key(), $payment_capture_id );
+    }
+
+    /**
+     * Retrives meta key for status final flag.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function status_final_key() {
+        return Helper::meta_key( 'status_final' );
+    }
+
+    /**
+     * Updates status final.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return void
+     */
+    public static function make_status_final( WC_Order $order ) {
+        $order->update_meta_data( self::status_final_key(), true );
+    }
+
+    /**
+     * Retrieves status final.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string|false
+     */
+    public static function get_status_final( WC_Order $order ) {
+        return $order->get_meta( self::status_final_key(), true );
+    }
+
+    /**
+     * Deletes status final.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return void
+     */
+    public static function undo_status_final( WC_Order $order ) {
+        $order->delete_meta_data( self::status_final_key() );
+    }
+
+    /**
+     * Retrives meta key for status before hold.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function status_before_hold_key() {
+        return Helper::meta_key( 'status_before_hold' );
+    }
+
+    /**
+     * Updates status before hold.
+     *
+     * @since 3.6.1
+     *
+     * @param WC_Order $order
+     * @param string   $status
+     *
+     * @return void
+     */
+    public static function update_status_before_hold( WC_Order $order, $status ) {
+        $order->update_meta_data( self::status_before_hold_key(), $status );
+    }
+
+    /**
+     * Retrieves status before hold.
+     *
+     * @since 3.6.1
+     *
+     * @param WC_Order $order
+     *
+     * @return string|false
+     */
+    public static function get_status_before_hold( WC_Order $order ) {
+        return $order->get_meta( self::status_before_hold_key(), true );
+    }
+
+    /**
+     * Retrieves meta key for vendor subscription order.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function vendor_subscription_order_key() {
+        return Helper::meta_key( 'vendor_subscription_order' );
+    }
+
+    /**
+     * Checks if order is a vendor subscription order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return boolean
+     */
+    public static function is_vendor_subscription( WC_Order $order ) {
+        return 'yes' === $order->get_meta( self::vendor_subscription_order_key(), true );
+    }
+
+    /**
+     * Updates flag for vendor subscription order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $status
+     *
+     * @return void
+     */
+    public static function update_vendor_subscription_order( WC_Order $order, $status = 'yes' ) {
+        $order->update_meta_data( self::vendor_subscription_order_key(), $status );
+    }
+
+    /**
+     * Retrives meta key for Stripe subscription id.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function stripe_subscription_id_key() {
+        return Helper::meta_key( 'stripe_subscription_id' );
+    }
+
+    /**
+     * Retrives Stripe subscription id.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string|false
+     */
+    public static function get_stripe_subscription_id( WC_Order $order ) {
+        return $order->get_meta( self::stripe_subscription_id_key(), true );
+    }
+
+    /**
+     * Updates Stripe subscription id.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $subscription_id
+     *
+     * @return void
+     */
+    public static function update_stripe_subscription_id( WC_Order $order, $subscription_id ) {
+        $order->update_meta_data( self::stripe_subscription_id_key(), $subscription_id );
+    }
+
+    /**
+     * Retrieves meta key for subscription charge id.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function subscription_charge_id_key() {
+        return Helper::meta_key( 'subscription_charge_id' );
+    }
+
+    /**
+     * Retrieves subscription charge id.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string|false
+     */
+    public static function get_subscription_charge_id( WC_Order $order ) {
+        return $order->get_meta( self::subscription_charge_id_key(), true );
+    }
+
+    /**
+     * Updates charge id for a subscription.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $charge_id
+     *
+     * @return void
+     */
+    public static function update_subscription_charge_id( WC_Order $order, $charge_id ) {
+        $order->update_meta_data( self::subscription_charge_id_key(), $charge_id );
+    }
+
+
+    /**
+     * Retrieves meta key for coupon id.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function coupon_id_key() {
+        return Helper::meta_key( 'coupon_id' );
+    }
+
+    /**
+     * Retrieves coupon id for Stripe.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string|false
+     */
+    public static function get_stripe_coupon_id( WC_Order $order ) {
+        return $order->get_meta( self::coupon_id_key(), true );
+    }
+
+    /**
+     * Updates Stripe coupon id for order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $coupon_id
+     *
+     * @return void
+     */
+    public static function update_stripe_coupon_id( WC_Order $order, $coupon_id ) {
+        $order->update_meta_data( self::coupon_id_key(), $coupon_id );
+    }
+
+    /**
+     * Retrieves meta key for awaiting disbursement flag.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function awaiting_disbursement_key() {
+        return Helper::meta_key( 'awaiting_disbursement' );
+    }
+
+    /**
+     * Retrieves meta data of awaiting disbursement flag.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return string|false
+     */
+    public static function has_awaiting_disbursement( WC_Order $order ) {
+        return 'yes' === $order->get_meta( self::awaiting_disbursement_key(), true );
+    }
+
+    /**
+     * Updates meta data of awaiting disbursement flag.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $is_awaiting
+     *
+     * @return void
+     */
+    public static function update_awaiting_disbursement( WC_Order $order, $is_awaiting = 'yes' ) {
+        $order->update_meta_data( self::awaiting_disbursement_key(), $is_awaiting );
+    }
+
+    /**
+     * Deletes awaiting disbursement flag.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return void
+     */
+    public static function delete_awaiting_disbursement( WC_Order $order ) {
+        $order->delete_meta_data( self::awaiting_disbursement_key() );
+    }
+
+    /**
+     * Retrieves meta key for save payment method flag.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function save_payment_method_key() {
+        return Helper::meta_key( 'save_payment_method' );
+    }
+
+    /**
+     * Indicates whether or not payment method should be saved.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return boolean
+     */
+    public static function should_save_payment_method( WC_Order $order ) {
+        return 'yes' === $order->get_meta( self::save_payment_method_key(), true );
+    }
+
+    /**
+     * Updates flag of whether or not payment method should be saved.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return void
+     */
+    public static function update_save_payment_method( WC_Order $order, $save = 'yes' ) {
+        $order->update_meta_data( self::save_payment_method_key(), $save );
+    }
+
+    //** Default Dokan meta keys are below. No need to add prefix for these. **//
 
     /**
      * Updates gateway fee for dokan.
@@ -635,70 +1217,30 @@ class OrderMeta {
     }
 
     /**
-     * Updates status final.
+     * Updates meta data of tax fee recipient.
      *
-     * @since 3.6.1
+     * @since 3.7.8
      *
      * @param WC_Order $order
-     * @param string   $status
+     * @param string   $recipient
      *
      * @return void
      */
-    public static function make_status_final( WC_Order $order ) {
-        $order->update_meta_data( self::key( 'status_final' ), true );
+    public static function update_tax_fee_recipient( WC_Order $order, $recipient = 'admin' ) {
+        $order->update_meta_data( 'tax_fee_recipient', $recipient );
     }
 
     /**
-     * Retrieves status final.
+     * Updates meta data of shipping fee recipient.
      *
-     * @since 3.6.1
-     *
-     * @param WC_Order $order
-     *
-     * @return string|false
-     */
-    public static function get_status_final( WC_Order $order ) {
-        return $order->get_meta( self::key( 'status_final' ), true );
-    }
-
-    /**
-     * Deletes status final.
-     *
-     * @since 3.6.1
+     * @since 3.7.8
      *
      * @param WC_Order $order
-     * @param string   $status
+     * @param string   $recipient
      *
      * @return void
      */
-    public static function undo_status_final( WC_Order $order ) {
-        $order->delete_meta_data( self::key( 'status_final' ) );
-    }
-
-    /**
-     * Updates status before hold.
-     *
-     * @since 3.6.1
-     *
-     * @param WC_Order $order
-     * @param string   $status
-     *
-     * @return void
-     */
-    public static function update_status_before_hold( WC_Order $order, $status ) {
-        $order->update_meta_data( self::key( 'status_before_hold' ), $status );
-    }
-
-    /**
-     * Retrieves status before hold.
-     *
-     * @since 3.6.1
-     *
-     * @param WC_Order $order
-     *
-     * @return string|false
-     */
-    public static function get_status_before_hold( WC_Order $order ) {
-        return $order->get_meta( self::key( 'status_before_hold' ), true );
+    public static function update_shipping_fee_recipient( WC_Order $order, $recipient = 'admin' ) {
+        $order->update_meta_data( 'shipping_fee_recipient', $recipient );
     }
 }

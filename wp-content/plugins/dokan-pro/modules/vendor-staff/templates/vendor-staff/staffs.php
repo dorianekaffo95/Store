@@ -113,7 +113,7 @@
                                     </td>
                                     <td><?php echo $staff->user_email; ?></td>
                                     <td><?php echo get_user_meta( $staff->ID, '_staff_phone', true ); ?></td>
-                                    <td><?php echo dokan_date_time_format( $staff->user_registered ); ?></td>
+                                    <td><?php echo dokan_format_datetime( $staff->user_registered ); ?></td>
                                 </tr>
                             <?php } ?>
 

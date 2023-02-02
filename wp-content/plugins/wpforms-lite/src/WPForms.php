@@ -2,6 +2,7 @@
 
 namespace WPForms {
 
+	use AllowDynamicProperties;
 	use stdClass;
 
 	/**
@@ -9,6 +10,7 @@ namespace WPForms {
 	 *
 	 * @since 1.0.0
 	 */
+	#[AllowDynamicProperties]
 	final class WPForms {
 
 		/**
@@ -217,12 +219,10 @@ namespace WPForms {
 				]
 			);
 
-			if ( version_compare( phpversion(), '5.5', '>=' ) ) {
-				/*
-				 * Load PHP 5.5 email subsystem.
-				 */
-				add_action( 'wpforms_loaded', [ '\WPForms\Emails\Summaries', 'get_instance' ] );
-			}
+			/*
+			 * Load email subsystem.
+			 */
+			add_action( 'wpforms_loaded', [ '\WPForms\Emails\Summaries', 'get_instance' ] );
 
 			/*
 			 * Load admin components. Exclude from frontend.

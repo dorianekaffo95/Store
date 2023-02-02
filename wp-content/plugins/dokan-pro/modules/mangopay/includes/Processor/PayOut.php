@@ -147,7 +147,7 @@ class PayOut extends Processor {
         $payout										 = new MangoPayOut();
         $payout->Tag								 = "Earning from WC Order #$order_id";
         $payout->AuthorId							 = $mp_user_id;
-        $payout->DebitedWalletID					 = $wallet->Id;
+        $payout->DebitedWalletId					 = $wallet->Id;
         $payout->DebitedFunds						 = new Money();
         $payout->DebitedFunds->Currency				 = $currency;
         $payout->DebitedFunds->Amount				 = round( $amount * 100 );

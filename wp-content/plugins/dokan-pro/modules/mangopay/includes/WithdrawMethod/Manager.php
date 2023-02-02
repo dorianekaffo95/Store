@@ -2,6 +2,8 @@
 
 namespace WeDevs\DokanPro\Modules\MangoPay\WithdrawMethod;
 
+defined( 'ABSPATH' ) || exit; // Exit if called directly
+
 use WeDevs\DokanPro\Admin\Announcement;
 use WeDevs\DokanPro\Modules\MangoPay\Support\Meta;
 use WeDevs\DokanPro\Modules\MangoPay\Support\Helper;
@@ -121,7 +123,8 @@ class Manager {
      */
     public function vendor_gateway_settings( $store_settings ) {
         $user_id           = get_current_user_id();
-        $mangopay_settings = array();
+        $mangopay_settings = [];
+        $mangopay_user_id  = Meta::get_mangopay_account_id( $user_id );
 
         if ( ! empty( $store_settings['payment'] ) && ! empty( $store_settings['payment']['mangopay'] ) ) {
             $mangopay_settings = $store_settings['payment']['mangopay'];
@@ -134,10 +137,10 @@ class Manager {
             'vendor-gateway-settings',
             array(
                 'user_id'             => $user_id,
-                'signup_fields'       => Helper::get_signup_fields() + Helper::get_extra_signup_fields( $user_id ),
+                'signup_fields'        => Helper::get_signup_fields( $user_id ),
                 'is_seller_connected' => Helper::is_seller_connected( $user_id ),
                 'is_payout_enabled'   => PayOut::is_user_eligible( $user_id ),
-                'mp_user'             => User::get( Meta::get_mangopay_account_id( $user_id ) ),
+                'mp_user'             => User::get( $mangopay_user_id ),
                 'payment_settings'    => $mangopay_settings,
             )
         );
@@ -268,19 +271,19 @@ class Manager {
 
         if ( ! empty( $mangopay_data['vendor'] ) && ! empty( $mp_user_id ) ) {
             $mp_user = User::update(
-                $mp_user_id,
                 $vendor_id,
                 array_merge(
                     array(
-                        'date_of_birth' => $mangopay_data['vendor']['birthday'],
-                        'person_type'   => $mangopay_data['vendor']['status'],
+                        'birthday' => $mangopay_data['vendor']['birthday'],
+                        'staus'    => $mangopay_data['vendor']['status'],
                     ),
                     $mangopay_data['vendor']
-                )
+                ),
+                false
             );
 
-            if ( is_wp_error( $mp_user ) ) {
-                unset( $mangopay_data['vendor'] );
+            if ( ! empty( $mangopay_data['vendor']['terms'] ) ) {
+                $mangopay_data['vendor']['terms'] = '1';
             }
         }
 
@@ -351,30 +354,29 @@ class Manager {
             return;
         }
 
+        $seller_id = dokan_get_current_user_id();
+
+        if ( ! dokan_is_user_seller( $seller_id ) ) {
+            return;
+        }
+
         if ( ! Settings::is_send_announcement_to_sellers_enabled() ) {
             return;
         }
 
-        // Check Mangopay payment gateway is enabled
+        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
+            return;
+        }
+
         $available_gateways = WC()->payment_gateways->get_available_payment_gateways();
         if ( ! array_key_exists( Helper::get_gateway_id(), $available_gateways ) ) {
             return;
         }
 
-        // Check if Mangopay is ready
         if ( ! Helper::is_gateway_ready() ) {
             return;
         }
 
-        // get current user id
-        $seller_id = dokan_get_current_user_id();
-
-        // check if current user is vendor
-        if ( ! dokan_is_user_seller( $seller_id ) ) {
-            return;
-        }
-
-        // check if vendor is already connected with MangoPay
         if ( Helper::is_seller_connected( $seller_id ) ) {
             return;
         }
@@ -392,13 +394,14 @@ class Manager {
             $notice = $announcement->create_announcement( $args );
 
             if ( is_wp_error( $notice ) ) {
-                return Helper::log(
+                Helper::log(
                     sprintf(
                         'Error creating announcement for non-connected seller %1$s. Error Message: %2$s',
                         $seller_id,
                         $notice->get_error_message()
                     )
                 );
+                return;
             }
 
             // Notice is sent, now store transient
@@ -426,6 +429,10 @@ class Manager {
             return;
         }
 
+        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
+            return;
+        }
+
         // Check if notice on vendor dashboard is enabled
         if ( ! Settings::is_display_notice_on_vendor_dashboard_enabled() ) {
             return;
@@ -444,10 +451,6 @@ class Manager {
 
         // Check if vendor is already connected with mangopay
         if ( Helper::is_seller_connected( $seller_id ) ) {
-            return;
-        }
-
-        if ( ! dokan_is_withdraw_method_enabled( Helper::get_gateway_id() ) ) {
             return;
         }
 

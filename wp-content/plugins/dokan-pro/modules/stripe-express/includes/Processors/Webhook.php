@@ -4,12 +4,15 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\Processors;
 
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
+use Stripe\Event;
+use WeDevs\Dokan\Exceptions\DokanException;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Config;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Settings;
+use WeDevs\DokanPro\Modules\StripeExpress\Api\WebhookEndpoint;
 
 /**
- * Class for processing webhhoks.
+ * Class for processing webhooks.
  *
  * @since 3.6.1
  *
@@ -31,6 +34,53 @@ class Webhook {
     const STATUS_SIGNATURE_INVALID      = 'signature_invalid';
     const STATUS_SIGNATURE_MISMATCH     = 'signature_mismatch';
     const STATUS_TIMESTAMP_OUT_OF_RANGE = 'timestamp_out_of_range';
+
+    /**
+     * Prefix for webhook.
+     *
+     * @since 3.7.8
+     *
+     * @var string
+     */
+    private static $prefix = 'dokan-stripe-express';
+
+    /**
+     * Retrieves prefic for Webhook.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function prefix() {
+        return self::$prefix;
+    }
+
+    /**
+     * Generates URL for webhook.
+     *
+     * @since 3.7.8
+     *
+     * @return string
+     */
+    public static function generate_url() {
+        return home_url( 'wc-api/' . self::prefix(), 'https' );
+    }
+
+    /**
+     * Generates default webhook data.
+     *
+     * @since 3.7.8
+     *
+     * @return array{url:string,enabled_events:string[],api_version:string,description:string}
+     */
+    public static function generate_data() {
+        return [
+            'url'            => self::generate_url(),
+            'enabled_events' => array_keys( self::get_supported_events() ),
+            'api_version'    => Helper::get_api_version(),
+            'description'    => __( 'This webhook is created by Dokan Pro.', 'dokan' ),
+        ];
+    }
 
     /**
      * Returns instance of configuration.
@@ -55,6 +105,132 @@ class Webhook {
     }
 
     /**
+     * Retrieves supported webhook events.
+     *
+     * @since 3.7.8
+     *
+     * @return array<string,string>
+     */
+    public static function get_supported_events() {
+        return apply_filters(
+            'dokan_stripe_express_webhook_events',
+            [
+                Event::PAYMENT_INTENT_SUCCEEDED                 => 'PaymentIntentSucceeded',
+                Event::PAYMENT_INTENT_REQUIRES_ACTION           => 'PaymentIntentRequiresAction',
+                Event::PAYMENT_INTENT_AMOUNT_CAPTURABLE_UPDATED => 'PaymentIntentAmountCapturableUpdated',
+                Event::SETUP_INTENT_SUCCEEDED                   => 'SetupIntentSucceeded',
+                Event::SETUP_INTENT_SETUP_FAILED                => 'SetupIntentSetupFailed',
+                Event::CHARGE_SUCCEEDED                         => 'ChargeSucceeded',
+                Event::CHARGE_CAPTURED                          => 'ChargeCaptured',
+                Event::CHARGE_FAILED                            => 'ChargeFailed',
+                Event::CHARGE_DISPUTE_CREATED                   => 'ChargeDisputeCreated',
+                Event::CHARGE_DISPUTE_CLOSED                    => 'ChargeDisputeClosed',
+                Event::BALANCE_AVAILABLE                        => 'BalanceAvailable',
+                Event::REVIEW_OPENED                            => 'ReviewOpened',
+                Event::REVIEW_CLOSED                            => 'ReviewClosed',
+                Event::CUSTOMER_SUBSCRIPTION_CREATED            => 'SubscriptionCreated',
+                Event::CUSTOMER_SUBSCRIPTION_UPDATED            => 'SubscriptionUpdated',
+                Event::CUSTOMER_SUBSCRIPTION_DELETED            => 'SubscriptionDeleted',
+                Event::CUSTOMER_SUBSCRIPTION_TRIAL_WILL_END     => 'SubscriptionTrialWillEnd',
+                Event::INVOICE_PAYMENT_SUCCEEDED                => 'InvoicePaymentSucceeded',
+                Event::INVOICE_PAYMENT_FAILED                   => 'InvoicePaymentFailed',
+                Event::INVOICE_PAYMENT_ACTION_REQUIRED          => 'InvoicePaymentActionRequired',
+            ]
+        );
+    }
+
+    /**
+     * Creates webhook endpoint.
+     * Creates the endpoint if no endpoint exists,
+     * Synchronizes the endpoint otherwise.
+     *
+     * @since 3.7.8
+     *
+     * @return boolean
+     */
+    public static function create() {
+        if ( ! Helper::is_api_ready() ) {
+            return false;
+        }
+
+        try {
+            $data      = self::generate_data();
+            $endpoints = WebhookEndpoint::all();
+
+            // If no endpoint exists, create one.
+            if ( empty( $endpoints ) ) {
+                WebhookEndpoint::create( $data );
+                self::delete_key();
+                return true;
+            }
+
+            $endpoint_updated = false;
+
+            /*
+             * Traverse all the existing endpoints and update if needed.
+             * Any endpoint that doesn't match as expected will be deleted.
+             */
+            foreach ( $endpoints as $endpoint ) {
+                if ( $endpoint->url === self::generate_url() ) {
+                    unset( $data['api_version'] );
+                    WebhookEndpoint::update( $endpoint->id, $data );
+                    $endpoint_updated = true;
+                }
+            }
+
+            /*
+             * If no endpoint was updated, that means
+             * there was no endpoint regarding our need,
+             * so we need to create one.
+             */
+            if ( ! $endpoint_updated ) {
+                WebhookEndpoint::create( $data );
+                self::delete_key();
+            }
+
+            return true;
+        } catch ( DokanException $e ) {
+            return false;
+        }
+    }
+
+    /**
+     * Deletes webhook endpoint.
+     *
+     * @since 3.7.8
+     *
+     * @return boolean
+     */
+    public static function delete() {
+        if ( ! Helper::is_api_ready() ) {
+            return false;
+        }
+
+        try {
+            $endpoints = WebhookEndpoint::all();
+            if ( empty( $endpoints ) ) {
+                return false;
+            }
+
+            /*
+             * Traverse all the endpoints and delete
+             * the one that matches our endpoint.
+             */
+            foreach ( $endpoints as $endpoint ) {
+                if ( $endpoint->url === self::generate_url() ) {
+                    WebhookEndpoint::delete( $endpoint->id );
+                    self::delete_key();
+                    return true;
+                }
+            }
+
+            return true;
+        } catch ( DokanException $e ) {
+            return false;
+        }
+    }
+
+    /**
      * Removes webhook key from settings.
      *
      * @since 3.6.1
@@ -75,7 +251,7 @@ class Webhook {
      *
      * @since 3.6.1
      *
-     * @return array
+     * @return array<string,string>
      */
     public static function get_status_messages() {
         return [

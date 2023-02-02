@@ -17,32 +17,26 @@
             <?php foreach ( $all_docs as $doc ) : ?>
             <tr class="kyc-doc-list-data" data-id="<?php echo esc_attr( $doc->Id ); ?>">
                 <td class="kyc-doc-status-icon">
-                    <mark class="kyc <?php echo esc_attr( $doc->Status ); ?>">
+                    <mark class="kyc <?php echo esc_attr( strtolower( $doc->Status ) ); ?>">
                         <?php echo esc_html( $doc->StatusLabel ); ?>
                     </mark>
                 </td>
 
                 <td><?php echo esc_html( $doc->TypeLabel ); ?></td>
 
-                <td><?php printf( esc_html__( '%s', 'dokan' ), $doc->CreationDate ); ?></td>
+                <td><?php echo esc_html( $doc->CreationDate ); ?></td>
 
                 <td>
                     <?php
                     echo esc_html( $doc->StatusLabel );
                     echo ! empty( $doc->RefusedReasonMessage ) && 'NULL' !== $doc->RefusedReasonMessage
-                        ? ': ' . esc_html__( $doc->RefusedReasonMessage, 'dokan')
+                        ? ': ' . esc_html( $doc->RefusedReasonMessage )
                         : (
                             ! empty( $doc->RefusedReasonType )
-                            ? ': ' . esc_html__( $refused_reasons[ $doc->RefusedReasonType ], 'dokan')
+                            ? ': ' . esc_html( $refused_reasons[ $doc->RefusedReasonType ] )
                             : ''
                         );
                     ?>
-
-                    <?php if ( is_array( $doc->UserDocError ) ) : ?>
-                        <?php foreach ( $data_error_file_user_meta as $key_error_message => $message_error ) : ?>
-                            <br><?php esc_html_e( $message_error, 'dokan' ); ?>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -54,7 +48,7 @@
                         <?php esc_html_e( 'NOT SENT', 'dokan' ); ?>
                     </mark>
                 </td>
-                <td><?php printf( esc_html__( '%s', 'dokan' ), ucfirst( str_replace( '_', ' ', strtolower( $key ) ) ) ); ?></td>
+                <td><?php echo esc_html( $doc ); ?></td>
 
                 <td>&nbsp;-&nbsp;</td>
 

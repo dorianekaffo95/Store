@@ -98,17 +98,6 @@ class Settings {
     }
 
     /**
-     * Checks if 3DS2 mode is enabled
-     *
-     * @since 3.5.0
-     *
-     * @return boolean
-     */
-    public static function is_3ds2_disabled() {
-        return 'yes' === self::get( 'disabled_3DS2' );
-    }
-
-    /**
      * Checks if mangopay gateway is enabled
      *
      * @since 3.5.0

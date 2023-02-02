@@ -4,9 +4,9 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\Controllers;
 
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
-use WC_Payment_Tokens;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Customer;
+use WeDevs\DokanPro\Modules\StripeExpress\Processors\Token as TokenProcessor;
 
 /**
  * Handles and process WC payment tokens API.
@@ -24,7 +24,7 @@ class Token {
      * @since 3.6.1
      */
     public function __construct() {
-        $this->hooks();
+        add_action( 'init', [ $this, 'hooks' ] );
     }
 
     /**
@@ -34,7 +34,7 @@ class Token {
      *
      * @return void
      */
-    private function hooks() {
+    public function hooks() {
         add_filter( 'woocommerce_get_customer_payment_tokens', [ $this, 'get_customer_payment_tokens' ], 10, 3 );
         add_filter( 'woocommerce_payment_methods_list_item', [ $this, 'get_account_saved_payment_methods_list_item_sepa' ], 10, 2 );
         add_filter( 'woocommerce_get_credit_card_type_label', [ $this, 'normalize_sepa_label' ] );
@@ -60,95 +60,38 @@ class Token {
     }
 
     /**
-     * Extract the payment token from the provided request.
-     *
-     * @todo Once php requirement is bumped to >= 7.1.0 set return type to ?\WC_Payment_Token
-     * since the return type is nullable, as per
-     * https://www.php.net/manual/en/functions.returning-values.php#functions.returning-values.type-declaration
-     *
-     * @since 3.6.1
-     *
-     * @param array $request Associative array containing payment request information.
-     *
-     * @return WC_Payment_Token|NULL
-     */
-    public static function get_from_request( array $request ) {
-        $payment_method    = ! is_null( $request['payment_method'] ) ? $request['payment_method'] : null;
-        $token_request_key = "wc-$payment_method-payment-token";
-
-        if (
-            ! isset( $request[ $token_request_key ] ) ||
-            'new' === $request[ $token_request_key ]
-        ) {
-            return null;
-        }
-
-        //phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-        $token = WC_Payment_Tokens::get( sanitize_text_field( $request[ $token_request_key ] ) );
-
-        // If the token doesn't belong to this gateway or the current user it's invalid.
-        if ( ! $token || $payment_method !== $token->get_gateway_id() || $token->get_user_id() !== get_current_user_id() ) {
-            return null;
-        }
-
-        return $token;
-    }
-
-    /**
-     * Checks if customer has saved payment methods.
-     *
-     * @since 3.6.1
-     *
-     * @param int $customer_id
-     *
-     * @return bool
-     */
-    public static function customer_has_saved_methods( $customer_id ) {
-        $gateways = [ 'dokan_stripe_express', 'dokan_stripe_express_sepa' ];
-
-        if ( empty( $customer_id ) ) {
-            return false;
-        }
-
-        $has_token = false;
-
-        foreach ( $gateways as $gateway ) {
-            $tokens = WC_Payment_Tokens::get_customer_tokens( $customer_id, $gateway );
-
-            if ( ! empty( $tokens ) ) {
-                $has_token = true;
-                break;
-            }
-        }
-
-        return $has_token;
-    }
-
-    /**
      * Gets saved tokens from Stripe, if they don't already exist in WooCommerce.
      *
-     * @param array  $tokens     Array of tokens
-     * @param string $user_id    WC User ID
-     * @param string $gateway_id WC Gateway ID
+     * @since 3.6.1
+     *
+     * @param \WC_Payment_Token[]  $tokens     Array of tokens
+     * @param string               $user_id    WC User ID
+     * @param string               $gateway_id WC Gateway ID
      *
      * @return array
      */
     public function get_customer_payment_tokens( $tokens, $user_id, $gateway_id ) {
-        if ( ! is_user_logged_in() || ( ! empty( $gateway_id ) && Helper::get_gateway_id() !== $gateway_id ) ) {
+        /*
+         * If Stripe express gateway is not available,
+         * then we won't show any token related to it.
+         */
+        if ( ! empty( $tokens ) && ! Helper::is_gateway_ready() ) {
+            $tokens = array_filter(
+                $tokens, function( $token ) {
+                    Helper::get_gateway_id() !== $token->get_gateway_id();
+                }
+            );
+        }
+
+        /*
+         * If the user is not logged in or the gateway is not Stripe Express,
+         * we don't further intervene in the process.
+         */
+        if ( ( ! empty( $gateway_id ) && Helper::get_gateway_id() !== $gateway_id ) || ! is_user_logged_in() ) {
             return $tokens;
         }
 
-        if ( count( $tokens ) >= get_option( 'posts_per_page' ) ) {
-            /*
-             * The tokens data store is not paginated and
-             * only the first "post_per_page" (defaults to 10) tokens are retrieved.
-             * Having 10 saved credit cards is considered an unsupported edge case,
-             * new ones that have been stored in Stripe won't be added.
-             */
-            return $tokens;
-        }
-
-        $reusable_payment_methods = Helper::get_reusable_payment_methods();
+        $reusable_payment_methods = Helper::get_enabled_reusable_payment_methods();
         $customer                 = Customer::set( $user_id );
         $remaining_tokens         = [];
 
@@ -171,17 +114,21 @@ class Token {
             }
         }
 
+        /*
+         * Maps the reusable payment methods to their respective retrievable types.
+         * The retrievable type will indeed be used to create a new token in the WooCommerce end.
+         */
         $retrievable_payment_method_types = [];
         $payment_methods                  = Helper::get_available_method_instances();
-        foreach ( $reusable_payment_methods as $payment_method_id ) {
-            $payment_method = $payment_methods[ $payment_method_id ];
+        foreach ( $reusable_payment_methods as $payment_method_type ) {
+            $payment_method = $payment_methods[ $payment_method_type ];
             if ( ! in_array( $payment_method->get_retrievable_type(), $retrievable_payment_method_types, true ) ) {
                 $retrievable_payment_method_types[] = $payment_method->get_retrievable_type();
             }
         }
 
-        foreach ( $retrievable_payment_method_types as $payment_method_id ) {
-            $customers_payment_methods = $customer->get_payment_methods( $payment_method_id );
+        foreach ( $retrievable_payment_method_types as $payment_method_type ) {
+            $customers_payment_methods = $customer->get_payment_methods( $payment_method_type );
 
             // Prevent unnecessary recursion, WC_Payment_Token::save() ends up calling 'get_customer_payment_tokens' in some cases.
             remove_action( 'woocommerce_get_customer_payment_tokens', [ $this, 'get_customer_payment_tokens' ], 10, 3 );
@@ -191,6 +138,7 @@ class Token {
                     if ( ! in_array( $payment_method_type, $reusable_payment_methods, true ) ) {
                         continue;
                     }
+
                     // Create new token for new payment method and add to list.
                     $payment_method             = $payment_methods[ $payment_method_type ];
                     $token                      = $payment_method->create_payment_token_for_user( $user_id, $method );
@@ -224,7 +172,9 @@ class Token {
      * Returns original type of payment method from Stripe payment method response,
      * after checking whether payment method is SEPA method generated from another type.
      *
-     * @param object $payment_method Stripe payment method JSON object.
+     * @since 3.6.1
+     *
+     * @param \Stripe\PaymentMethod $payment_method Stripe payment method object.
      *
      * @return string Payment method type/ID
      */
@@ -241,9 +191,11 @@ class Token {
     }
 
     /**
-     * Returns original Stripe payment method type from payment token
+     * Returns original Stripe payment method type from payment token.
      *
-     * @param object $payment_token WC Payment Token (CC or SEPA)
+     * @since 3.6.1
+     *
+     * @param \WeDevs\DokanPro\Modules\StripeExpress\PaymentTokens\Sepa|\WeDevs\DokanPro\Modules\StripeExpress\PaymentTokens\Card $payment_token WC Payment Token (CC or SEPA)
      *
      * @return string
      */
@@ -288,8 +240,8 @@ class Token {
      * @return void
      */
     public function payment_token_deleted( $token_id, $token ) {
-        $customer = Customer::set( get_current_user_id() );
-        if ( Helper::get_gateway_id() === $token->get_gateway_id() ) {
+        if ( Helper::get_gateway_id() === $token->get_gateway_id() && Helper::is_gateway_ready() ) {
+            $customer = Customer::set( get_current_user_id() );
             $customer->detach_payment_method( $token->get_token() );
         }
     }
@@ -304,10 +256,13 @@ class Token {
      * @return void
      */
     public function payment_token_set_default( $token_id ) {
-        $token    = WC_Payment_Tokens::get( $token_id );
-        $customer = Customer::set( get_current_user_id() );
+        if ( ! Helper::is_gateway_ready() ) {
+            return;
+        }
 
+        $token = TokenProcessor::get( $token_id );
         if ( Helper::get_gateway_id() === $token->get_gateway_id() ) {
+            $customer = Customer::set( get_current_user_id() );
             $customer->set_default_payment_method( $token->get_token() );
         }
     }

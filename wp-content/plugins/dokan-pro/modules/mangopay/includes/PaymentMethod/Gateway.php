@@ -256,20 +256,15 @@ class Gateway extends WC_Payment_Gateway {
         wp_enqueue_style( 'dokan-mangopay-checkout' );
 
         $mp_user_id            = '';
-        $signup_fields         = array();
-        $signup_data           = array();
         $available_card_types  = Helper::get_available_card_types();
         $selected_credit_cards = Settings::get_selected_credit_cards();
         $user_id               = get_current_user_id();
         $credit_card_activated = false;
         $selected_debit_cards  = Settings::get_selected_direct_pay_methods();
-        $selected_card         = ! empty( $_POST['dokan_mangopay_card_type'] ) ? sanitize_text_field( wp_unslash( $_POST['dokan_mangopay_card_type'] ) ) : ''; // phpcs:ignore
+        $selected_card         = ! empty( $_POST['dokan_mangopay_card_type'] ) ? sanitize_text_field( wp_unslash( $_POST['dokan_mangopay_card_type'] ) ) : '';
 
         if ( $user_id ) {
-            $signup_fields              = Helper::get_signup_fields();
-            $signup_data['birthday']    = Meta::get_user_birthday( $user_id );
-            $signup_data['nationality'] = Meta::get_user_nationality( $user_id );
-            $mp_user_id                 = Meta::get_mangopay_account_id( $user_id );
+            $mp_user_id = Meta::get_mangopay_account_id( $user_id );
         }
 
         // Check if at least one credit card is activated
@@ -290,8 +285,6 @@ class Gateway extends WC_Payment_Gateway {
                 'credit_card_enabled'       => ! empty( $selected_credit_cards ),
                 'available_direct_payments' => Helper::get_available_direct_payment_types(),
                 'available_card_types'      => $available_card_types,
-                'signup_fields'             => $signup_fields,
-                'signup_data'               => $signup_data,
                 'mangopay_url'              => Settings::is_test_mode() ? 'https://api.sandbox.mangopay.com' : 'https://api.mangopay.com',
                 'months'                    => Helper::get_months_dropdown(),
                 'years'                     => Helper::get_years_dropdown(),

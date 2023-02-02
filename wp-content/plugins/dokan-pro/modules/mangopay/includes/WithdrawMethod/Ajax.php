@@ -329,76 +329,56 @@ class Ajax {
      * @return mixed
      */
     public function sign_up() {
-        if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['_wpnonce'] ) ), 'dokan_payment_settings_nonce' ) ) { // phpcs:ignore
-            wp_send_json_error( __( 'Nonce verification failed!', 'dokan' ) );
+        if ( ! isset( $_POST['signup_nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['signup_nonce'] ) ), 'dokan_payment_settings_nonce' ) ) {
+            wp_send_json_error( esc_html__( 'Nonce verification failed!', 'dokan' ) );
         }
 
         if ( ! current_user_can( 'dokan_manage_withdraw' ) ) {
-            wp_send_json_error( __( 'Pemission denied!', 'dokan' ) );
+            wp_send_json_error( esc_html__( 'Pemission denied!', 'dokan' ) );
         }
 
         if ( empty( $_POST['user_id'] ) ) {
-            wp_send_json_error( __( 'No vendor found!', 'dokan' ) );
+            wp_send_json_error( esc_html__( 'No vendor found!', 'dokan' ) );
         }
 
-        $user_id = intval( wp_unslash( $_POST['user_id'] ) );
+        if ( empty( $_POST['terms'] ) ) {
+            wp_send_json_error( esc_html__( 'Please read and accept the Terms and Conditions of MangoPay to proceed.', 'dokan' ) );
+        }
 
-        $data = array(
-            'date_of_birth'  => ! empty( $_POST['date_of_birth'] ) ? sanitize_text_field( wp_unslash( $_POST['date_of_birth'] ) ) : '',
-            'nationality'    => ! empty( $_POST['nationality'] ) ? sanitize_text_field( wp_unslash( $_POST['nationality'] ) ) : '',
-            'person_type'    => ! empty( $_POST['person_type'] ) ? sanitize_text_field( wp_unslash( $_POST['person_type'] ) ) : '',
-            'business_type'  => ! empty( $_POST['business_type'] ) ? sanitize_text_field( wp_unslash( $_POST['business_type'] ) ) : '',
-            'company_number' => ! empty( $_POST['company_number'] ) ? sanitize_text_field( wp_unslash( $_POST['company_number'] ) ) : '',
-            'address1'       => ! empty( $_POST['address1'] ) ? sanitize_text_field( wp_unslash( $_POST['address1'] ) ) : '',
-            'address2'       => ! empty( $_POST['address2'] ) ? sanitize_text_field( wp_unslash( $_POST['address2'] ) ) : '',
-            'city'           => ! empty( $_POST['city'] ) ? sanitize_text_field( wp_unslash( $_POST['city'] ) ) : '',
-            'postcode'       => ! empty( $_POST['postcode'] ) ? sanitize_text_field( wp_unslash( $_POST['postcode'] ) ) : '',
-            'state'          => ! empty( $_POST['state'] ) ? sanitize_text_field( wp_unslash( $_POST['state'] ) ) : '',
-            'country'        => ! empty( $_POST['country'] ) ? sanitize_text_field( wp_unslash( $_POST['country'] ) ) : '',
-            'company_name'   => get_user_meta( $user_id, 'dokan_store_name', true ),
+        $data          = [];
+        $error_notice  = [];
+        $user_id       = intval( wp_unslash( $_POST['user_id'] ) );
+        $signup_fields  = Helper::get_signup_fields(
+            $user_id,
+            [
+                'status'        => ! empty( $_POST['status'] ) ? sanitize_text_field( wp_unslash( $_POST['status'] ) ) : '',
+                'business_type' => ! empty( $_POST['business_type'] ) ? sanitize_text_field( wp_unslash( $_POST['business_type'] ) ) : '',
+            ]
         );
 
-        $existing_account_id = Meta::get_trashed_mangopay_account_id( $user_id );
-        if ( $existing_account_id ) {
-            Meta::update_mangopay_account_id( $user_id, $existing_account_id );
-        } else {
-            $existing_account_id = Meta::get_mangopay_account_id( $user_id );
-        }
-
-        // User already exists. It's an update request
-        if ( ! empty( $existing_account_id ) ) {
-            $response = User::update( $existing_account_id, $user_id, $data );
-
-            if ( ! $response || is_wp_error( $response ) ) {
-                wp_send_json_error( __( 'Something went wrong!', 'dokan' ) );
+        foreach ( $signup_fields as $key => $field ) {
+            if ( ! empty( $_POST[ $key ] ) ) {
+                $data[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $key ] ) );
+            } elseif ( ! empty( $field['required'] ) ) {
+                $error_notice[] = sprintf( esc_html__( '%s is required', 'dokan' ), $field['label'] );
             }
-
-            wp_send_json_success( __( 'Account connected sucessfully.', 'dokan' ) );
         }
 
-        $error_notice = array();
-
-        if ( empty( $data['date_of_birth'] ) ) {
-            $error_notice[] = __( 'Date of Birth is required', 'dokan' );
+        if ( 'EITHER' === Settings::get_default_vendor_status() && empty( $data['status'] ) ) {
+            $error_notice[] = esc_html__( 'Type of User is required', 'dokan' );
         }
 
-        if ( empty( $data['nationality'] ) ) {
-            $error_notice[] = __( 'Nationality is required', 'dokan' );
-        }
-
-        if ( 'EITHER' === Settings::get_default_vendor_status() && empty( $data['person_type'] ) ) {
-            $error_notice[] = __( 'Type of User is required', 'dokan' );
-        }
-
-        if ( 'EITHER' === Settings::get_default_business_type() && ! empty( $data['person_type'] ) && empty( $data['business_type'] ) ) {
-            $error_notice[] = __( 'Type of Business is required', 'dokan' );
+        if ( 'EITHER' === Settings::get_default_business_type() && ! empty( $data['status'] ) && empty( $data['business_type'] ) ) {
+            $error_notice[] = esc_html__( 'Type of Business is required', 'dokan' );
         }
 
         if ( ! empty( $error_notice ) ) {
             wp_send_json_error( implode( '<br>', $error_notice ) );
         }
 
-        if ( 'LEGAL' === $data['person_type'] ) {
+        $data['company_name'] = get_user_meta( $user_id, 'dokan_store_name', true );
+
+        if ( 'LEGAL' === $data['status'] ) {
             $store_info = dokan_get_store_info( $user_id );
 
             if (
@@ -412,11 +392,18 @@ class Ajax {
                 )
             ) {
                 wp_send_json_error(
-                    sprintf(
-                        /* translators: 1) opening anchor tag with link, 2) closing anchor tag */
-                        __( 'Your store address is required to be a MangoPay business user. Please go to your %1$sstore settings%2$s and update the address.', 'dokan' ),
-                        sprintf( '<a href="%s">', esc_url_raw( home_url( 'dashboard/settings/store' ) ) ),
-                        '</a>'
+                    wp_kses(
+                        sprintf(
+                            /* translators: 1) opening anchor tag with link, 2) closing anchor tag */
+                            __( 'Your store address is required to be a MangoPay business user. Please go to your %1$sstore settings%2$s and update the address.', 'dokan' ),
+                            sprintf( '<a href="%s">', esc_url_raw( dokan_get_navigation_url( 'settings/store' ) ) ),
+                            '</a>'
+                        ),
+                        [
+                            'a' => [
+                                'href' => true,
+                            ]
+                        ]
                     )
                 );
             }
@@ -461,7 +448,25 @@ class Ajax {
             wp_send_json_error( implode( '<br>', $error_notice ) );
         }
 
-        $response = User::create( $user_id, $data );
+        $existing_account_id = Meta::get_trashed_mangopay_account_id( $user_id );
+        if ( $existing_account_id ) {
+            Meta::update_mangopay_account_id( $user_id, $existing_account_id );
+        } else {
+            $existing_account_id = Meta::get_mangopay_account_id( $user_id );
+        }
+
+        // User already exists. It's an update request
+        if ( ! empty( $existing_account_id ) ) {
+            $response = User::update( $user_id, $data, false );
+
+            if ( ! $response || is_wp_error( $response ) ) {
+                wp_send_json_error( __( 'Something went wrong!', 'dokan' ) );
+            }
+
+            wp_send_json_success( __( 'Account connected sucessfully.', 'dokan' ) );
+        }
+
+        $response = User::create( $user_id, $data, false );
 
         if ( is_wp_error( $response ) ) {
             wp_send_json_error( $response->get_error_message() );
@@ -549,7 +554,7 @@ class Ajax {
                 'ubo_exists'          => $ubo_exists,
                 'show_create_button'  => $show_create_button,
                 'existing_account_id' => $account_id,
-                'fields'              => Helper::get_ubo_form_field(),
+                'fields'               => Helper::get_ubo_form_field(),
             )
         );
 

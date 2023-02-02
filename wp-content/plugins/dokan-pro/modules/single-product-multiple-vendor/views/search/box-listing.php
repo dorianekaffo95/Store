@@ -9,6 +9,13 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
+
+$new_product_url = add_query_arg(
+    [
+        '_dokan_add_product_nonce' => wp_create_nonce( 'dokan_add_product_nonce' ),
+    ],
+    dokan_get_navigation_url( 'new-product' )
+);
 ?>
 
 <div class="dokan-spmv-add-new-product-search-box-area dokan-w13">
@@ -32,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
         <?php elseif ( 'auction' === $type ) : ?>
             <a href="<?php echo esc_url( dokan_get_navigation_url( 'new-auction-product' ) ); ?>"><?php esc_html_e( 'Create New Auction Product', 'dokan' ); ?></a>
         <?php else : ?>
-            <a class="<?php echo ( 'on' === dokan_get_option( 'disable_product_popup', 'dokan_selling', 'off' ) ) ? '' : 'dokan-add-new-product'; ?>" href="<?php echo esc_url( dokan_get_navigation_url( 'new-product' ) ); ?>"><?php esc_html_e( 'Create New', 'dokan' ); ?></a>
+            <a class="<?php echo ( 'on' === dokan_get_option( 'disable_product_popup', 'dokan_selling', 'off' ) ) ? '' : 'dokan-add-new-product'; ?>" href="<?php echo esc_url( $new_product_url ); ?>"><?php esc_html_e( 'Create New', 'dokan' ); ?></a>
         <?php endif; ?>
 
     </div>

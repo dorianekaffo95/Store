@@ -6,20 +6,21 @@ defined( 'ABSPATH' ) || exit;
 
 use WC_Order;
 use Exception;
+use WC_Payment_Tokens;
 use WC_Payment_Gateway_CC;
 use WeDevs\Dokan\Exceptions\DokanException;
-use WeDevs\DokanPro\Modules\StripeExpress\Api\Source;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Order;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\UserMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\OrderMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Payment;
 use WeDevs\DokanPro\Modules\StripeExpress\Processors\Customer;
+use WeDevs\DokanPro\Modules\StripeExpress\Processors\Subscription;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Traits\PaymentUtils;
-use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Traits\Subscriptions;
+use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Traits\SubscriptionUtils;
 
 /**
- * Base class for Stripe credit cards.
+ * Base class for Stripe payment gateway.
  *
  * @since 3.6.1
  *
@@ -28,7 +29,7 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Traits\Subscriptions;
 abstract class PaymentGateway extends WC_Payment_Gateway_CC {
 
     use PaymentUtils;
-    use Subscriptions;
+    use SubscriptionUtils;
 
     /**
      * The delay between retries.
@@ -75,7 +76,7 @@ abstract class PaymentGateway extends WC_Payment_Gateway_CC {
     /**
      * Admin options in WC payments settings
      *
-     * @since 3.0.3
+     * @since 3.6.1
      *
      * @return void
      */
@@ -102,162 +103,209 @@ abstract class PaymentGateway extends WC_Payment_Gateway_CC {
     }
 
     /**
-	 * Process the payment.
-	 *
-	 * @since 3.6.2
-	 *
-	 * @param int  $order_id Reference.
-	 * @param bool $retry Should we retry on fail.
-	 * @param bool $force_save_source Force save the payment source.
-	 * @param mix  $previous_error Any error message from previous request.
-	 * @param bool $use_order_source Whether to use the source, which should already be attached to the order.
-	 *
-	 * @throws Exception If payment will not be accepted.
-	 * @return array|void
-	 */
-	public function process_payment( $order_id, $retry = true, $force_save_source = false, $previous_error = false, $use_order_source = false ) {
-		try {
-			$order = wc_get_order( $order_id );
+     * Process the payment.
+     *
+     * @since 3.6.2
+     *
+     * @param int    $order_id Reference.
+     * @param bool   $retry Should we retry on fail.
+     * @param bool   $force_save_source Force save the payment source.
+     * @param string $previous_error Any error message from previous request.
+     * @param bool   $use_order_source Whether to use the source, which should already be attached to the order.
+     *
+     * @throws Exception If payment will not be accepted.
+     * @return array|void
+     */
+    public function process_payment( $order_id, $retry = true, $force_save_source = false, $previous_error = false, $use_order_source = false ) {
+        // phpcs:disable WordPress.Security.NonceVerification.Missing
+        try {
+            $order = wc_get_order( $order_id );
 
-			if ( $this->has_subscription( $order_id ) ) {
-				$force_save_source = true;
-			}
+            if ( Subscription::is_subscription_order( $order_id ) ) {
+                $force_save_source = true;
+            }
 
-			// Check whether there is an existing intent.
-			$intent = Payment::get_intent( $order );
-			if ( isset( $intent->object ) && 'setup_intent' === $intent->object ) {
-				$intent = false; // We will only deal with payment intent here
-			}
+            if ( ! empty( $_POST['subscription_id'] ) ) {
+                $subscription_id = sanitize_text_field( wp_unslash( $_POST['subscription_id'] ) );
+                $subscription    = Subscription::get( $subscription_id );
+                $intent          = ! is_wp_error( $subscription ) ? $subscription->latest_invoice->payment_intent : false;
 
-			$stripe_customer_id = null;
-			if ( $intent && ! empty( $intent->customer ) ) {
-				$stripe_customer_id = $intent->customer;
-			}
+                OrderMeta::update_stripe_subscription_id( $order, $subscription_id );
+                UserMeta::update_stripe_debug_subscription_id( $order->get_customer_id(), $subscription_id );
+                OrderMeta::save( $order );
+            } else {
+                // Check whether there is an existing intent.
+                $intent = Payment::get_intent( $order );
+                if ( isset( $intent->object ) && 'setup_intent' === $intent->object ) {
+                    $intent = false; // We will only deal with payment intent here
+                }
+            }
 
-			// For some payments the source should already be present in the order.
-			if ( $use_order_source ) {
-				$prepared_source = Order::prepare_source( $order );
-			} else {
-				$prepared_source = Payment::prepare_source( get_current_user_id(), $force_save_source, $stripe_customer_id );
-			}
+            $stripe_customer_id = null;
+            if ( $intent && ! empty( $intent->customer ) ) {
+                $stripe_customer_id = $intent->customer;
+            }
 
-			Helper::maybe_disallow_prepaid_card( $prepared_source->source_object );
-			Order::validate_source( $prepared_source );
-			Order::save_source( $order, $prepared_source );
+            // For some payments the source should already be present in the order.
+            if ( $use_order_source ) {
+                $prepared_source = Order::prepare_source( $order );
+            } else {
+                $prepared_source = Payment::prepare_source( get_current_user_id(), $force_save_source, $stripe_customer_id );
+            }
 
-			if ( 0 >= $order->get_total() ) {
-				return $this->complete_free_order( $order, $prepared_source, $force_save_source );
-			}
+            /*
+             * If we are using a saved payment method that is
+             * PaymentMethod (pm_) and not a Source (src_),
+             * we need to use the process_payment() from the
+             * Stripe class that uses Payment Method api
+             * instead of Source api.
+             */
+            if (
+                Helper::is_using_saved_payment_method() &&
+                ! empty( $prepared_source->payment_method ) &&
+                substr( $prepared_source->payment_method, 0, 3 ) === 'pm_'
+            ) {
+                return Helper::get_gateway_instance()->process_payment_with_saved_payment_method( $order_id );
+            }
 
-			// This will throw exception if not valid.
-			$this->validate_minimum_order_amount( $order );
+            Helper::maybe_disallow_prepaid_card( $prepared_source->payment_method_object );
 
-			Helper::log( "Processing payment for order $order_id for the amount of {$order->get_total()}", 'Order', 'info' );
+            if ( empty( $prepared_source->payment_method ) ) {
+                throw new DokanException(
+                    'invalid-source',
+                    __( 'Invalid Payment Source: Payment processing failed. Please retry.', 'dokan' )
+                );
+            }
 
-			if ( $intent ) {
-				$intent = Payment::update_intent( $intent, $order->get_id() );
-			} else {
-                unset( $prepared_source->source_object, $prepared_source->token_id, $prepared_source->token_saved );
-				$intent = Payment::create_intent( $order, $prepared_source );
-			}
+            Order::save_source( $order, $prepared_source );
 
-			// Confirm the intent after locking the order to make sure webhooks will not interfere.
-			if ( empty( $intent->error ) ) {
-				Order::lock_processing( $order, $intent );
-				$intent = Payment::confirm_intent( $intent, $prepared_source );
-			}
+            /**
+             * Process payment when needed.
+             *
+             * @since 3.7.8
+             *
+             * @param WC_Order $order             The order being processed.
+             * @param string   $payment_method_id The source of the payment.
+             */
+            do_action( 'dokan_stripe_express_process_payment', $order, $prepared_source->payment_method );
 
-			$force_save_source_value = apply_filters( 'dokan_stripe_express_force_save_source', $force_save_source, $prepared_source->source );
+            // This may be needed at a point next and so we need to store it as it will be unset.
+            $payment_method_object = $prepared_source->payment_method_object;
+            // Unset unnecessary indexes before hitting the intent api
+            unset( $prepared_source->payment_method_object );
 
-            // Handle intent error (if any) after confirming the intent.
-			if ( ! empty( $intent->error ) ) {
-				$this->maybe_remove_non_existent_customer( $intent->error, $order );
-				Order::unlock_processing( $order );
+            if ( 0 >= $order->get_total() ) {
+                return $this->complete_free_order( $order, $prepared_source, $force_save_source );
+            }
 
-                $error_message = Helper::get_error_message_from_response( $intent, $order );
-                $order->add_order_note( $error_message );
+            // This will throw exception if not valid.
+            $this->validate_minimum_order_amount( $order );
 
-		        throw new Exception( $error_message );
-			}
+            Helper::log( "Processing payment for order $order_id for the amount of {$order->get_total()}", 'Order', 'info' );
 
-			if ( 'succeeded' === $intent->status && ! Helper::is_using_saved_payment_method() && ( $this->save_payment_method_requested() || $force_save_source_value ) ) {
-				$source_object = $prepared_source->source_object;
-				$user_id       = get_current_user_id();
-				$customer      = Customer::set( $user_id );
+            if ( ! Subscription::is_recurring_vendor_subscription_order( $order_id ) ) {
+                if ( $intent ) {
+                    $intent = Payment::update_intent( $intent->id, $order->get_id() );
+                } else {
+                    $intent = Payment::create_intent( $order, $prepared_source );
+                }
 
-                if ( ( $user_id && 'reusable' === $source_object->usage ) ) {
-                    $response = $customer->add_source( $source_object->id );
+                // Confirm the intent after locking the order to make sure webhooks will not interfere.
+                if ( empty( $intent->error ) ) {
+                    Order::lock_processing( $order->get_id(), 'intent', $intent->id );
+                    $intent = Payment::confirm_intent( $intent, $prepared_source->payment_method );
+                }
 
-                    if ( ! empty( $response->error ) ) {
-                        throw new Exception( Helper::get_error_message_from_response( $response ) );
+                // Handle intent error (if any) after confirming the intent.
+                if ( ! empty( $intent->error ) ) {
+                    $this->maybe_remove_non_existent_customer( $intent->error, $order );
+                    Order::unlock_processing( $order->get_id() );
+
+                    $error_message = Helper::get_error_message_from_response( $intent, $order );
+                    $order->add_order_note( $error_message );
+
+                    throw new Exception( $error_message );
+                }
+            }
+
+            $force_save_source = apply_filters( 'dokan_stripe_express_force_save_source', $force_save_source, $prepared_source->payment_method );
+
+            if ( ! empty( $intent ) ) {
+                if ( 'requires_action' === $intent->status ) {
+                    Order::unlock_processing( $order );
+
+                    if ( is_wc_endpoint_url( 'order-pay' ) ) {
+                        return [
+                            'result'   => 'success',
+                            'redirect' => add_query_arg( 'dokan_stripe_express_confirmation', 1, $order->get_checkout_payment_url( false ) ),
+                        ];
                     }
 
-                    if ( is_wp_error( $response ) ) {
-                        throw new Exception( $response->get_error_message() );
+                    /*
+                     * This URL contains only a hash, which will be sent to `checkout.js` where it will be set like this:
+                     * `window.location = result.redirect`
+                     * Once this redirect is sent to JS, the `onHashChange` function will execute `handleCardPayment`.
+                     */
+                    return [
+                        'result'                => 'success',
+                        'redirect'              => $this->get_return_url( $order ),
+                        'payment_intent_secret' => $intent->client_secret,
+                        'save_payment_method'   => $this->save_payment_method_requested(),
+                    ];
+                }
+
+                if ( 'succeeded' === $intent->status && ! Helper::is_using_saved_payment_method() && ( $this->save_payment_method_requested() || $force_save_source ) ) {
+                    $user_id = get_current_user_id();
+
+                    if ( ( $user_id ) ) {
+                        $customer = Customer::set( $user_id );
+                        $response = $customer->attach_payment_method( $prepared_source->payment_method );
+
+                        if ( is_wp_error( $response ) ) {
+                            throw new Exception( $response->get_error_message() );
+                        }
+
+                        do_action( 'dokan_stripe_express_add_payment_method_success', $prepared_source->payment_method, $payment_method_object );
                     }
                 }
-			}
 
-			if ( ! empty( $intent ) ) {
-				// Use the last charge within the intent to proceed.
-				$response = end( $intent->charges->data );
+                // Use the last charge within the intent to proceed or the original response in case of SEPA
+                $response = Payment::get_latest_charge_from_intent( $intent );
+                if ( ! $response ) {
+                    $response = $intent;
+                }
 
-				if ( 'requires_action' === $intent->status ) {
-					Order::unlock_processing( $order );
+                Payment::process_response( $response, $order );
+            }
 
-					if ( is_wc_endpoint_url( 'order-pay' ) ) {
-						$redirect_url = add_query_arg( 'dokan_stripe_express_confirmation', 1, $order->get_checkout_payment_url( false ) );
+            // Remove cart.
+            if ( isset( WC()->cart ) ) {
+                WC()->cart->empty_cart();
+            }
 
-						return [
-							'result'   => 'success',
-							'redirect' => $redirect_url,
-						];
-					} else {
-						/**
-						 * This URL contains only a hash, which will be sent to `checkout.js` where it will be set like this:
-						 * `window.location = result.redirect`
-						 * Once this redirect is sent to JS, the `onHashChange` function will execute `handleCardPayment`.
-						 */
-						return [
-							'result'                => 'success',
-							'redirect'              => $this->get_return_url( $order ),
-							'payment_intent_secret' => $intent->client_secret,
-							'save_payment_method'   => $this->save_payment_method_requested(),
-						];
-					}
-				}
-			}
+            // Unlock the order.
+            Order::unlock_processing( $order );
 
-			// Process valid response.
-			Payment::process_response( $response, $order );
+            // Return thank you page redirect.
+            return [
+                'result'       => 'success',
+                'redirect'     => $this->get_return_url( $order ),
+            ];
+        } catch ( Exception $e ) {
+            wc_add_notice( $e->getMessage(), 'error' );
+            Helper::log( 'Error: ' . $e->getMessage() );
 
-			// Remove cart.
-			if ( isset( WC()->cart ) ) {
-				WC()->cart->empty_cart();
-			}
+            do_action( 'dokan_stripe_express_process_payment_error', $e, $order );
 
-			// Unlock the order.
-			Order::unlock_processing( $order );
+            $order->update_status( 'failed' );
 
-			// Return thank you page redirect.
-			return [
-				'result'   => 'success',
-				'redirect' => $this->get_return_url( $order ),
-			];
-		} catch ( Exception $e ) {
-			wc_add_notice( $e->getMessage(), 'error' );
-			Helper::log( 'Error: ' . $e->getMessage() );
-
-			do_action( 'dokan_stripe_express_process_payment_error', $e, $order );
-
-			$order->update_status( 'failed' );
-
-			return [
-				'result'   => 'fail',
-				'redirect' => '',
-			];
-		}
-	}
+            return [
+                'result'   => 'fail',
+                'redirect' => '',
+            ];
+        }
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
+    }
 
     /**
      * Displays the save to account checkbox.
@@ -322,31 +370,42 @@ abstract class PaymentGateway extends WC_Payment_Gateway_CC {
         ];
     }
 
+    /**
+     * Handles payment complete process of free orders.
+     *
+     * @since 3.6.1
+     *
+     * @param WC_Order $order
+     * @param object   $prepared_source
+     * @param boolean  $force_save_source
+     *
+     * @return array
+     */
     public function complete_free_order( $order, $prepared_source, $force_save_source ) {
-		if ( $force_save_source ) {
-			$intent = Payment::create_intent( $order, $prepared_source, true );
+        if ( $force_save_source ) {
+            $intent = Payment::create_intent( $order, $prepared_source, true );
 
-			if ( ! empty( $intent->client_secret ) ) {
-				// `get_return_url()` must be called immediately before returning a value.
-				return [
-					'result'              => 'success',
-					'redirect'            => $this->get_return_url( $order ),
-					'setup_intent_secret' => $intent->client_secret,
-				];
-			}
-		}
+            if ( ! empty( $intent->client_secret ) ) {
+                // `get_return_url()` must be called immediately before returning a value.
+                return [
+                    'result'              => 'success',
+                    'redirect'            => $this->get_return_url( $order ),
+                    'setup_intent_secret' => $intent->client_secret,
+                ];
+            }
+        }
 
-		// Remove cart.
-		WC()->cart->empty_cart();
+        // Remove cart.
+        WC()->cart->empty_cart();
 
-		$order->payment_complete();
+        $order->payment_complete();
 
-		// Return thank you page redirect.
-		return [
-			'result'   => 'success',
-			'redirect' => $this->get_return_url( $order ),
-		];
-	}
+        // Return thank you page redirect.
+        return [
+            'result'   => 'success',
+            'redirect' => $this->get_return_url( $order ),
+        ];
+    }
 
     /**
      * Includes the template for Stripe element form.
@@ -367,26 +426,13 @@ abstract class PaymentGateway extends WC_Payment_Gateway_CC {
      * @return string
      */
     public function testmode_description() {
-        echo wp_kses(
-            sprintf(
-                /* translators: link to Stripe testing page */
-                __( '%1$s%2$sTest mode:%3$s use the test VISA card 4242424242424242 with any expiry date and CVC. Other payment methods may redirect to a Stripe test page to authorize payment. More test card numbers are listed %4$shere%5$s.', 'dokan' ),
-                '<p class="testmode-info">',
-                '<strong>',
-                '</strong>',
-                '<a href="https://stripe.com/docs/testing" target="_blank">',
-                '</a>'
-            ),
-            [
-                'p'      => [
-                    'class' => true,
-                ],
-                'strong' => [],
-                'a'      => [
-                    'href' => true,
-                    'target' => true,
-                ],
-            ]
+        return sprintf(
+            /* translators: 1) opening strong tag, 2) closing strong tag, 3) opening anchor tag with link to stripe testing doc, 4) closing anchor tag  */
+            __( '%1$sTest mode:%2$s use the test VISA card 4242424242424242 with any expiry date and CVC. Other payment methods may redirect to a Stripe test page to authorize payment. For example, 4000002500003155 is a 3D secure test card. More test card numbers are listed %3$shere%4$s.', 'dokan' ),
+            '<strong>',
+            '</strong>',
+            '<a href="https://stripe.com/docs/testing" target="_blank">',
+            '</a>'
         );
     }
 
@@ -398,9 +444,42 @@ abstract class PaymentGateway extends WC_Payment_Gateway_CC {
      * @return boolean
      */
     public function save_payment_method_requested() {
-        $payment_method = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : Helper::get_gateway_id(); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $payment_method = isset( $_POST['payment_method'] ) ? sanitize_text_field( wp_unslash( $_POST['payment_method'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
-        return ! empty( $_POST[ "wc-$payment_method-new-payment-method" ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        return Helper::is_saved_card( $payment_method );
+    }
+
+    /**
+     * Checks if customer has saved payment methods.
+     *
+     * @since 3.7.8
+     *
+     * @param int $customer_id
+     *
+     * @return bool
+     */
+    public static function customer_has_saved_methods( $customer_id ) {
+        if ( empty( $customer_id ) ) {
+            return false;
+        }
+
+        $has_token = false;
+
+        $gateways = [
+            Helper::get_gateway_id(),
+            Helper::get_sepa_gateway_id(),
+        ];
+
+        foreach ( $gateways as $gateway ) {
+            $tokens = WC_Payment_Tokens::get_customer_tokens( $customer_id, $gateway );
+
+            if ( ! empty( $tokens ) ) {
+                $has_token = true;
+                break;
+            }
+        }
+
+        return $has_token;
     }
 
     /**
@@ -452,6 +531,27 @@ abstract class PaymentGateway extends WC_Payment_Gateway_CC {
         OrderMeta::save( $order );
 
         return true;
+    }
+
+    /**
+     * Check to see if we need to update the idempotency
+     * key to be different from previous charge request.
+     *
+     * @since 3.7.8
+     *
+     * @param object $source_object
+     * @param object $error
+     *
+     * @return bool
+     */
+    public function idempotency_key_update_needed( $source_object, $error ) {
+        return (
+            $error &&
+            1 < $this->retry_interval &&
+            ! empty( $source_object ) &&
+            'chargeable' === $source_object->status &&
+            Helper::is_same_idempotency_error( $error )
+        );
     }
 
     /**

@@ -3,6 +3,7 @@ namespace WeDevs\DokanPro\Modules\ProductAdvertisement;
 
 use phpDocumentor\Reflection\Types\Static_;
 use WP_Error;
+use Exception;
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
@@ -750,8 +751,101 @@ class Helper {
             $product->save();
 
             update_option( static::get_advertisement_base_product_option_key(), $product->get_id() );
-        } catch ( \Exception $exception ) {
+        } catch ( Exception $exception ) {
             return;
+        }
+    }
+
+    /**
+     * Purchase product advertisement.
+     *
+     * @since 3.7.13
+     *
+     * @param int $product_id
+     *
+     * @return array|Exception
+     *
+     * @throws Exception
+     */
+    public static function purchase_advertisement( $product_id ) {
+        try {
+            // check permission, don't let vendor staff view this section
+            if ( ! current_user_can( 'dokandar' ) ) {
+                throw new Exception( __( 'You do not have permission to use this action.', 'dokan' ), 400 );
+            }
+
+            // check if purchasing advertisement settings is enabled
+            if ( ! Helper::is_per_product_advertisement_enabled() && ! Helper::is_enabled_for_vendor_subscription() ) {
+                throw new Exception( __( 'Purchasing advertisement is restricted by admin.', 'dokan' ), 403 );
+            }
+
+            // get advertisement data
+            $advertisement_data = Helper::get_advertisement_data_for_insert( $product_id, get_current_user_id() );
+
+            if ( is_wp_error( $advertisement_data ) ) {
+                throw new Exception( $advertisement_data->get_error_message(), 400 );
+            }
+
+            // validate user can advertise product
+            if ( false !== $advertisement_data['can_advertise_for_free'] ) {
+                // prepare item for database
+                $args = [
+                    'product_id'         => $advertisement_data['product_id'],
+                    'created_via'        => false !== $advertisement_data['subscription_status'] && ! empty( $advertisement_data['subscription_remaining_slot'] ) ? 'subscription' : 'free', // possible values are order, admin, subscription, free
+                    'price'              => 0,
+                    'expires_after_days' => $advertisement_data['expires_after_days'],
+                    'status'             => 1, // 1 for active, 2 for inactive
+                ];
+
+                $manager  = new Manager();
+                $inserted = $manager->insert( $args );
+
+                if ( is_wp_error( $inserted ) ) {
+                    throw new Exception( $inserted->get_error_message(), 400 );
+                }
+
+                return [
+                    'message'       => __( 'Product has been successfully advertised.', 'dokan' ),
+                    'free_purchase' => true,
+                ];
+            }
+
+            // Add advertisement product to cart
+            $advertisement_product_id = Helper::get_advertisement_base_product();
+            if ( ! is_numeric( $advertisement_product_id ) ) {
+                throw new Exception( __( 'Invalid base advertisement product id. Please contact with site admin.', 'dokan' ), 400 );
+            }
+
+            $advertisement_product = wc_get_product( $advertisement_product_id );
+            if ( ! $advertisement_product ) {
+                throw new Exception( __( 'Invalid base advertisement product found. Please contact with site admin.', 'dokan' ), 400 );
+            }
+
+            if ( $advertisement_product->get_status() !== 'publish' ) {
+                throw new Exception( __( 'Base advertisement product status is not published. Please contact with site admin.', 'dokan' ), 400 );
+            }
+
+            // Add  product to cart
+            WC()->cart->empty_cart();
+            $cart_item_data = [
+                'dokan_product_advertisement'           => true,
+                'dokan_advertisement_product_id'        => $product_id,
+                'dokan_advertisement_cost'              => $advertisement_data['listing_price'],
+                'dokan_advertisement_expire_after_days' => $advertisement_data['expires_after_days'],
+            ];
+
+            $added = WC()->cart->add_to_cart( $advertisement_product_id, 1, '', '', $cart_item_data ); // phpcs:ignore
+
+            if ( $added ) {
+                return [
+                    'message'       => __( 'Product has been added to your cart.', 'dokan' ),
+                    'free_purchase' => false,
+                ];
+            }
+
+            throw new Exception( __( 'Something went wrong.', 'dokan' ), 400 );
+        } catch ( Exception $e ) {
+            return new WP_Error( 'dokan-error-purchase-product-advertisement', $e->getMessage(), [ 'status' => $e->getCode() ] );
         }
     }
 }

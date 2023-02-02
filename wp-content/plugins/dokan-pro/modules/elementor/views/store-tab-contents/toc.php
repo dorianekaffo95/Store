@@ -6,7 +6,7 @@ $vendor = dokan()->vendor->get( get_query_var( 'author' ) );
         <?php if( ! empty( $vendor->get_store_tnc() ) ): ?>
             <h2 class="headline"><?php esc_html_e( 'Terms And Conditions', 'dokan' ); ?></h2>
             <div>
-                <?php echo wp_kses_post( nl2br( $vendor->get_store_tnc() ) ); ?>
+                <?php echo wp_kses_post( wpautop( wptexturize( $vendor->get_store_tnc() ) ) ); ?>
             </div>
         <?php endif; ?>
     </div><!-- #store-toc -->

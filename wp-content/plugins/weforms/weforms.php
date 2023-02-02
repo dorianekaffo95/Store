@@ -5,7 +5,7 @@
  * Plugin URI: https://weformspro.com/
  * Author: weForms
  * Author URI: https://weformspro.com/
- * Version: 1.6.14
+ * Version: 1.6.16
  * License: GPL2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: weforms
@@ -55,7 +55,7 @@ final class WeForms {
      *
      * @var string
      */
-    public $version = '1.6.14';
+    public $version = '1.6.16';
 
     /**
      * Form field value seperator
@@ -99,8 +99,6 @@ final class WeForms {
 
         add_action( 'admin_init', [ $this, 'plugin_upgrades' ] );
         add_action( 'plugins_loaded', [ $this, 'init_plugin' ] );
-
-        $this->init_appsero();
     }
 
     /**

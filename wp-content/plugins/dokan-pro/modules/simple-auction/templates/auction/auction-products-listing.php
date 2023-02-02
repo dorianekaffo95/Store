@@ -42,6 +42,7 @@
                     'publish' => __( 'Publish', 'dokan' ),
                     'draft'   => __( 'Draft', 'dokan' ),
                     'pending' => __( 'Pending', 'dokan' ),
+                    'vacation' => __( 'Vacation', 'dokan' ),
                 ];
 
                 $search         = empty( $_GET['search'] ) ? '' : esc_sql( sanitize_text_field( wp_unslash( $_GET['search'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
@@ -267,7 +268,7 @@
                                     </td>
 
                                     <td class="post-status" data-title="<?php esc_attr_e( 'Status', 'dokan' ); ?>">
-                                        <label class="dokan-label <?php echo $product->get_status(); ?>"><?php echo dokan_get_post_status( $product->get_status() ); ?></label>
+                                    <label class="dokan-label <?php echo esc_attr( dokan_get_post_status_label_class( $product->get_status() ) ); ?>"><?php echo esc_html( dokan_get_post_status( $product->get_status() ) ); ?></label>
                                     </td>
 
                                     <td data-title="<?php esc_attr_e( 'SKU', 'dokan' ); ?>">

@@ -1,13 +1,3 @@
-<?php if ( ! empty( $signup_fields ) ) : ?>
-<div class="dokan-mangopay-signup" id="dokan-mangopay-signup">
-    <?php foreach ( $signup_fields as $key => $field ) :
-        if ( empty( $signup_data[ $key ] ) ) :
-            woocommerce_form_field( "dokan_user_$key", $field );
-        endif;
-    endforeach; ?>
-</div>
-<?php endif; ?>
-
 <div class="mp_payment_fields" id="dokan-mangopay-payment-options">
     <!-- Credit cards selector -->
     <?php if ( $credit_card_activated ) : ?>

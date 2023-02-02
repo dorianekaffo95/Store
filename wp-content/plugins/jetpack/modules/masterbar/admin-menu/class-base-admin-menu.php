@@ -8,6 +8,7 @@
 namespace Automattic\Jetpack\Dashboard_Customizations;
 
 use Automattic\Jetpack\Status;
+use Automattic\Jetpack\Status\Host;
 
 /**
  * Class Base_Admin_Menu
@@ -247,14 +248,8 @@ abstract class Base_Admin_Menu {
 	 * Enqueues scripts and styles.
 	 */
 	public function enqueue_scripts() {
-		$is_wpcom = defined( 'IS_WPCOM' ) && IS_WPCOM;
-
 		if ( $this->is_rtl() ) {
-			if ( $is_wpcom ) {
-				$css_path = 'rtl/admin-menu-rtl.css';
-			} else {
-				$css_path = 'admin-menu-rtl.css';
-			}
+			$css_path = 'admin-menu-rtl.css';
 		} else {
 			$css_path = 'admin-menu.css';
 		}
@@ -283,6 +278,7 @@ abstract class Base_Admin_Menu {
 			array(
 				'upsellNudgeJitm'  => wp_create_nonce( 'upsell_nudge_jitm' ),
 				'jitmDismissNonce' => wp_create_nonce( 'jitm_dismiss' ),
+				'isAtomic'         => ( new Host() )->is_woa_site(),
 			)
 		);
 	}

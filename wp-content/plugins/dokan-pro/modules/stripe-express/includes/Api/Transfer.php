@@ -27,7 +27,7 @@ class Transfer extends Api {
      * @param int|string $transfer_id
      * @param array      $args
      *
-     * @return object|false
+     * @return \Stripe\Transfer|false
      */
     public static function get( $transfer_id, $args = [] ) {
         try {
@@ -45,7 +45,7 @@ class Transfer extends Api {
      *
      * @param array $args
      *
-     * @return object
+     * @return \Stripe\Transfer
      * @throws DokanException
      */
     public static function create( $args = [] ) {
@@ -72,7 +72,7 @@ class Transfer extends Api {
      * @param string $transfer_id
      * @param array  $args
      *
-     * @return object
+     * @return \Stripe\Transfer
      * @throws DokanException
      */
     public static function reverse( $transfer_id, $args ) {

@@ -8,7 +8,7 @@ use Exception;
 use BadMethodCallException;
 use WeDevs\Dokan\Exceptions\DokanException;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
-use WeDevs\DokanPro\Modules\StripeExpress\Api\WebhookEndpoint;
+use WeDevs\DokanPro\Modules\StripeExpress\Processors\Webhook;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 
 /**
@@ -39,14 +39,13 @@ class WebhookEvents {
 
             if ( ! empty( $args[0] ) ) {
                 $event         = $args[0];
-                $payload       = $args[1];
                 $event_handler = self::construct_handler( $event );
 
                 if ( $event_handler instanceof WebhookEvent ) {
-                    return $event_handler->$method( $payload );
+                    return $event_handler->$method();
                 }
 
-                do_action( 'dokan_stripe_express_events', $event, $method, $payload );
+                do_action( 'dokan_stripe_express_events', $event, $method );
             }
         } catch ( Exception $e ) {
             Helper::log( sprintf( 'Webhook Rendering Error: %s', $e->getMessage() ) );
@@ -58,20 +57,20 @@ class WebhookEvents {
      *
      * @since 3.6.1
      *
-     * @param string $event
+     * @param \Stripe\Event $event
      *
      * @return WebhookEvent|void
      * @throws DokanException
      */
     public static function construct_handler( $event ) {
-        $events = WebhookEndpoint::get_supported_events();
+        $events = Webhook::get_supported_events();
         $class  = null;
 
-        if ( ! array_key_exists( $event, $events ) ) {
+        if ( ! array_key_exists( $event->type, $events ) ) {
             return;
         }
 
-        $class = $events[ $event ];
+        $class = $events[ $event->type ];
         $class = "\\WeDevs\\DokanPro\\Modules\\StripeExpress\\WebhookEvents\\{$class}";
 
         if ( ! class_exists( $class ) ) {

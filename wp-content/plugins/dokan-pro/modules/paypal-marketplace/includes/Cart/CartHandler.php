@@ -41,7 +41,13 @@ class CartHandler {
 
         $paypal_js_sdk_url = CartManager::get_paypal_sdk_url();
 
-        wp_register_script( 'dokan_paypal_sdk', $paypal_js_sdk_url, [], false, false ); //phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+        /*
+         * Setting the value of `version` parameter `null` will unset the `ver`
+         * query param when the script will be enqueued. We need to do this since
+         * PayPal doesn't recognize the parameter for their sdk script.
+         */
+        wp_register_script( 'dokan_paypal_sdk', $paypal_js_sdk_url, [], null, false ); //phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
+
         wp_register_script( 'dokan_paypal_checkout', DOKAN_PAYPAL_MP_ASSETS . 'js/paypal-checkout' . $suffix . '.js', [ 'dokan_paypal_sdk' ], time(), true ); // don't cache this script
         wp_register_style( 'dokan_paypal_payment_method', DOKAN_PAYPAL_MP_ASSETS . 'css/paypal-payment-method' . $suffix . '.css', [], $version );
     }

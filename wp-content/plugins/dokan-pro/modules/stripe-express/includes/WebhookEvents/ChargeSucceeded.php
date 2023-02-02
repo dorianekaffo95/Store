@@ -19,30 +19,19 @@ use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\WebhookEvent;
 class ChargeSucceeded extends WebhookEvent {
 
     /**
-     * Class constructor.
-     *
-     * @since 3.6.1
-     *
-     * @param object $event
-     */
-    public function __construct( $event ) {
-        $this->set( $event );
-    }
-
-    /**
      * Handles the event.
      *
      * @since 3.6.1
      *
-     * @param object $charge
-     *
      * @return void
      */
-    public function handle( $charge ) {
-        // The following payment methods are synchronous so does not need to be handle via webhook
+    public function handle() {
+        $charge = $this->get_payload();
+
+        // The following payment methods are synchronous so does not need to be handled via webhook
         if (
-            ( isset( $charge->source->type ) && 'card' === $charge->source->type ) ||
-            ( isset( $charge->source->type ) && 'three_d_secure' === $charge->source->type )
+            isset( $charge->payment_method_details->type ) &&
+            'card' === $charge->payment_method_details->type
         ) {
             return;
         }
@@ -50,7 +39,7 @@ class ChargeSucceeded extends WebhookEvent {
         $order = Order::get_order_by_charge_id( $charge->id );
 
         if ( ! $order ) {
-            Helper::log( 'Could not find order via charge ID: ' . $charge->id );
+            $this->log( 'Could not find order via charge ID: ' . $charge->id );
             return;
         }
 
@@ -71,18 +60,17 @@ class ChargeSucceeded extends WebhookEvent {
 
         OrderMeta::update_charge_captured( $order );
         OrderMeta::update_transaction_id( $order, $charge->id );
+        OrderMeta::save( $order );
 
         $order->payment_complete( $charge->id );
 
         $order->add_order_note(
             sprintf(
                 /* translators: 1) gateway title, 2) transaction id */
-                __( '[%1$s] Stripe charge complete (Charge ID: %2$s)', 'dokan' ),
+                __( '[%1$s] Charge complete (Charge ID: %2$s)', 'dokan' ),
                 Helper::get_gateway_title(),
                 $charge->id
             )
         );
-
-        OrderMeta::save( $order );
     }
 }

@@ -176,6 +176,11 @@ class Assets {
                 'version'   => $this->script_version,
                 'in_footer' => true,
             ],
+
+            'dokan-magnific-popup' => [
+                'src'       => DOKAN_PRO_PLUGIN_ASSEST . '/vendor/magnific/jquery.magnific-popup.min.js',
+                'deps'      => [ 'jquery' ],
+            ],
         ];
 
         /**
@@ -210,6 +215,9 @@ class Assets {
             'dokan-pro-wp-version-before-5-3' => [
                 'src'     => DOKAN_PRO_PLUGIN_ASSEST . '/css/wp-version-before-5-3.css',
                 'version' => $this->script_version,
+            ],
+            'dokan-magnific-popup' => [
+                'src'     => DOKAN_PRO_PLUGIN_ASSEST . '/vendor/magnific/magnific-popup.css',
             ],
         ];
 

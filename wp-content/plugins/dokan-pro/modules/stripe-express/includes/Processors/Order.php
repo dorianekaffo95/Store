@@ -5,13 +5,10 @@ namespace WeDevs\DokanPro\Modules\StripeExpress\Processors;
 defined( 'ABSPATH' ) || exit; // Exit if called directly
 
 use WC_Order;
-use Exception;
-use WC_Product;
-use WeDevs\Dokan\Exceptions\DokanException;
-use WeDevs\DokanPro\Modules\StripeExpress\Api\Source;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\UserMeta;
 use WeDevs\DokanPro\Modules\StripeExpress\Support\OrderMeta;
+use WeDevs\DokanPro\Modules\StripeExpress\Api\PaymentMethod;
 
 /**
  * Class for processing orders.
@@ -28,7 +25,7 @@ class Order {
      * @since 3.6.1
      *
      * @param WC_Order $order
-     * @param object $source
+     * @param object   $source
      *
      * @return void
      */
@@ -37,138 +34,64 @@ class Order {
             OrderMeta::update_customer_id( $order, $source->customer );
         }
 
-        if ( $source->source ) {
-            OrderMeta::update_source_id( $order, $source->source );
+        if ( $source->payment_method ) {
+            OrderMeta::update_payment_method_id( $order, $source->payment_method );
         }
 
         OrderMeta::save( $order );
-    }
 
-    /**
-     * Checks whether a source exists.
-     *
-     * @since 3.6.1
-     *
-     * @param object $prepared_source The source that should be verified.
-     * @throws Exception
-     */
-    public static function validate_source( $prepared_source ) {
-        if ( empty( $prepared_source->source ) ) {
-            throw new DokanException(
-                'invalid-source',
-                __( 'Invalid Payment Source: Payment processing failed. Please retry.', 'dokan' )
-            );
-        }
-
-        if ( ! empty( $prepared_source->source_object->status ) && 'consumed' === $prepared_source->source_object->status ) {
-            throw new DokanException(
-                'invalid-source',
-                sprintf(
-                    /* translators: payment method endpoint url */
-                    __( 'Payment processing failed. Please try again with a different card. If it\'s a saved card, <a href="%s" target="_blank">remove it first</a> and try again.', 'dokan' ),
-                    wc_get_account_endpoint_url( 'payment-methods' )
-                )
-            );
-        }
+        /**
+         * Hooks when payment method data are updated for an order.
+         *
+         * @since 3.7.8
+         *
+         * @param WC_Order              $order
+         * @param \Stripe\PaymentMethod $payment_method
+         */
+        do_action( 'dokan_stripe_express_save_payment_method_data', $order, $source->payment_method_object );
     }
 
     /**
      * Get payment source from an order. This could be used in the future for
      * a subscription as an example, therefore using the current user ID would
-     * not work - the customer won't be logged in :)
-     *
-     * Not using 2.6 tokens for this part since we need a customer AND a card
-     * token, and not just one.
+     * not work when the customer won't be logged in.
      *
      * @since 3.6.1
      *
-     * @param object $order
+     * @param WC_Order $order
      *
-     * @return object
-     * @throws Exception
+     * @return object{customer:string|false,payment_method:string|null,payment_method_object:\Stripe\PaymentMethod|false}
      */
     public static function prepare_source( $order = null ) {
-        $stripe_customer = Customer::set();
-        $stripe_source   = false;
-        $token_id        = false;
-        $source_object   = false;
+        $stripe_customer   = Customer::set();
+        $payment_method_id = '';
+        $payment_method    = false;
 
-        if ( $order ) {
+        if ( $order instanceof WC_Order ) {
             $stripe_customer_id = self::get_stripe_customer_id_from_order( $order );
 
             if ( $stripe_customer_id ) {
                 $stripe_customer->set_id( $stripe_customer_id );
             }
 
-            $source_id = OrderMeta::get_source_id( $order );
+            $payment_method_id = OrderMeta::get_payment_method_id( $order );
 
-            // Since 4.0.0, we changed card to source so we need to account for that.
-            if ( empty( $source_id ) ) {
-                $source_id = OrderMeta::get_card_id( $order );
-
-                // Take this opportunity to update the key name.
-                OrderMeta::update_source_id( $order, $source_id );
-                OrderMeta::save( $order );
-            }
-
-            if ( $source_id ) {
-                $stripe_source = $source_id;
-                $source_object = Source::get( $source_id );
-            } elseif ( apply_filters( 'dokan_stripe_express_use_default_customer_source', true ) ) {
+            if ( $payment_method_id ) {
+                $payment_method = PaymentMethod::get( $payment_method_id );
+            } elseif ( apply_filters( 'dokan_stripe_express_use_default_customer_payment_method', true ) ) {
                 /*
                  * We can attempt to charge the customer's default source
                  * by sending empty source id.
                  */
-                $stripe_source = '';
+                $payment_method_id = '';
             }
         }
 
         return (object) [
-            'token_id'      => $token_id,
-            'customer'      => $stripe_customer ? $stripe_customer->get_id() : false,
-            'source'        => $stripe_source,
-            'source_object' => $source_object,
+            'customer'              => $stripe_customer ? $stripe_customer->get_id() : false,
+            'payment_method'        => $payment_method_id,
+            'payment_method_object' => $payment_method,
         ];
-    }
-
-    /**
-     * Checks if a order is a subscription order.
-     *
-     * @since 3.6.1
-     *
-     * @param WC_Order $order
-     *
-     * @return boolean
-     */
-    public static function is_subscription_order( WC_Order $order ) {
-        if ( ! Helper::has_subscription_module() ) {
-            return false;
-        }
-
-        $product = self::get_subscription_product_by_order( $order );
-
-        return $product ? true : false;
-    }
-
-    /**
-     * Get subscription product from an order.
-     *
-     * @since 3.6.1
-     *
-     * @param WC_Order $order
-     *
-     * @return \WC_Product|null
-     */
-    public static function get_subscription_product_by_order( WC_Order $order ) {
-        foreach ( $order->get_items() as $item ) {
-            $product = wc_get_product( $item['product_id'] );
-
-            if ( 'product_pack' === $product->get_type() ) {
-                return $product;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -179,7 +102,7 @@ class Order {
      *
      * @param WC_Order $order
      *
-     * @return array
+     * @return WC_Order[]
      */
     public static function get_all_orders_to_be_processed( $order ) {
         $all_orders = [];
@@ -209,24 +132,27 @@ class Order {
      *
      * @since 3.6.1
      *
-     * @param WC_Order $order
-     * @param object   $intent
+     * @param WC_Order              $order
+     * @param \Stripe\PaymentIntent $intent
      *
-     * @return string|false on failure
+     * @return string|false
      */
     public static function get_charge_id( WC_Order $order, $intent = false ) {
         if ( ! $intent || ! is_object( $intent ) ) {
             $intent = Payment::get_intent( $order );
         }
 
-        if ( ! $intent || ! is_object( $intent ) ) {
+        if ( ! $intent ) {
             return false;
         }
 
-        $charges    = ! empty( $intent->charges->data ) ? $intent->charges->data : [];
-        $charge_ids = wp_list_pluck( $charges, 'id' );
+        $charge = Payment::get_latest_charge_from_intent( $intent );
 
-        return is_array( $charge_ids ) && isset( $charge_ids[0] ) ? $charge_ids[0] : false;
+        if ( $charge instanceof \Stripe\Charge ) {
+            return $charge->id;
+        }
+
+        return false;
     }
 
     /**
@@ -241,6 +167,9 @@ class Order {
      * @return float
      */
     public static function get_fee_for_suborder( $processing_fee, $suborder, $order ) {
+        if ( ! Helper::is_payment_needed( $order->get_id() ) ) {
+            return 0;
+        }
         $stripe_fee_for_vendor = $processing_fee * ( $suborder->get_total() / $order->get_total() );
         return number_format( $stripe_fee_for_vendor, 10 );
     }
@@ -305,9 +234,9 @@ class Order {
      *
      * @since 3.6.1
      *
-     * @param \WC_Order                      $order
+     * @param WC_Order                       $order
      * @param \WeDevs\DokanPro\Refund\Refund $dokan_refund
-     * @param \MangoPay\Refund               $mangopay_refund
+     * @param \Stripe\Refund                 $stripe_refund
      *
      * @return boolean
      */
@@ -315,11 +244,12 @@ class Order {
         $order->add_order_note(
             sprintf(
                 /* translators: 1) gateway title, 2) refund amount, 3) refund id, 4) refund reason */
-                __( '[%1$s]. Refunded %2$s. Refund ID: %3$s. Reason - %4$s', 'dokan' ),
+                __( '[%1$s]. Refunded %2$s. Refund ID: %3$s.%4$s', 'dokan' ),
                 Helper::get_gateway_title(),
                 wc_price( $dokan_refund->get_refund_amount(), [ 'currency' => $order->get_currency() ] ),
                 $stripe_refund->id,
-                $dokan_refund->get_refund_reason()
+                /* translators: refund reason */
+                ! empty( $dokan_refund->get_refund_reason() ) ? sprintf( __( 'Reason - %s', 'dokan' ), $dokan_refund->get_refund_reason() ) : ''
             )
         );
 
@@ -348,43 +278,45 @@ class Order {
     }
 
     /**
-     * Locks an order for payment intent processing for 5 minutes.
+     * Locks an order for processing specific operation for 5 minutes.
      *
      * @since 3.6.1
+     * @since 3.7.8 Replaced parameter `$order` by `$order_id`. Added `$processing_type` as an optional parameter instead of `$intent`. Also added optional `$data` to serve the purpose of passing extra data.
      *
-     * @param WC_Order $order  The order that is being paid.
-     * @param object   $intent The intent that is being processed.
+     * @param int    $order_id        ID of the order that is being paid.
+     * @param string $processing_type (Optional) The operation type that is being processed. Default is `intent`.
+     * @param string $data            (Optional) A specific data to be used for locking. For example, it can be the intent id while processing an intent. Default is `-1`
      *
-     * @return bool            A flag that indicates whether the order is already locked.
+     * @return bool A flag that indicates whether the order is already locked.
      */
-    public static function lock_processing( $order, $intent = null ) {
-        $order_id   = $order->get_id();
-        $transient  = 'dokan_stripe_express_processing_intent_' . $order_id;
+    public static function lock_processing( $order_id, $processing_type = 'intent', $data = '-1' ) {
+        $transient  = "dokan_stripe_express_processing_{$processing_type}_{$order_id}";
         $processing = get_transient( $transient );
 
         // Block the process if the same intent is already being handled.
-        if ( '-1' === $processing || ( isset( $intent->id ) && $processing === $intent->id ) ) {
+        if ( '-1' === $processing || ( '-1' !== $data && $processing === $data ) ) {
             return true;
         }
 
         // Save the new intent as a transient, eventually overwriting another one.
-        set_transient( $transient, empty( $intent ) ? '-1' : $intent->id, 5 * MINUTE_IN_SECONDS );
+        set_transient( $transient, empty( $data ) ? '-1' : $data, 5 * MINUTE_IN_SECONDS );
 
         return false;
     }
 
     /**
-     * Unlocks an order for processing by payment intents.
+     * Unlocks an order for processing specific operation.
      *
      * @since 3.6.1
+     * @since 3.7.8 Replaced parameter `$order` by `$order_id`. Added `$processing_type` as an optional parameter.
      *
-     * @param WC_Order $order The order that is being unlocked.
+     * @param int    $order_id        ID of the order that is being unlocked.
+     * @param string $processing_type (Optional) The operation type that is being processed. Default is `intent`.
      *
      * @return void
      */
-    public static function unlock_processing( $order ) {
-        $order_id = $order->get_id();
-        delete_transient( 'dokan_stripe_express_processing_intent_' . $order_id );
+    public static function unlock_processing( $order_id, $processing_type = 'intent' ) {
+        delete_transient( "dokan_stripe_express_processing_{$processing_type}_{$order_id}" );
     }
 
     /**
@@ -397,8 +329,7 @@ class Order {
      * @return string
      */
     public static function get_transaction_url( $order ) {
-        $gateways = WC()->payment_gateways()->payment_gateways();
-        $gateway  = $gateways[ Helper::get_gateway_id() ];
+        $gateway = Helper::get_gateway_instance();
 
         if ( $gateway->testmode ) {
             $gateway->view_transaction_url = 'https://dashboard.stripe.com/test/payments/%s';
@@ -433,12 +364,7 @@ class Order {
                 ON posts.ID = meta.post_id
                 WHERE meta.meta_value = %s
                 AND meta.meta_key = %s
-                AND posts.ID IN (
-                    SELECT DISTINCT post_id
-                    FROM $wpdb->postmeta
-                    WHERE meta_key = 'has_sub_order'
-                    AND meta_value = '1'
-                )",
+                AND posts.post_parent = '0'",
                 $charge_id,
                 OrderMeta::transaction_id_key()
             )
@@ -449,6 +375,11 @@ class Order {
         }
 
         $order = wc_get_order( $order_id );
+        if ( ! $order instanceof WC_Order ) {
+            return false;
+        }
+
+        return $order;
     }
 
     /**
@@ -471,49 +402,26 @@ class Order {
                 LEFT JOIN $wpdb->postmeta as meta
                 ON posts.ID = meta.post_id
                 WHERE meta.meta_value = %s
-                AND meta.meta_key = %s",
+                AND (
+                    meta.meta_key = %s
+                    OR meta.meta_key = %s
+                )",
                 $intent_id,
-                OrderMeta::intent_id_key( $is_setup )
+                OrderMeta::intent_id_key( $is_setup ),
+                OrderMeta::debug_intent_id_key( $is_setup )
             )
         );
 
-        if ( ! empty( $order_id ) ) {
-            return wc_get_order( $order_id );
+        if ( empty( $order_id ) ) {
+            return false;
         }
 
-        return false;
-    }
-
-    /**
-     * Retrieves order by source id.
-     *
-     * @since 3.6.1
-     *
-     * @param string  $source_id
-     *
-     * @return WC_Order|false
-     */
-    public static function get_order_by_source_id( $source_id ) {
-        global $wpdb;
-
-        $order_id = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT DISTINCT ID
-                FROM $wpdb->posts as posts
-                LEFT JOIN $wpdb->postmeta as meta
-                ON posts.ID = meta.post_id
-                WHERE meta.meta_value = %s
-                AND meta.meta_key = %s",
-                $source_id,
-                OrderMeta::source_id_key()
-            )
-        );
-
-        if ( ! empty( $order_id ) ) {
-            return wc_get_order( $order_id );
+        $order = wc_get_order( $order_id );
+        if ( ! $order instanceof WC_Order ) {
+            return false;
         }
 
-        return false;
+        return $order;
     }
 
     /**
@@ -541,15 +449,158 @@ class Order {
      *
      * @since 3.6.1
      *
-     * @param \WC_Order $order
+     * @param WC_Order $order
      *
      * @return WP_User
      */
-    public static function get_user_from_order( \WC_Order $order ) {
+    public static function get_user_from_order( WC_Order $order ) {
         $user = $order->get_user();
         if ( false === $user ) {
             $user = wp_get_current_user();
         }
         return $user;
+    }
+
+    /**
+     * Validates cart contents to ensure they're allowed to be paid through Stripe Express.
+     *
+     * @since 3.7.8
+     *
+     * @return boolean
+     */
+    public static function validate_cart_items() {
+        $is_valid = true;
+
+        /*
+         * This payment method can't be used if a Vendor is not connected
+         * to Stripe express. So we need to traverse all the cart items
+         * to check if any vendor is not connected.
+         */
+        if ( ! empty( WC()->cart->cart_contents ) ) {
+            foreach ( WC()->cart->cart_contents as $item ) {
+                $product_id = $item['data']->get_id();
+
+                /*
+                 * If it contains vendor subscription product,
+                 * we don't need to check whether the vendor is connected or not.
+                 * Because in this case, the vendors themselves are customers.
+                 */
+                if ( Subscription::is_vendor_subscription_product( $product_id ) ) {
+                    $is_valid = true;
+                    break;
+                }
+
+                // Get vendor id from product id
+                $vendor_id = dokan_get_vendor_by_product( $product_id, true );
+                if ( ! $vendor_id ) {
+                    $is_valid = false;
+                    break;
+                }
+
+                /*
+                 * If any vendor is not registered for a Stripe express account,
+                 * and/or not enabled for payouts, the gateway is not available for checkout.
+                 */
+                if ( ! Helper::is_seller_activated( $vendor_id ) ) {
+                    $is_valid = false;
+                    break;
+                }
+            }
+        }
+
+        /**
+         * Filter to validate cart items.
+         * It can be used in case of any other validation logic.
+         *
+         * @since 3.7.8
+         *
+         * @param boolean $is_valid
+         */
+        return apply_filters( 'dokan_stripe_express_validate_cart_items', $is_valid );
+    }
+
+    /**
+     * Checks if authentication has already failed for order.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     *
+     * @return boolean
+     */
+    public static function check_if_authentication_failed( $order ) {
+        $existing_intent = Payment::get_intent( $order );
+
+        if (
+            ! $existing_intent
+            || 'requires_payment_method' !== $existing_intent->status
+            || empty( $existing_intent->last_payment_error )
+            || 'authentication_required' !== $existing_intent->last_payment_error->code
+        ) {
+            return false;
+        }
+
+        /**
+         * Triggers when a payment attempt failed because SCA is required.
+         *
+         * @since 3.7.8
+         *
+         * @param WC_Order $order The order that is being renewed.
+         */
+        do_action( 'dokan_stripe_express_process_payment_authentication_required', $order );
+
+        // Fail the payment attempt (order would be currently pending because of retry rules).
+        $charge = Payment::get_latest_charge_from_intent( $existing_intent );
+
+        $order->update_status(
+            'failed',
+            /* translators: %s) stripe charge id */
+            sprintf(
+                __( 'Stripe charge%s has awaiting authentication by user.', 'dokan' ),
+                isset( $charge->id ) ? " ($charge->id)" : ''
+            )
+        );
+
+        return true;
+    }
+
+    /**
+     * Checks if the payment intent associated with an order failed and records the event.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order              $order  The order which should be checked.
+     * @param \Stripe\PaymentIntent $intent The intent, associated with the order.
+     *
+     * @return void
+     */
+    public static function process_failed_sca_auth( $order, $intent ) {
+        // If the order has already failed, do not repeat the same message.
+        if ( $order->has_status( 'failed' ) ) {
+            return;
+        }
+
+        $order->update_status(
+            'failed',
+            isset( $intent->last_payment_error )
+                /* translators: error message */
+                ? sprintf( __( 'Stripe SCA authentication failed. Reason: %s', 'dokan' ), $intent->last_payment_error->message )
+                : __( 'Stripe SCA authentication failed.', 'dokan' )
+        );
+    }
+
+    /**
+     * Adds order note.
+     *
+     * @since 3.7.8
+     *
+     * @param WC_Order $order
+     * @param string   $note
+     *
+     * @return void
+     */
+    public static function add_note( WC_Order $order, $note ) {
+        /* translators: order note */
+        $order->add_order_note( sprintf( __( '[Stripe Express] %s', 'dokan' ), $note ) );
     }
 }

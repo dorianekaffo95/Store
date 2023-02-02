@@ -8,7 +8,7 @@ use WeDevs\DokanPro\Modules\StripeExpress\Support\Helper;
 use WeDevs\DokanPro\Modules\StripeExpress\Utilities\Abstracts\PaymentMethod;
 
 /**
- * Gateway handler class for Stripe Credit/Debit Cards.
+ * Payment method handler class for Stripe iDeal.
  *
  * @since 3.6.1
  *
@@ -52,5 +52,17 @@ class Ideal extends PaymentMethod {
             'iDEAL is a Netherlands-based payment method that allows customers to complete transactions online using their bank credentials.',
             'dokan'
         );
+    }
+
+    /**
+     * Returns string representing payment method type
+     * to query to retrieve saved payment methods from Stripe.
+     *
+     * @since 3.7.8
+     *
+     * @return string|null
+     */
+    public function get_retrievable_type() {
+        return $this->is_reusable() ? Sepa::STRIPE_ID : null;
     }
 }
